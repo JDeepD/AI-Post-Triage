@@ -121,8 +121,15 @@ final class Healthcheck implements CLI_Command {
 			),
 			'api_key'           => self::result(
 				'' !== OpenRouter_Client::api_key(),
-				'An OpenRouter API key is set.',
-				sprintf( 'No OpenRouter API key. Define %s or connect OpenRouter.', OpenRouter_Client::KEY_CONSTANT )
+				sprintf(
+					'An OpenRouter API key is set%s.',
+					[
+						OpenRouter_Client::SOURCE_CONSTANT => ' by the constant',
+						OpenRouter_Client::SOURCE_SETTINGS => ' on the settings screen',
+						OpenRouter_Client::SOURCE_CONNECTOR => ' by the OpenRouter connector',
+					][ OpenRouter_Client::key_source() ] ?? ''
+				),
+				sprintf( 'No OpenRouter API key. Save one on the Wire Desk settings screen, define %s, or connect OpenRouter.', OpenRouter_Client::KEY_CONSTANT )
 			),
 		];
 

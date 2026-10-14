@@ -9,6 +9,8 @@ declare( strict_types = 1 );
 
 namespace JDeepD\Wire_Desk\Decisions;
 
+use JDeepD\Wire_Desk\Modules\Settings\Api_Key;
+
 /**
  * Class - OpenRouter_Client
  *
@@ -36,11 +38,17 @@ final class OpenRouter_Client implements Decision_Client {
 	private const TIMEOUT = 15;
 
 	/**
-	 * The OpenRouter API key, from the constant or the OpenRouter connector.
+	 * Where the key comes from.
+	 */
+	public const SOURCE_CONSTANT  = 'constant';
+	public const SOURCE_SETTINGS  = 'settings';
+	public const SOURCE_CONNECTOR = 'connector';
+
+	/**
+	 * The OpenRouter API key: the constant, then the key saved on the settings screen, then the OpenRouter connector.
 	 */
 	public static function api_key(): string {
-		$key = defined( self::KEY_CONSTANT ) ? constant( self::KEY_CONSTANT ) : '';
-		$key = is_string( $key ) && '' !== $key ? $key : self::connector_key();
+		$key = self::configured_key()[0];
 
 		/**
 		 * Filters the OpenRouter API key.
@@ -50,6 +58,36 @@ final class OpenRouter_Client implements Decision_Client {
 		$key = apply_filters( 'wire_desk/openrouter_api_key', $key );
 
 		return is_string( $key ) ? trim( $key ) : '';
+	}
+
+	/**
+	 * Where the key comes from, before the filter: one of the SOURCE_* constants, or an empty string for none.
+	 */
+	public static function key_source(): string {
+		return self::configured_key()[1];
+	}
+
+	/**
+	 * The configured key and where it comes from.
+	 *
+	 * @return array{0: string, 1: string}
+	 */
+	private static function configured_key(): array {
+		$constant = defined( self::KEY_CONSTANT ) ? constant( self::KEY_CONSTANT ) : '';
+
+		if ( is_string( $constant ) && '' !== trim( $constant ) ) {
+			return [ trim( $constant ), self::SOURCE_CONSTANT ];
+		}
+
+		$saved = Api_Key::get();
+
+		if ( '' !== $saved ) {
+			return [ $saved, self::SOURCE_SETTINGS ];
+		}
+
+		$connector = self::connector_key();
+
+		return '' !== $connector ? [ $connector, self::SOURCE_CONNECTOR ] : [ '', '' ];
 	}
 
 	/**

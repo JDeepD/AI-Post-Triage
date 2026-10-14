@@ -97,6 +97,7 @@ function delete_options(): void {
 		PLUGIN_PREFIX . 'settings', // Set by Modules\Settings\Settings.
 		PLUGIN_PREFIX . 'usage', // Set by Jobs\Usage.
 		PLUGIN_PREFIX . 'backfill', // Set by Jobs\Backfill.
+		PLUGIN_PREFIX . 'openrouter_api_key', // Set by Modules\Settings\Api_Key.
 	];
 
 	foreach ( $options as $option ) {

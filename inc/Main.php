@@ -37,6 +37,7 @@ final class Main {
 		Modules\Queue\Queue_Screen::class,
 		Modules\REST\Posts_Controller::class,
 		Modules\Settings\Admin_Screen::class,
+		Modules\Settings\Api_Key::class,
 		Modules\Settings\Rescore_Controller::class,
 		Modules\Settings\Settings::class,
 		Modules\Settings\Term_Search_Controller::class,

@@ -7,14 +7,32 @@
 
 declare(strict_types = 1);
 
-/** @var array{id: string, name: string, taxonomies: \WP_Taxonomy[], selected: array<string, \WP_Term[]>} $args */
+/** @var array{id: string, name: string, taxonomies: \WP_Taxonomy[], post_types: array<string, string[]>, selected: array<string, \WP_Term[]>} $args */
 ?>
 <div id="<?php echo esc_attr( $args['id'] ); ?>" class="wire-desk-terms">
 	<input type="hidden" name="<?php echo esc_attr( $args['name'] ); ?>[_]" value="" />
 	<?php foreach ( $args['taxonomies'] as $taxonomy ) : ?>
 		<?php $input_name = $args['name'] . '[' . $taxonomy->name . '][]'; ?>
 		<fieldset class="wire-desk-terms-taxonomy" data-wire-desk-terms data-taxonomy="<?php echo esc_attr( $taxonomy->name ); ?>" data-input-name="<?php echo esc_attr( $input_name ); ?>">
-			<legend><?php echo esc_html( $taxonomy->labels->name ); ?></legend>
+			<legend>
+				<?php echo esc_html( $taxonomy->labels->name ); ?>
+				<code><?php echo esc_html( $taxonomy->name ); ?></code>
+				<span class="wire-desk-terms-meta">
+					<?php
+					echo esc_html(
+						sprintf(
+							/* translators: %s: post type names, such as Posts, Wire items. */
+							__( 'on %s', 'wire-desk' ),
+							implode( ', ', $args['post_types'][ $taxonomy->name ] ?? [] )
+						)
+					);
+
+					if ( ! $taxonomy->show_ui ) {
+						echo ' · ' . esc_html__( 'no admin screen', 'wire-desk' );
+					}
+					?>
+				</span>
+			</legend>
 			<ul class="wire-desk-terms-selected" data-wire-desk-selected-terms>
 				<?php foreach ( $args['selected'][ $taxonomy->name ] ?? [] as $term ) : ?>
 					<li>

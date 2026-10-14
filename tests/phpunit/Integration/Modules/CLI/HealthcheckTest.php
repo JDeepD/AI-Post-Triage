@@ -15,6 +15,7 @@ use JDeepD\Wire_Desk\Jobs\Maintenance;
 use JDeepD\Wire_Desk\Jobs\Queue;
 use JDeepD\Wire_Desk\Jobs\Usage;
 use JDeepD\Wire_Desk\Modules\CLI\Healthcheck;
+use JDeepD\Wire_Desk\Modules\Settings\Api_Key;
 use JDeepD\Wire_Desk\Modules\Settings\Settings;
 use JDeepD\Wire_Desk\Tests\Fakes\Fake_WP_CLI;
 use JDeepD\Wire_Desk\Tests\TestCase;
@@ -89,6 +90,10 @@ class HealthcheckTest extends TestCase {
 
 		$this->assertSame( Healthcheck::PASS, $checks['api_key']['status'] );
 		$this->assertSame( Healthcheck::PASS, $checks['prune_job']['status'] );
+
+		Api_Key::save( 'sk-or-v1-saved00000' );
+
+		$this->assertSame( 'An OpenRouter API key is set on the settings screen.', Healthcheck::checks( false )['api_key']['message'] );
 	}
 
 	/**
@@ -166,7 +171,7 @@ class HealthcheckTest extends TestCase {
 		Healthcheck::run( [], [ 'skip-remote' => true ] );
 
 		$this->assertSame( 'Wire Desk Health Check', Fake_WP_CLI::$logs[0] );
-		$this->assertContains( '  api_key: ✗ FAIL  No OpenRouter API key. Define WIRE_DESK_OPENROUTER_API_KEY or connect OpenRouter.', Fake_WP_CLI::$logs );
+		$this->assertContains( '  api_key: ✗ FAIL  No OpenRouter API key. Save one on the Wire Desk settings screen, define WIRE_DESK_OPENROUTER_API_KEY, or connect OpenRouter.', Fake_WP_CLI::$logs );
 		$this->assertSame( [ 'One or more health checks failed. Please investigate the issues above.' ], Fake_WP_CLI::$errors );
 		$this->assertSame( [], Fake_WP_CLI::$successes );
 	}

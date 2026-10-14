@@ -12,9 +12,12 @@ namespace JDeepD\Wire_Desk\Tests\Integration\Decisions;
 use JDeepD\Wire_Desk\Decisions\Decision;
 use JDeepD\Wire_Desk\Decisions\Decision_Client;
 use JDeepD\Wire_Desk\Decisions\OpenRouter_Client;
+use JDeepD\Wire_Desk\Modules\Settings\Api_Key;
 use JDeepD\Wire_Desk\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use WP_Connector_Registry;
 
 /**
@@ -428,6 +431,49 @@ class OpenRouter_ClientTest extends TestCase {
 		putenv( self::CONNECTOR_ENV . '=sk-or-env' ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_putenv -- Test setup.
 
 		$this->assertSame( 'sk-or-env', OpenRouter_Client::api_key() );
+	}
+
+	/**
+	 * Test that the key saved on the settings screen is used, ahead of the connector.
+	 */
+	public function test_api_key_prefers_saved_key_over_connector(): void {
+		remove_filter( 'wire_desk/openrouter_api_key', [ $this, 'filter_key' ] );
+		$this->register_connector();
+		update_option( self::CONNECTOR_OPTION, 'sk-or-option' );
+
+		$this->assertSame( OpenRouter_Client::SOURCE_CONNECTOR, OpenRouter_Client::key_source() );
+
+		Api_Key::save( 'sk-or-saved' );
+
+		$this->assertSame( 'sk-or-saved', OpenRouter_Client::api_key() );
+		$this->assertSame( OpenRouter_Client::SOURCE_SETTINGS, OpenRouter_Client::key_source() );
+
+		Api_Key::delete();
+
+		$this->assertSame( 'sk-or-option', OpenRouter_Client::api_key() );
+	}
+
+	/**
+	 * Test that there is no source without a key.
+	 */
+	public function test_key_source_without_key(): void {
+		remove_filter( 'wire_desk/openrouter_api_key', [ $this, 'filter_key' ] );
+
+		$this->assertSame( '', OpenRouter_Client::key_source() );
+	}
+
+	/**
+	 * Test that the constant wins over the saved key.
+	 */
+	#[RunInSeparateProcess]
+	#[PreserveGlobalState( false )]
+	public function test_api_key_prefers_constant(): void {
+		remove_filter( 'wire_desk/openrouter_api_key', [ $this, 'filter_key' ] );
+		Api_Key::save( 'sk-or-saved' );
+		define( OpenRouter_Client::KEY_CONSTANT, ' sk-or-constant ' );
+
+		$this->assertSame( 'sk-or-constant', OpenRouter_Client::api_key() );
+		$this->assertSame( OpenRouter_Client::SOURCE_CONSTANT, OpenRouter_Client::key_source() );
 	}
 
 	/**

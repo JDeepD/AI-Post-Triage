@@ -15,9 +15,12 @@ use JDeepD\Wire_Desk\Decisions\Model_Catalogue;
 use JDeepD\Wire_Desk\Jobs\Usage;
 use JDeepD\Wire_Desk\Modules\Queue\Queue_Screen;
 use JDeepD\Wire_Desk\Modules\Settings\Admin_Screen;
+use JDeepD\Wire_Desk\Modules\Settings\Api_Key;
 use JDeepD\Wire_Desk\Modules\Settings\Settings;
 use JDeepD\Wire_Desk\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 
 /**
  * Class - Admin_ScreenTest
@@ -149,6 +152,7 @@ class Admin_ScreenTest extends TestCase {
 				'wire-desk-questions',
 				'wire-desk-high-threshold',
 				'wire-desk-medium-threshold',
+				'wire-desk-api-key',
 				'wire-desk-model',
 				'wire-desk-try',
 				'wire-desk-daily-budget',
@@ -283,6 +287,115 @@ class Admin_ScreenTest extends TestCase {
 		$this->assertStringContainsString( 'wire-desk-paused', $output );
 		$this->assertStringContainsString( 'Last error: Server error', $output );
 		$this->assertStringContainsString( 'action=wire_desk_resume', $output );
+	}
+
+	/**
+	 * Test that the key field is empty and never shows the saved key or its stored value.
+	 */
+	public function test_render_screen_api_key_hides_saved_key(): void {
+		$output = $this->render_screen();
+
+		$this->assertMatchesRegularExpression( '#<input\s+type="password"\s+class="regular-text"\s+id="wire-desk-api-key"\s+name="wire_desk_openrouter_api_key\[key\]"\s+value=""#', $output );
+		$this->assertStringNotContainsString( 'Remove the saved key', $output );
+
+		Api_Key::save( 'sk-or-v1-secret0000abcd' );
+
+		$output = $this->render_screen();
+
+		$this->assertStringNotContainsString( 'secret0000', $output );
+		$this->assertStringNotContainsString( (string) get_option( Api_Key::OPTION ), $output );
+		$this->assertStringContainsString( 'A key ending in <code>…abcd</code> is saved, encrypted.', $output );
+		$this->assertStringContainsString( 'name="wire_desk_openrouter_api_key[remove]"', $output );
+	}
+
+	/**
+	 * Test that, with no key saved, the field mentions the constant as the other way to set one.
+	 */
+	public function test_render_screen_api_key_mentions_constant(): void {
+		$this->assertStringContainsString( 'You can also define the <code>WIRE_DESK_OPENROUTER_API_KEY</code> constant', $this->render_screen() );
+	}
+
+	/**
+	 * Test that the field is disabled when the constant sets the key.
+	 */
+	#[RunInSeparateProcess]
+	#[PreserveGlobalState( false )]
+	public function test_render_screen_api_key_locked_by_constant(): void {
+		define( 'WIRE_DESK_OPENROUTER_API_KEY', 'sk-or-constant' );
+
+		$output = $this->render_screen();
+
+		$this->assertMatchesRegularExpression( '#id="wire-desk-api-key"[^>]*disabled#s', $output );
+		$this->assertStringContainsString( 'The key is set by the <code>WIRE_DESK_OPENROUTER_API_KEY</code> constant', $output );
+		$this->assertStringNotContainsString( 'sk-or-constant', $output );
+	}
+
+	/**
+	 * Test that an unreadable saved key asks for it again.
+	 *
+	 * @expectedIncorrectUsage JDeepD\Wire_Desk\Framework\Encryptor::decrypt
+	 */
+	public function test_render_screen_api_key_unreadable(): void {
+		update_option( Api_Key::OPTION, 'not base64 at all!' );
+
+		$this->assertStringContainsString( 'The saved key could not be decrypted', $this->render_screen() );
+	}
+
+	/**
+	 * Test that submitting the rendered form keeps the saved key.
+	 */
+	public function test_submitting_rendered_form_keeps_api_key(): void {
+		Api_Key::save( 'sk-or-v1-kept00000000' );
+		$stored = (string) get_option( Api_Key::OPTION );
+
+		$submitted = $this->submit( $this->render_screen() );
+
+		$this->assertSame( $stored, Api_Key::sanitize( $submitted[ Api_Key::OPTION ] ?? null ) );
+	}
+
+	/**
+	 * Test that custom taxonomies of custom post types are offered, even without an admin screen, and core's internal ones aren't.
+	 */
+	public function test_taxonomies_include_custom_taxonomies(): void {
+		register_post_type(
+			'wire_item',
+			[
+				'label'   => 'Wire items',
+				'show_ui' => true,
+			]
+		);
+		register_taxonomy( 'wire_agency', 'wire_item', [ 'label' => 'Agencies' ] );
+		register_taxonomy(
+			'wire_feed',
+			'wire_item',
+			[
+				'label'   => 'Feeds',
+				'public'  => false,
+				'show_ui' => false,
+			]
+		);
+		register_taxonomy( 'hidden_type_tax', 'wire_hidden', [ 'public' => false ] );
+
+		$taxonomies = Admin_Screen::taxonomies();
+		$names      = wp_list_pluck( $taxonomies, 'name' );
+
+		$this->assertContains( 'wire_agency', $names );
+		$this->assertContains( 'wire_feed', $names );
+		$this->assertContains( 'category', $names );
+		$this->assertNotContains( 'post_format', $names );
+		$this->assertNotContains( 'hidden_type_tax', $names );
+		$this->assertSame( [ 'Wire items' ], Admin_Screen::taxonomy_post_types( $taxonomies )['wire_feed'] );
+		$this->assertSame( [ 'Posts' ], Admin_Screen::taxonomy_post_types( $taxonomies )['category'] );
+
+		$output = $this->render_screen();
+
+		$this->assertMatchesRegularExpression( '#Feeds\s+<code>wire_feed</code>\s+<span class="wire-desk-terms-meta">\s+on Wire items · no admin screen#', $output );
+		$this->assertMatchesRegularExpression( '#Agencies\s+<code>wire_agency</code>\s+<span class="wire-desk-terms-meta">\s+on Wire items\s+</span>#', $output );
+
+		unregister_taxonomy( 'wire_agency' );
+		unregister_taxonomy( 'wire_feed' );
+		unregister_taxonomy( 'hidden_type_tax' );
+		unregister_post_type( 'wire_item' );
 	}
 
 	/**

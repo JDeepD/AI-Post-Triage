@@ -82,7 +82,7 @@ apply_filters( 'wire_desk/capability_map', array $map );
 
 ## `wire_desk/openrouter_api_key`
 
-Filters the OpenRouter API key. By default the key comes from the `WIRE_DESK_OPENROUTER_API_KEY` constant, or else from the OpenRouter connector under Settings → Connectors.
+Filters the OpenRouter API key. By default the key comes from the `WIRE_DESK_OPENROUTER_API_KEY` constant, then the key saved on the Wire Desk settings screen, then the OpenRouter connector under Settings → Connectors.
 
 ```php
 apply_filters( 'wire_desk/openrouter_api_key', string $key );

@@ -13,6 +13,7 @@ use JDeepD\Wire_Desk\Core\Assets;
 use JDeepD\Wire_Desk\Core\Capabilities;
 use JDeepD\Wire_Desk\Core\Templates;
 use JDeepD\Wire_Desk\Decisions\Model_Catalogue;
+use JDeepD\Wire_Desk\Decisions\OpenRouter_Client;
 use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
 use JDeepD\Wire_Desk\Jobs\Usage;
 use JDeepD\Wire_Desk\Modules\Queue\Queue_Screen;
@@ -186,6 +187,13 @@ final class Admin_Screen implements Registrable {
 				'description' => __( 'Posts scoring at least this much are Medium. The rest are Low.', 'wire-desk' ),
 			],
 			[
+				'key'      => 'api_key',
+				'option'   => Api_Key::OPTION,
+				'title'    => __( 'OpenRouter API key', 'wire-desk' ),
+				'section'  => 'wire_desk_model',
+				'template' => 'api-key',
+			],
+			[
 				'key'      => 'model',
 				'title'    => __( 'Model', 'wire-desk' ),
 				'section'  => 'wire_desk_model',
@@ -252,7 +260,7 @@ final class Admin_Screen implements Registrable {
 				[ $this, 'render_field' ],
 				self::SCREEN_ID,
 				$field['section'],
-				in_array( $field['template'], [ 'checkbox', 'number', 'text', 'context', 'model' ], true )
+				in_array( $field['template'], [ 'checkbox', 'number', 'text', 'context', 'model', 'api-key' ], true )
 					? [ 'label_for' => $id ] + $field
 					: $field
 			);
@@ -289,6 +297,7 @@ final class Admin_Screen implements Registrable {
 
 			case 'terms':
 				$args['taxonomies'] = self::taxonomies();
+				$args['post_types'] = self::taxonomy_post_types( $args['taxonomies'] );
 				$args['selected']   = self::selected_terms( $settings['terms'] );
 				break;
 
@@ -299,6 +308,16 @@ final class Admin_Screen implements Registrable {
 			case 'questions':
 				$args['weights'] = Settings::weights();
 				$args['max']     = Settings::MAX_QUESTIONS;
+				break;
+
+			case 'api-key':
+				$saved = Api_Key::get();
+
+				$args['value']    = '';
+				$args['source']   = OpenRouter_Client::key_source();
+				$args['constant'] = OpenRouter_Client::KEY_CONSTANT;
+				$args['saved']    = '' !== $saved ? Api_Key::hint( $saved ) : '';
+				$args['broken']   = '' === $saved && Api_Key::is_saved();
 				break;
 
 			case 'model':
@@ -336,6 +355,8 @@ final class Admin_Screen implements Registrable {
 	/**
 	 * Taxonomies of the selectable post types whose terms can be picked as wire content.
 	 *
+	 * Custom taxonomies are included even without an admin screen, as feed importers often register them that way.
+	 *
 	 * @return \WP_Taxonomy[]
 	 */
 	public static function taxonomies(): array {
@@ -343,10 +364,32 @@ final class Admin_Screen implements Registrable {
 
 		return array_values(
 			array_filter(
-				get_taxonomies( [ 'show_ui' => true ], 'objects' ),
-				static fn ( \WP_Taxonomy $taxonomy ): bool => (bool) array_intersect( $taxonomy->object_type, $post_types )
+				get_taxonomies( [], 'objects' ),
+				static fn ( \WP_Taxonomy $taxonomy ): bool => ( $taxonomy->show_ui || ! $taxonomy->_builtin ) && (bool) array_intersect( $taxonomy->object_type, $post_types )
 			)
 		);
+	}
+
+	/**
+	 * Names of the selectable post types each taxonomy belongs to.
+	 *
+	 * @param \WP_Taxonomy[] $taxonomies Taxonomies.
+	 * @return array<string, string[]> Taxonomy name => post type names.
+	 */
+	public static function taxonomy_post_types( array $taxonomies ): array {
+		$labels = [];
+
+		foreach ( self::post_types() as $post_type ) {
+			$labels[ $post_type->name ] = (string) $post_type->labels->name;
+		}
+
+		$post_types = [];
+
+		foreach ( $taxonomies as $taxonomy ) {
+			$post_types[ $taxonomy->name ] = array_values( array_intersect_key( $labels, array_flip( $taxonomy->object_type ) ) );
+		}
+
+		return $post_types;
 	}
 
 	/**
