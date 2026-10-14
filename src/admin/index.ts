@@ -89,24 +89,26 @@ const initQuestions = ( field: HTMLElement ): void => {
 };
 
 /**
- * Searches a taxonomy's terms and adds picked terms to the selection.
+ * Searches the chosen taxonomy's terms and adds picked terms to the selection.
  *
- * @param fieldset The taxonomy's fieldset.
+ * @param field The terms field.
  */
-const initTermSearch = ( fieldset: HTMLElement ): void => {
-	const taxonomy = fieldset.dataset[ 'taxonomy' ] ?? '';
-	const inputName = fieldset.dataset[ 'inputName' ] ?? '';
-	const search = fieldset.querySelector< HTMLInputElement >(
+const initTermSearch = ( field: HTMLElement ): void => {
+	const baseName = field.dataset[ 'inputName' ] ?? '';
+	const taxonomies = field.querySelector< HTMLSelectElement >(
+		'[data-wire-desk-term-taxonomy]'
+	);
+	const search = field.querySelector< HTMLInputElement >(
 		'[data-wire-desk-term-search]'
 	);
-	const results = fieldset.querySelector< HTMLElement >(
+	const results = field.querySelector< HTMLElement >(
 		'[data-wire-desk-term-results]'
 	);
-	const selected = fieldset.querySelector< HTMLElement >(
+	const selected = field.querySelector< HTMLElement >(
 		'[data-wire-desk-selected-terms]'
 	);
 
-	if ( ! taxonomy || ! inputName || ! search || ! results || ! selected ) {
+	if ( ! baseName || ! taxonomies || ! search || ! results || ! selected ) {
 		return;
 	}
 
@@ -120,10 +122,14 @@ const initTermSearch = ( fieldset: HTMLElement ): void => {
 		return item;
 	};
 
-	const select = ( term: Term ): void => {
+	const select = ( term: Term, taxonomy: string ): void => {
+		const inputName = `${ baseName }[${ taxonomy }][]`;
 		const existing = Array.from(
 			selected.querySelectorAll< HTMLInputElement >( 'input' )
-		).find( ( input ) => input.value === String( term.id ) );
+		).find(
+			( input ) =>
+				input.name === inputName && input.value === String( term.id )
+		);
 
 		if ( existing ) {
 			existing.checked = true;
@@ -131,13 +137,18 @@ const initTermSearch = ( fieldset: HTMLElement ): void => {
 			const item = document.createElement( 'li' );
 			const label = document.createElement( 'label' );
 			const checkbox = document.createElement( 'input' );
+			const meta = document.createElement( 'span' );
 
 			checkbox.type = 'checkbox';
 			checkbox.name = inputName;
 			checkbox.value = String( term.id );
 			checkbox.checked = true;
 
-			label.append( checkbox, ' ', term.name );
+			meta.className = 'wire-desk-terms-meta';
+			meta.textContent =
+				taxonomies.selectedOptions[ 0 ]?.dataset[ 'label' ] ?? taxonomy;
+
+			label.append( checkbox, ' ', term.name, ' ', meta );
 			item.append( label );
 			selected.append( item );
 		}
@@ -147,7 +158,7 @@ const initTermSearch = ( fieldset: HTMLElement ): void => {
 		search.focus();
 	};
 
-	const render = ( terms: Term[] ): void => {
+	const render = ( terms: Term[], taxonomy: string ): void => {
 		if ( ! terms.length ) {
 			results.replaceChildren(
 				message( __( 'No terms found.', 'wire-desk' ) )
@@ -163,7 +174,9 @@ const initTermSearch = ( fieldset: HTMLElement ): void => {
 				button.type = 'button';
 				button.className = 'button-link';
 				button.textContent = term.name;
-				button.addEventListener( 'click', () => select( term ) );
+				button.addEventListener( 'click', () =>
+					select( term, taxonomy )
+				);
 
 				item.append( button );
 				return item;
@@ -177,12 +190,14 @@ const initTermSearch = ( fieldset: HTMLElement ): void => {
 		}
 	} );
 
-	search.addEventListener( 'input', () => {
+	const find = (): void => {
 		window.clearTimeout( timer );
+		++request;
 
 		const value = search.value.trim();
+		const taxonomy = taxonomies.value;
 
-		if ( value.length < MIN_SEARCH_LENGTH ) {
+		if ( value.length < MIN_SEARCH_LENGTH || ! taxonomy ) {
 			results.replaceChildren();
 			return;
 		}
@@ -199,7 +214,7 @@ const initTermSearch = ( fieldset: HTMLElement ): void => {
 				} );
 
 				if ( current === request ) {
-					render( terms );
+					render( terms, taxonomy );
 				}
 			} catch {
 				if ( current === request ) {
@@ -211,7 +226,10 @@ const initTermSearch = ( fieldset: HTMLElement ): void => {
 				}
 			}
 		}, SEARCH_DELAY );
-	} );
+	};
+
+	search.addEventListener( 'input', find );
+	taxonomies.addEventListener( 'change', find );
 };
 
 /**

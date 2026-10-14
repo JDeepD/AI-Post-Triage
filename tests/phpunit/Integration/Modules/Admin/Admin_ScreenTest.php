@@ -389,8 +389,11 @@ class Admin_ScreenTest extends TestCase {
 
 		$output = $this->render_screen();
 
-		$this->assertMatchesRegularExpression( '#Feeds\s+<code>wire_feed</code>\s+<span class="wire-desk-terms-meta">\s+on Wire items · no admin screen#', $output );
-		$this->assertMatchesRegularExpression( '#Agencies\s+<code>wire_agency</code>\s+<span class="wire-desk-terms-meta">\s+on Wire items\s+</span>#', $output );
+		$this->assertSame( 1, substr_count( $output, 'data-wire-desk-term-taxonomy' ) );
+		$this->assertSame( 1, substr_count( $output, 'data-wire-desk-term-search' ) );
+		$this->assertMatchesRegularExpression( '#<option value="category" data-label="Categories">\s+Categories \(Posts\)\s+</option>#', $output );
+		$this->assertMatchesRegularExpression( '#<option value="wire_feed" data-label="Feeds">\s+Feeds \(Wire items\)\s+</option>#', $output );
+		$this->assertMatchesRegularExpression( '#<option value="wire_agency" data-label="Agencies">\s+Agencies \(Wire items\)\s+</option>#', $output );
 
 		unregister_taxonomy( 'wire_agency' );
 		unregister_taxonomy( 'wire_feed' );
@@ -399,7 +402,7 @@ class Admin_ScreenTest extends TestCase {
 	}
 
 	/**
-	 * Test that the terms field shows the saved terms for their taxonomy.
+	 * Test that the terms field lists the saved terms with their taxonomy.
 	 */
 	public function test_render_screen_shows_saved_terms(): void {
 		$category = self::factory()->category->create( [ 'name' => 'Wire Feed' ] );
@@ -408,8 +411,7 @@ class Admin_ScreenTest extends TestCase {
 
 		$output = $this->render_screen();
 
-		$this->assertStringContainsString( 'data-taxonomy="category"', $output );
-		$this->assertMatchesRegularExpression( '/name="wire_desk_settings\[terms\]\[category\]\[\]" value="' . $category . '" checked \/>\s+Wire Feed/', $output );
+		$this->assertMatchesRegularExpression( '/name="wire_desk_settings\[terms\]\[category\]\[\]" value="' . $category . '" checked \/>\s+Wire Feed\s+<span class="wire-desk-terms-meta">Categories<\/span>/', $output );
 	}
 
 	/**
