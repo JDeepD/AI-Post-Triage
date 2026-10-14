@@ -10,9 +10,12 @@ declare(strict_types = 1);
 namespace JDeepD\Wire_Desk\Modules\Settings;
 
 use JDeepD\Wire_Desk\Core\Capabilities;
+use JDeepD\Wire_Desk\Data\Wire_Post;
 use JDeepD\Wire_Desk\Decisions\Decision_Client;
 use JDeepD\Wire_Desk\Decisions\OpenRouter_Client;
 use JDeepD\Wire_Desk\Framework\Contracts\Abstracts\Abstract_REST_Controller;
+use JDeepD\Wire_Desk\Scoring\Rubric;
+use JDeepD\Wire_Desk\Scoring\Scorer;
 use WP_REST_Response;
 use WP_REST_Server;
 
@@ -121,21 +124,28 @@ final class Try_Controller extends Abstract_REST_Controller {
 			);
 		}
 
-		$answers = [];
+		$score = Scorer::score( Rubric::from_settings(), $decision->answers );
 
-		foreach ( $settings['questions'] as $question ) {
-			$answers[] = [
-				'id'       => $question['id'],
-				'question' => $question['question'],
-				'expected' => $question['expected'],
-				'yes'      => $decision->answers[ $question['id'] ] ?? 0.0,
-			];
+		if ( is_wp_error( $score ) ) {
+			return new \WP_Error( $score->get_error_code(), $score->get_error_message(), [ 'status' => 502 ] );
 		}
 
 		return new WP_REST_Response(
 			[
-				'model'   => $decision->model,
-				'answers' => $answers,
+				'model'      => $decision->model,
+				'score'      => $score->score,
+				'band'       => $score->band,
+				'band_label' => Wire_Post::band_labels()[ $score->band ],
+				'answers'    => array_map(
+					static fn ( array $detail ): array => [
+						'id'       => $detail['id'],
+						'question' => $detail['question'],
+						'expected' => $detail['expected'],
+						'yes'      => $detail['yes'],
+						'met'      => $detail['met'],
+					],
+					$score->details
+				),
 			]
 		);
 	}

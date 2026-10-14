@@ -9,6 +9,7 @@ declare( strict_types = 1 );
 
 namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Settings;
 
+use JDeepD\Wire_Desk\Data\Wire_Post;
 use JDeepD\Wire_Desk\Decisions\Decision;
 use JDeepD\Wire_Desk\Decisions\Decision_Client;
 use JDeepD\Wire_Desk\Modules\Settings\Settings;
@@ -131,9 +132,12 @@ class Try_ControllerTest extends TestCase {
 				'question' => Settings::questions()[3]['question'],
 				'expected' => 'no',
 				'yes'      => 0.0,
+				'met'      => true,
 			],
 			$data['answers'][3]
 		);
+		$this->assertSame( 78, $data['score'] );
+		$this->assertSame( Wire_Post::BAND_HIGH, $data['band'] );
 	}
 
 	/**
@@ -173,19 +177,66 @@ class Try_ControllerTest extends TestCase {
 	}
 
 	/**
-	 * Test that answers missing from the decision are reported as "no".
+	 * Test that a decision missing an answer is an error.
 	 */
-	public function test_missing_answers_default_to_no(): void {
+	public function test_missing_answer_is_error(): void {
 		$client = $this->fake_client( new Decision( [ 'q_breaking' => 0.8 ], 'typesafe/jev-1.13', 0.0, '' ) );
+
+		$response = ( new Try_Controller( $client ) )->create_item( $this->request( [ 'headline' => 'Quake hits city' ] ) );
+
+		$this->assertWPError( $response );
+		$this->assertSame( 'wire_desk_missing_answer', $response->get_error_code() );
+		$this->assertSame( [ 'status' => 502 ], $response->get_error_data() );
+	}
+
+	/**
+	 * Test that the answers are scored against the saved rubric.
+	 */
+	public function test_scores_answers(): void {
+		update_option(
+			Settings::OPTION_KEY,
+			[
+				'questions' => [
+					[
+						'id'       => 'q_breaking',
+						'question' => 'Is this breaking news?',
+						'expected' => 'yes',
+						'weight'   => 'high',
+						'required' => false,
+					],
+					[
+						'id'       => 'q_routine',
+						'question' => 'Is this routine?',
+						'expected' => 'no',
+						'weight'   => 'low',
+						'required' => false,
+					],
+				],
+			]
+		);
+
+		$client = $this->fake_client(
+			new Decision(
+				[
+					'q_breaking' => 1.0,
+					'q_routine'  => 1.0,
+				],
+				'typesafe/jev-1.13',
+				0.0,
+				''
+			)
+		);
 
 		$response = ( new Try_Controller( $client ) )->create_item( $this->request( [ 'headline' => 'Quake hits city' ] ) );
 
 		$this->assertInstanceOf( WP_REST_Response::class, $response );
 
-		$yes = array_column( $response->get_data()['answers'], 'yes', 'id' );
+		$data = $response->get_data();
 
-		$this->assertSame( 0.8, $yes['q_breaking'] );
-		$this->assertSame( 0.0, $yes['q_advisory'] );
+		$this->assertSame( 75, $data['score'] );
+		$this->assertSame( Wire_Post::BAND_HIGH, $data['band'] );
+		$this->assertSame( 'High', $data['band_label'] );
+		$this->assertSame( [ true, false ], array_column( $data['answers'], 'met' ) );
 	}
 
 	/**
@@ -224,12 +275,14 @@ class Try_ControllerTest extends TestCase {
 	}
 
 	/**
-	 * A client that records what it was asked.
+	 * A client that records what it was asked. By default it answers every saved question.
 	 *
 	 * @param \JDeepD\Wire_Desk\Decisions\Decision|\WP_Error|null $result What the client returns.
 	 */
 	private function fake_client( Decision|\WP_Error|null $result = null ): Decision_Client {
-		return new class( $result ?? new Decision( [], 'typesafe/jev-1.13', 0.0, '' ) ) implements Decision_Client {
+		$result ??= new Decision( array_fill_keys( array_column( Settings::questions(), 'id' ), 0.5 ), 'typesafe/jev-1.13', 0.0, '' );
+
+		return new class( $result ) implements Decision_Client {
 			/**
 			 * State it was asked about.
 			 *

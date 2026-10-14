@@ -21,10 +21,14 @@ type TryAnswer = {
 	question: string;
 	expected: 'yes' | 'no';
 	yes: number;
+	met: boolean;
 };
 
 type TryResult = {
 	model: string;
+	score: number;
+	band: number;
+	band_label: string;
 	answers: TryAnswer[];
 };
 
@@ -255,7 +259,8 @@ const initTry = ( box: HTMLElement ): void => {
 		head.append(
 			cell( 'th', __( 'Question', 'wire-desk' ) ),
 			cell( 'th', __( 'Answer', 'wire-desk' ) ),
-			cell( 'th', __( 'Expected', 'wire-desk' ) )
+			cell( 'th', __( 'Expected', 'wire-desk' ) ),
+			cell( 'th', __( 'Met', 'wire-desk' ) )
 		);
 		table.createTHead().append( head );
 
@@ -284,12 +289,30 @@ const initTry = ( box: HTMLElement ): void => {
 					'yes' === answer.expected
 						? __( 'Yes', 'wire-desk' )
 						: __( 'No', 'wire-desk' )
+				),
+				cell(
+					'td',
+					answer.met
+						? __( 'Yes', 'wire-desk' )
+						: __( 'No', 'wire-desk' )
 				)
 			);
 			body.append( row );
 		} );
 
 		table.append( body );
+
+		const summary = document.createElement( 'p' );
+		const strong = document.createElement( 'strong' );
+
+		strong.textContent = sprintf(
+			/* translators: 1: score from 0 to 100, 2: band name. */
+			__( 'Score %1$d: %2$s', 'wire-desk' ),
+			data.score,
+			data.band_label
+		);
+		summary.className = 'wire-desk-try-summary';
+		summary.append( strong );
 
 		const model = document.createElement( 'p' );
 		model.className = 'description';
@@ -299,7 +322,7 @@ const initTry = ( box: HTMLElement ): void => {
 			data.model
 		);
 
-		result.replaceChildren( table, model );
+		result.replaceChildren( summary, table, model );
 	};
 
 	submit.addEventListener( 'click', async () => {

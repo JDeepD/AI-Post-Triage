@@ -149,6 +149,20 @@ final class Wire_Post {
 	}
 
 	/**
+	 * Band names, keyed by BAND_* constant.
+	 *
+	 * @return array<int, string>
+	 */
+	public static function band_labels(): array {
+		return [
+			self::BAND_NONE   => __( 'Not scored', 'wire-desk' ),
+			self::BAND_LOW    => __( 'Low', 'wire-desk' ),
+			self::BAND_MEDIUM => __( 'Medium', 'wire-desk' ),
+			self::BAND_HIGH   => __( 'High', 'wire-desk' ),
+		];
+	}
+
+	/**
 	 * Builds a Wire_Post from a database row.
 	 *
 	 * @param array<string, mixed> $row Row selected by Wire_Post_Repository.
