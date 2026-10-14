@@ -49,6 +49,7 @@ final class CLI implements Registrable {
 	private function get_commands(): array {
 		$commands = [
 			CLI\Healthcheck::class,
+			CLI\Score::class,
 		];
 
 		return array_reduce(

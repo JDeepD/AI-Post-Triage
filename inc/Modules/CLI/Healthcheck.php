@@ -11,6 +11,7 @@ declare( strict_types = 1 );
 namespace JDeepD\Wire_Desk\Modules\CLI;
 
 use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\CLI_Command;
+use WP_CLI;
 
 /**
  * Class - Healthcheck
@@ -47,13 +48,13 @@ final class Healthcheck implements CLI_Command {
 		$checks['constants']         = defined( 'WIRE_DESK_PATH' ) && defined( 'WIRE_DESK_URL' );
 		$checks['composer_autoload'] = class_exists( 'Composer\Autoload\ClassLoader' );
 
-		\WP_CLI::log( 'Wire Desk Health Check' );
-		\WP_CLI::log( '==============================' );
+		WP_CLI::log( 'Wire Desk Health Check' );
+		WP_CLI::log( '==============================' );
 
 		$all_passed = true;
 		foreach ( $checks as $check_name => $passed ) {
 			$status = $passed ? '✓ PASS' : '✗ FAIL';
-			\WP_CLI::log( "  {$check_name}: {$status}" );
+			WP_CLI::log( "  {$check_name}: {$status}" );
 
 			if ( ! $passed ) {
 				$all_passed = false;
@@ -61,9 +62,9 @@ final class Healthcheck implements CLI_Command {
 		}
 
 		if ( ! $all_passed ) {
-			\WP_CLI::error( 'One or more health checks failed. Please investigate the issues above.' );
+			WP_CLI::error( 'One or more health checks failed. Please investigate the issues above.' );
 		}
 
-		\WP_CLI::success( 'All health checks passed!' );
+		WP_CLI::success( 'All health checks passed!' );
 	}
 }

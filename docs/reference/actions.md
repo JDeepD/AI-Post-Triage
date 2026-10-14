@@ -5,6 +5,7 @@
 - [Action Hooks](#action-hooks)
   - [TOC](#toc)
   - [`wire_desk/get_template_part_$slug`](#wire_deskget_template_part_slug)
+  - [`wire_desk/scored`](#wire_deskscored)
 
 ## `wire_desk/get_template_part_$slug`
 
@@ -19,3 +20,15 @@ do_action( 'wire_desk/get_template_part_' . $slug, string $slug, ?string $name, 
 - `$slug (string)`: Template slug.
 - `$name (string|null)`: Optional. Template variation name.
 - `$args (array<string, mixed>)`: Optional. Data to pass to the template.
+
+## `wire_desk/scored`
+
+Fires after the model scores a post and the score is saved. It doesn't fire when an unchanged post is skipped.
+
+```php
+do_action( 'wire_desk/scored', JDeepD\Wire_Desk\Scoring\Result $result );
+```
+
+### Parameters
+
+- `$result (Result)`: The post ID, its score, band and per-question answers, the model snapshot that answered, and the cost in US dollars.
