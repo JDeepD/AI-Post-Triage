@@ -3,7 +3,7 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import domReady from '@wordpress/dom-ready';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -368,6 +368,74 @@ const initTry = ( box: HTMLElement ): void => {
 	} );
 };
 
+/**
+ * Queues the newest posts to be scored again.
+ *
+ * @param box The re-score box.
+ */
+const initRescore = ( box: HTMLElement ): void => {
+	const limit = box.querySelector< HTMLInputElement >(
+		'[data-wire-desk-rescore-limit]'
+	);
+	const submit = box.querySelector< HTMLButtonElement >(
+		'[data-wire-desk-rescore-submit]'
+	);
+	const spinner = box.querySelector< HTMLElement >(
+		'[data-wire-desk-rescore-spinner]'
+	);
+	const result = box.querySelector< HTMLElement >(
+		'[data-wire-desk-rescore-result]'
+	);
+
+	if ( ! limit || ! submit || ! spinner || ! result ) {
+		return;
+	}
+
+	limit.addEventListener( 'keydown', ( event ) => {
+		if ( 'Enter' === event.key ) {
+			event.preventDefault();
+			submit.click();
+		}
+	} );
+
+	submit.addEventListener( 'click', async () => {
+		if ( ! limit.reportValidity() ) {
+			return;
+		}
+
+		submit.disabled = true;
+		spinner.classList.add( 'is-active' );
+		result.classList.remove( 'wire-desk-try-error' );
+
+		try {
+			const { queued } = await apiFetch< { queued: number } >( {
+				path: '/wire-desk/v1/rescore',
+				method: 'POST',
+				data: { limit: Number( limit.value ) },
+			} );
+
+			result.textContent = sprintf(
+				/* translators: %d: number of posts. */
+				_n(
+					'Queued %d post. It is scored in the background.',
+					'Queued %d posts. They are scored in the background.',
+					queued,
+					'wire-desk'
+				),
+				queued
+			);
+		} catch ( error ) {
+			result.classList.add( 'wire-desk-try-error' );
+			result.textContent =
+				( error as { message?: string } ).message ||
+				__( 'The request failed. Try again.', 'wire-desk' );
+		} finally {
+			submit.disabled = false;
+			spinner.classList.remove( 'is-active' );
+		}
+	} );
+};
+
 domReady( () => {
 	document
 		.querySelectorAll< HTMLElement >( '[data-wire-desk-questions-field]' )
@@ -380,4 +448,8 @@ domReady( () => {
 	document
 		.querySelectorAll< HTMLElement >( '[data-wire-desk-try]' )
 		.forEach( initTry );
+
+	document
+		.querySelectorAll< HTMLElement >( '[data-wire-desk-rescore]' )
+		.forEach( initRescore );
 } );

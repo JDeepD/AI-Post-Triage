@@ -42,7 +42,7 @@ class CLITest extends TestCase {
 		$cli = new CLI();
 		$cli->register_hooks();
 
-		$this->assertSame( [ 'wire-desk health-check', 'wire-desk score' ], array_keys( CLI_Mock_WP_CLI::$commands ) );
+		$this->assertSame( [ 'wire-desk health-check', 'wire-desk rescore', 'wire-desk score' ], array_keys( CLI_Mock_WP_CLI::$commands ) );
 	}
 
 	/**

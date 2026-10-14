@@ -5,6 +5,7 @@
 - [TOC](#toc)
 - [wp wire-desk health-check](#wp-wire-desk-healthcheck)
 - [wp wire-desk score](#wp-wire-desk-score)
+- [wp wire-desk rescore](#wp-wire-desk-rescore)
 
 ## `wp wire-desk health-check`
 
@@ -36,4 +37,25 @@ wp wire-desk score <id>... [--force]
 ```bash
 wp wire-desk score 123
 wp wire-desk score 123 456 --force
+```
+
+## `wp wire-desk rescore`
+
+Queues the newest wire posts in the Wire Desk table to be scored again in the background, in batches of 25. Posts unchanged since they were last scored aren't sent to the model again, so they cost nothing. The same is on the settings screen, up to 1,000 posts.
+
+### Usage
+
+```bash
+wp wire-desk rescore [--limit=<number>]
+```
+
+### Options
+
+- `[--limit=<number>]`: How many of the newest posts to queue, up to 10,000. Default 100.
+
+### Examples
+
+```bash
+wp wire-desk rescore
+wp wire-desk rescore --limit=500
 ```

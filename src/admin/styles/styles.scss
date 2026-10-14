@@ -86,3 +86,12 @@
 .wire-desk-paused {
 	color: #d63638;
 }
+
+.wire-desk-rescore .spinner {
+	float: none;
+	margin-top: 0;
+}
+
+.wire-desk-rescore-result:empty {
+	display: none;
+}

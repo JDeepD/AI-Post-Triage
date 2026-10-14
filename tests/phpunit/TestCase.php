@@ -81,5 +81,14 @@ abstract class TestCase extends WP_UnitTestCase {
 		parent::checkRequirements();
 	}
 
-	// Add any common setup or utility methods for tests here.
+	/**
+	 * Cancels Wire Desk jobs left waiting in the shared Action Scheduler tables.
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+
+		if ( function_exists( 'as_unschedule_all_actions' ) ) {
+			as_unschedule_all_actions( '', [], 'wire-desk' );
+		}
+	}
 }

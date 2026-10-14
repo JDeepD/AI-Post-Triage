@@ -146,6 +146,7 @@ class Admin_ScreenTest extends TestCase {
 				'wire-desk-window-days',
 				'wire-desk-input',
 				'wire-desk-context',
+				'wire-desk-rescore',
 				'wire-desk-questions',
 				'wire-desk-high-threshold',
 				'wire-desk-medium-threshold',
@@ -240,6 +241,17 @@ class Admin_ScreenTest extends TestCase {
 		$this->assertMatchesRegularExpression( '#<textarea\s+id="wire-desk-try"\s+class="large-text"\s+rows="2"\s+maxlength="500"#', $output );
 		$this->assertStringNotContainsString( 'wire_desk_settings[try]', $output );
 		$this->assertStringContainsString( 'data-wire-desk-try-submit', $output );
+	}
+
+	/**
+	 * Test that the re-score box isn't submitted with the settings.
+	 */
+	public function test_render_screen_rescore_box_has_no_setting(): void {
+		$output = $this->render_screen();
+
+		$this->assertMatchesRegularExpression( '#id="wire-desk-rescore"\s+min="1"\s+max="1000"#', $output );
+		$this->assertStringNotContainsString( 'wire_desk_settings[rescore]', $output );
+		$this->assertStringContainsString( 'data-wire-desk-rescore-submit', $output );
 	}
 
 	/**

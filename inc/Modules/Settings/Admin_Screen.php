@@ -159,6 +159,14 @@ final class Admin_Screen implements Registrable {
 				'description' => __( 'Who the newsroom serves, sent with every post. For example: a national daily in Colombia.', 'wire-desk' ),
 			],
 			[
+				'key'         => 'rescore',
+				'title'       => __( 'Re-score', 'wire-desk' ),
+				'section'     => 'wire_desk_scoring',
+				'template'    => 'rescore',
+				'max'         => Rescore_Controller::MAX_LIMIT,
+				'description' => __( 'Scores the newest wire posts again with the saved settings, in the background. Posts whose text, questions and model haven\'t changed aren\'t sent to the model again and cost nothing.', 'wire-desk' ),
+			],
+			[
 				'key'      => 'questions',
 				'title'    => __( 'Questions', 'wire-desk' ),
 				'section'  => 'wire_desk_questions',

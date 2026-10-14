@@ -126,7 +126,7 @@ final class Queue {
 	}
 
 	/**
-	 * Deletes finished and canceled scoring jobs older than RETENTION, with their logs.
+	 * Deletes finished and canceled Wire Desk jobs older than RETENTION, with their logs.
 	 *
 	 * @param int $limit Most jobs to delete.
 	 * @return int Jobs deleted.
@@ -138,7 +138,6 @@ final class Queue {
 
 		$ids = as_get_scheduled_actions(
 			[
-				'hook'         => self::HOOK,
 				'group'        => self::GROUP,
 				'status'       => [ ActionScheduler_Store::STATUS_COMPLETE, ActionScheduler_Store::STATUS_CANCELED ],
 				'date'         => gmdate( 'Y-m-d H:i:s', time() - self::RETENTION ),
