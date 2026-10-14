@@ -1,0 +1,986 @@
+# Copyright (C) 2026 Jaydeep Das
+# This file is distributed under the GPL-3.0-or-later.
+# French translation of Wire Desk.
+msgid ""
+msgstr ""
+"Project-Id-Version: Wire Desk 0.0.1\n"
+"Report-Msgid-Bugs-To: https://github.com/JDeepD/wire-desk/issues\n"
+"Last-Translator: Jaydeep Das\n"
+"Language-Team: French (France)\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-10-14T20:21:44+00:00\n"
+"PO-Revision-Date: 2026-10-14 20:47+0000\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: wire-desk\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. Plugin Name of the plugin
+#: wire-desk.php
+#: inc/Modules/Queue/Queue_Screen.php:105
+#: inc/Modules/Queue/Queue_Screen.php:106
+#: build/editor.js:1
+msgid "Wire Desk"
+msgstr "Wire Desk"
+
+#. Plugin URI of the plugin
+#: wire-desk.php
+msgid "https://github.com/JDeepD/wire-desk"
+msgstr "https://github.com/JDeepD/wire-desk"
+
+#. Description of the plugin
+#: wire-desk.php
+msgid "Flags high-priority wire-ingested posts with a decision model and gives editors a review queue to decide what gets published."
+msgstr "Signale les dépêches d’agence prioritaires à l’aide d’un modèle de décision et offre aux éditeurs une file de relecture pour décider de ce qui est publié."
+
+#. Author of the plugin
+#: wire-desk.php
+msgid "Jaydeep Das"
+msgstr "Jaydeep Das"
+
+#. Author URI of the plugin
+#: wire-desk.php
+msgid "https://github.com/JDeepD"
+msgstr "https://github.com/JDeepD"
+
+#: framework/AssetLoaderTrait.php:49
+msgid "Block manifest file is missing. Blocks will not be registered."
+msgstr "Le fichier manifeste des blocs est manquant. Les blocs ne seront pas enregistrés."
+
+#. translators: %s: The asset filename.
+#: framework/AssetLoaderTrait.php:141
+#, php-format
+msgid "Asset file for \"%s\" is missing. The script will not be registered."
+msgstr "Le fichier de ressources de « %s » est manquant. Le script ne sera pas enregistré."
+
+#. translators: %s: The asset filename.
+#: framework/AssetLoaderTrait.php:157
+#, php-format
+msgid "Asset file for \"%s\" is invalid. The script will not be registered."
+msgstr "Le fichier de ressources de « %s » n’est pas valide. Le script ne sera pas enregistré."
+
+#. translators: %s: Class name.
+#: framework/Contracts/Traits/Singleton.php:54
+#, php-format
+msgid "The %s class should not be cloned."
+msgstr "La classe %s ne doit pas être clonée."
+
+#. translators: %s: Class name.
+#: framework/Contracts/Traits/Singleton.php:69
+#, php-format
+msgid "De-serializing instances of %s is not allowed."
+msgstr "La désérialisation des instances de %s n’est pas autorisée."
+
+#. translators: %s: The plugin name.
+#: inc/Autoloader.php:47
+#, php-format
+msgid "%s: The Composer autoloader was not found. If you installed the plugin from the GitHub source code, make sure to run `composer install`."
+msgstr "%s : le chargeur automatique de Composer est introuvable. Si vous avez installé l’extension depuis le code source GitHub, exécutez `composer install`."
+
+#: inc/Data/Wire_Post.php:168
+#: inc/Modules/Queue/Queue_List_Table.php:281
+msgid "Not scored"
+msgstr "Non noté"
+
+#: inc/Data/Wire_Post.php:169
+#: templates/settings-question-row.php:17
+msgid "Low"
+msgstr "Basse"
+
+#: inc/Data/Wire_Post.php:170
+#: inc/Modules/Settings/Admin_Screen.php:181
+#: templates/settings-question-row.php:16
+msgid "Medium"
+msgstr "Moyenne"
+
+#: inc/Data/Wire_Post.php:171
+#: inc/Modules/Settings/Admin_Screen.php:171
+#: templates/settings-question-row.php:15
+msgid "High"
+msgstr "Haute"
+
+#: inc/Data/Wire_Post.php:211
+msgid "Waiting to be scored"
+msgstr "En attente de notation"
+
+#: inc/Data/Wire_Post.php:212
+#: inc/Modules/Queue/Queue_List_Table.php:137
+msgid "Needs review"
+msgstr "À relire"
+
+#: inc/Data/Wire_Post.php:213
+msgid "Scoring failed"
+msgstr "Échec de la notation"
+
+#: inc/Data/Wire_Post.php:214
+#: inc/Modules/Queue/Queue_List_Table.php:141
+msgid "Dismissed"
+msgstr "Écarté"
+
+#: inc/Data/Wire_Post.php:215
+#: inc/Modules/Queue/Queue_List_Table.php:140
+msgid "Published"
+msgstr "Publié"
+
+#: inc/Decisions/Model_Catalogue.php:127
+msgid "The model list could not be loaded from OpenRouter."
+msgstr "Impossible de charger la liste des modèles depuis OpenRouter."
+
+#: inc/Decisions/OpenRouter_Client.php:98
+msgid "A model and at least one question are required."
+msgstr "Un modèle et au moins une question sont requis."
+
+#: inc/Decisions/OpenRouter_Client.php:104
+msgid "No OpenRouter API key is configured."
+msgstr "Aucune clé d’API OpenRouter n’est configurée."
+
+#: inc/Decisions/OpenRouter_Client.php:129
+msgid "The request could not be encoded."
+msgstr "Impossible d’encoder la requête."
+
+#. translators: 1: HTTP status code, 2: error message.
+#: inc/Decisions/OpenRouter_Client.php:197
+#, php-format
+msgid "OpenRouter returned %1$d: %2$s"
+msgstr "OpenRouter a renvoyé %1$d : %2$s"
+
+#: inc/Decisions/OpenRouter_Client.php:236
+msgid "OpenRouter returned a response without answers."
+msgstr "OpenRouter a renvoyé une réponse sans aucune réponse aux questions."
+
+#. translators: %s: question text.
+#: inc/Decisions/OpenRouter_Client.php:251
+#, php-format
+msgid "OpenRouter returned no valid answer to: %s"
+msgstr "OpenRouter n’a renvoyé aucune réponse valide à : %s"
+
+#: inc/Editorial/Post_Actions.php:63
+msgid "Publish"
+msgstr "Publier"
+
+#: inc/Editorial/Post_Actions.php:64
+msgid "Dismiss"
+msgstr "Écarter"
+
+#: inc/Editorial/Post_Actions.php:65
+msgid "Restore"
+msgstr "Restaurer"
+
+#: inc/Editorial/Post_Actions.php:66
+#: inc/Modules/Settings/Admin_Screen.php:157
+#: templates/settings-field-rescore.php:25
+#: build/editor.js:3
+msgid "Re-score"
+msgstr "Renoter"
+
+#: inc/Editorial/Post_Actions.php:107
+msgid "Unknown action."
+msgstr "Action inconnue."
+
+#: inc/Editorial/Post_Actions.php:108
+msgid "Sorry, you are not allowed to do that."
+msgstr "Désolé, vous n’avez pas l’autorisation de faire cela."
+
+#: inc/Editorial/Post_Actions.php:109
+msgid "The wire post does not exist."
+msgstr "La dépêche n’existe pas."
+
+#: inc/Editorial/Post_Actions.php:110
+msgid "Published posts can't be dismissed."
+msgstr "Les articles publiés ne peuvent pas être écartés."
+
+#: inc/Editorial/Post_Actions.php:111
+msgid "Only dismissed posts can be restored."
+msgstr "Seuls les articles écartés peuvent être restaurés."
+
+#: inc/Editorial/Post_Actions.php:112
+msgid "The wire post could not be updated."
+msgstr "Impossible de mettre à jour la dépêche."
+
+#: inc/Editorial/Post_Actions.php:113
+msgid "This post can't be added to the review queue."
+msgstr "Cet article ne peut pas être ajouté à la file de relecture."
+
+#: inc/Modules/Queue/Post_List_Actions.php:126
+msgid "In review queue"
+msgstr "Dans la file de relecture"
+
+#. translators: %s: post title.
+#: inc/Modules/Queue/Post_List_Actions.php:147
+#, php-format
+msgid "Add &#8220;%s&#8221; to the review queue"
+msgstr "Ajouter &laquo;&nbsp;%s&nbsp;&raquo; à la file de relecture"
+
+#: inc/Modules/Queue/Post_List_Actions.php:148
+#: inc/Modules/Queue/Post_List_Actions.php:163
+msgid "Add to review queue"
+msgstr "Ajouter à la file de relecture"
+
+#. translators: %s: number of posts.
+#: inc/Modules/Queue/Post_List_Actions.php:221
+#, php-format
+msgid "%s post added to the review queue. It is scored in the background."
+msgid_plural "%s posts added to the review queue. They are scored in the background."
+msgstr[0] "%s article ajouté à la file de relecture. Il est noté en arrière-plan."
+msgstr[1] "%s articles ajoutés à la file de relecture. Ils sont notés en arrière-plan."
+
+#: inc/Modules/Queue/Post_List_Actions.php:224
+msgid "View the review queue"
+msgstr "Voir la file de relecture"
+
+#: inc/Modules/Queue/Post_List_Actions.php:227
+msgid "No OpenRouter API key is set, so scoring will fail."
+msgstr "Aucune clé d’API OpenRouter n’est définie, la notation va donc échouer."
+
+#: inc/Modules/Queue/Post_List_Actions.php:227
+msgid "Add a key"
+msgstr "Ajouter une clé"
+
+#. translators: %s: number of posts.
+#: inc/Modules/Queue/Post_List_Actions.php:244
+#, php-format
+msgid "%s post could not be added to the review queue."
+msgid_plural "%s posts could not be added to the review queue."
+msgstr[0] "%s article n’a pas pu être ajouté à la file de relecture."
+msgstr[1] "%s articles n’ont pas pu être ajoutés à la file de relecture."
+
+#: inc/Modules/Queue/Queue_List_Table.php:138
+msgid "Waiting"
+msgstr "En attente"
+
+#: inc/Modules/Queue/Queue_List_Table.php:139
+msgid "Failed"
+msgstr "En échec"
+
+#: inc/Modules/Queue/Queue_List_Table.php:142
+msgid "All"
+msgstr "Tous"
+
+#: inc/Modules/Queue/Queue_List_Table.php:189
+msgid "Title"
+msgstr "Titre"
+
+#: inc/Modules/Queue/Queue_List_Table.php:190
+msgid "Priority"
+msgstr "Priorité"
+
+#: inc/Modules/Queue/Queue_List_Table.php:191
+msgid "Status"
+msgstr "État"
+
+#: inc/Modules/Queue/Queue_List_Table.php:192
+#: inc/Modules/Settings/Admin_Screen.php:100
+#: inc/Modules/Settings/Admin_Screen.php:198
+msgid "Model"
+msgstr "Modèle"
+
+#: inc/Modules/Queue/Queue_List_Table.php:193
+msgid "Date"
+msgstr "Date"
+
+#: inc/Modules/Queue/Queue_List_Table.php:201
+msgid "No wire posts found."
+msgstr "Aucune dépêche trouvée."
+
+#: inc/Modules/Queue/Queue_List_Table.php:211
+#: inc/Modules/Queue/Queue_List_Table.php:230
+msgid "(deleted)"
+msgstr "(supprimé)"
+
+#. translators: %s: post title.
+#: inc/Modules/Queue/Queue_List_Table.php:217
+#, php-format
+msgid "Select %s"
+msgstr "Sélectionner %s"
+
+#. translators: 1: post date, 2: post time.
+#: inc/Modules/Queue/Queue_List_Table.php:296
+#, php-format
+msgid "%1$s at %2$s"
+msgstr "%1$s à %2$s"
+
+#. translators: %s: time since the post was scored, such as 5 mins.
+#: inc/Modules/Queue/Queue_List_Table.php:306
+#, php-format
+msgid "Scored %s ago"
+msgstr "Noté il y a %s"
+
+#. translators: %s: post title.
+#: inc/Modules/Queue/Queue_List_Table.php:374
+#, php-format
+msgid "Edit &#8220;%s&#8221;"
+msgstr "Modifier &laquo;&nbsp;%s&nbsp;&raquo;"
+
+#: inc/Modules/Queue/Queue_List_Table.php:375
+msgid "Edit"
+msgstr "Modifier"
+
+#. translators: 1: action, such as Dismiss, 2: post title.
+#: inc/Modules/Queue/Queue_List_Table.php:397
+#, php-format
+msgid "%1$s &#8220;%2$s&#8221;"
+msgstr "%1$s &laquo;&nbsp;%2$s&nbsp;&raquo;"
+
+#: inc/Modules/Queue/Queue_List_Table.php:441
+msgid "Filter by priority"
+msgstr "Filtrer par priorité"
+
+#: inc/Modules/Queue/Queue_List_Table.php:443
+msgid "All priorities"
+msgstr "Toutes les priorités"
+
+#: inc/Modules/Queue/Queue_List_Table.php:448
+msgid "Filter"
+msgstr "Filtrer"
+
+#: inc/Modules/Queue/Queue_List_Table.php:468
+msgid "Newest posts"
+msgstr "Articles les plus récents"
+
+#: inc/Modules/Queue/Queue_List_Table.php:471
+msgid "Newer posts"
+msgstr "Articles plus récents"
+
+#: inc/Modules/Queue/Queue_List_Table.php:474
+msgid "Older posts"
+msgstr "Articles plus anciens"
+
+#: inc/Modules/Queue/Queue_Screen.php:116
+#: inc/Modules/Queue/Queue_Screen.php:117
+#: templates/queue-screen.php:18
+#: build/editor.js:3
+msgid "Review queue"
+msgstr "File de relecture"
+
+#. translators: %s: number of posts.
+#: inc/Modules/Queue/Queue_Screen.php:218
+#, php-format
+msgid "%s post published."
+msgid_plural "%s posts published."
+msgstr[0] "%s article publié."
+msgstr[1] "%s articles publiés."
+
+#. translators: %s: number of posts.
+#: inc/Modules/Queue/Queue_Screen.php:220
+#, php-format
+msgid "%s post dismissed."
+msgid_plural "%s posts dismissed."
+msgstr[0] "%s article écarté."
+msgstr[1] "%s articles écartés."
+
+#. translators: %s: number of posts.
+#: inc/Modules/Queue/Queue_Screen.php:222
+#, php-format
+msgid "%s post restored to the queue."
+msgid_plural "%s posts restored to the queue."
+msgstr[0] "%s article remis dans la file."
+msgstr[1] "%s articles remis dans la file."
+
+#. translators: %s: number of posts.
+#: inc/Modules/Queue/Queue_Screen.php:224
+#, php-format
+msgid "%s post will be scored again shortly."
+msgid_plural "%s posts will be scored again shortly."
+msgstr[0] "%s article sera de nouveau noté sous peu."
+msgstr[1] "%s articles seront de nouveau notés sous peu."
+
+#. translators: %s: number of posts.
+#: inc/Modules/Queue/Queue_Screen.php:234
+#, php-format
+msgid "%s post could not be updated."
+msgid_plural "%s posts could not be updated."
+msgstr[0] "%s article n’a pas pu être mis à jour."
+msgstr[1] "%s articles n’ont pas pu être mis à jour."
+
+#. translators: %s: highest count shown, such as 99.
+#: inc/Modules/Queue/Queue_Screen.php:368
+#, php-format
+msgid "More than %s high-priority posts need review"
+msgstr "Plus de %s articles prioritaires à relire"
+
+#. translators: %s: number of posts.
+#: inc/Modules/Queue/Queue_Screen.php:370
+#, php-format
+msgid "%s high-priority post needs review"
+msgid_plural "%s high-priority posts need review"
+msgstr[0] "%s article prioritaire à relire"
+msgstr[1] "%s articles prioritaires à relire"
+
+#: inc/Modules/REST/Posts_Controller.php:88
+#: inc/Modules/REST/Posts_Controller.php:110
+#: inc/Modules/REST/Posts_Controller.php:360
+msgid "Post ID."
+msgstr "ID de l’article."
+
+#: inc/Modules/REST/Posts_Controller.php:114
+msgid "Action to take."
+msgstr "Action à effectuer."
+
+#: inc/Modules/REST/Posts_Controller.php:140
+msgid "Sorry, you are not allowed to review wire posts."
+msgstr "Désolé, vous n’avez pas l’autorisation de relire les dépêches."
+
+#: inc/Modules/REST/Posts_Controller.php:163
+msgid "Sorry, you are not allowed to review this wire post."
+msgstr "Désolé, vous n’avez pas l’autorisation de relire cette dépêche."
+
+#: inc/Modules/REST/Posts_Controller.php:193
+msgid "The post to page from is not a wire post."
+msgstr "L’article à partir duquel paginer n’est pas une dépêche."
+
+#: inc/Modules/REST/Posts_Controller.php:313
+msgid "Only posts in this state."
+msgstr "Uniquement les articles dans cet état."
+
+#: inc/Modules/REST/Posts_Controller.php:318
+msgid "Only posts in this priority band."
+msgstr "Uniquement les articles de ce niveau de priorité."
+
+#: inc/Modules/REST/Posts_Controller.php:323
+msgid "Posts per page."
+msgstr "Articles par page."
+
+#: inc/Modules/REST/Posts_Controller.php:330
+msgid "Only posts older than this post."
+msgstr "Uniquement les articles plus anciens que celui-ci."
+
+#: inc/Modules/REST/Posts_Controller.php:335
+msgid "Only posts newer than this post."
+msgstr "Uniquement les articles plus récents que celui-ci."
+
+#: inc/Modules/REST/Posts_Controller.php:366
+msgid "Post title, rendered."
+msgstr "Titre de l’article, mis en forme."
+
+#: inc/Modules/REST/Posts_Controller.php:372
+msgid "Post status, or null when the post is gone."
+msgstr "État de l’article, ou null si l’article n’existe plus."
+
+#: inc/Modules/REST/Posts_Controller.php:378
+msgid "Link to edit the post, when the user can."
+msgstr "Lien pour modifier l’article, si l’utilisateur en a le droit."
+
+#: inc/Modules/REST/Posts_Controller.php:385
+msgid "Post date, in the site's timezone."
+msgstr "Date de l’article, dans le fuseau horaire du site."
+
+#: inc/Modules/REST/Posts_Controller.php:392
+msgid "Where the post is in the review queue."
+msgstr "Position de l’article dans la file de relecture."
+
+#: inc/Modules/REST/Posts_Controller.php:399
+msgid "Priority band."
+msgstr "Niveau de priorité."
+
+#: inc/Modules/REST/Posts_Controller.php:406
+msgid "Score from 0 to 100, or null before the post is scored."
+msgstr "Note de 0 à 100, ou null avant que l’article soit noté."
+
+#: inc/Modules/REST/Posts_Controller.php:414
+msgid "Model that scored the post."
+msgstr "Modèle qui a noté l’article."
+
+#: inc/Modules/REST/Posts_Controller.php:420
+msgid "Cost of the last paid score, in US dollars."
+msgstr "Coût de la dernière notation payante, en dollars américains."
+
+#: inc/Modules/REST/Posts_Controller.php:426
+msgid "When the post was last scored, in GMT."
+msgstr "Date de la dernière notation de l’article, en GMT."
+
+#: inc/Modules/REST/Posts_Controller.php:433
+msgid "Last scoring error."
+msgstr "Dernière erreur de notation."
+
+#: inc/Modules/REST/Posts_Controller.php:439
+msgid "Failed scoring attempts in a row."
+msgstr "Nombre de tentatives de notation échouées consécutives."
+
+#: inc/Modules/REST/Posts_Controller.php:445
+msgid "The model's answer to each question, or null when none are kept."
+msgstr "La réponse du modèle à chaque question, ou null si aucune n’est conservée."
+
+#: inc/Modules/REST/Posts_Controller.php:470
+msgid "Actions the current user can take."
+msgstr "Actions possibles pour l’utilisateur actuel."
+
+#: inc/Modules/Settings/Admin_Screen.php:58
+#: inc/Modules/Settings/Admin_Screen.php:71
+msgid "Settings"
+msgstr "Réglages"
+
+#: inc/Modules/Settings/Admin_Screen.php:70
+#: templates/admin-screen.php:16
+msgid "Wire Desk Settings"
+msgstr "Réglages de Wire Desk"
+
+#: inc/Modules/Settings/Admin_Screen.php:96
+msgid "Sources"
+msgstr "Sources"
+
+#: inc/Modules/Settings/Admin_Screen.php:97
+msgid "Scoring"
+msgstr "Notation"
+
+#: inc/Modules/Settings/Admin_Screen.php:98
+#: inc/Modules/Settings/Admin_Screen.php:165
+msgid "Questions"
+msgstr "Questions"
+
+#: inc/Modules/Settings/Admin_Screen.php:99
+msgid "Priority bands"
+msgstr "Niveaux de priorité"
+
+#: inc/Modules/Settings/Admin_Screen.php:101
+msgid "Limits"
+msgstr "Limites"
+
+#: inc/Modules/Settings/Admin_Screen.php:102
+msgid "Data"
+msgstr "Données"
+
+#: inc/Modules/Settings/Admin_Screen.php:115
+msgid "Post types"
+msgstr "Types de publication"
+
+#: inc/Modules/Settings/Admin_Screen.php:121
+msgid "Terms"
+msgstr "Termes"
+
+#: inc/Modules/Settings/Admin_Screen.php:127
+msgid "Automatic scoring"
+msgstr "Notation automatique"
+
+#: inc/Modules/Settings/Admin_Screen.php:130
+msgid "Score wire posts when they are saved"
+msgstr "Noter les dépêches lors de leur enregistrement"
+
+#: inc/Modules/Settings/Admin_Screen.php:134
+msgid "Scoring window"
+msgstr "Période de notation"
+
+#: inc/Modules/Settings/Admin_Screen.php:140
+msgid "Only posts from the last this many days are scored automatically. 0 means no limit."
+msgstr "Seuls les articles publiés depuis ce nombre de jours sont notés automatiquement. 0 signifie aucune limite."
+
+#: inc/Modules/Settings/Admin_Screen.php:144
+msgid "Model reads"
+msgstr "Ce que lit le modèle"
+
+#: inc/Modules/Settings/Admin_Screen.php:150
+msgid "Newsroom context"
+msgstr "Contexte de la rédaction"
+
+#: inc/Modules/Settings/Admin_Screen.php:153
+msgid "Who the newsroom serves, sent with every post. For example: a national daily in Colombia."
+msgstr "Le public de la rédaction, envoyé avec chaque article. Par exemple : un quotidien national en Colombie."
+
+#: inc/Modules/Settings/Admin_Screen.php:161
+msgid "Scores the newest wire posts again with the saved settings, in the background. Posts whose text, questions and model haven't changed aren't sent to the model again and cost nothing."
+msgstr "Note à nouveau les dépêches les plus récentes avec les réglages enregistrés, en arrière-plan. Les articles dont le texte, les questions et le modèle n’ont pas changé ne sont pas renvoyés au modèle et ne coûtent rien."
+
+#: inc/Modules/Settings/Admin_Screen.php:177
+msgid "Posts scoring at least this much are High."
+msgstr "Les articles ayant au moins cette note sont en priorité Haute."
+
+#: inc/Modules/Settings/Admin_Screen.php:187
+msgid "Posts scoring at least this much are Medium. The rest are Low."
+msgstr "Les articles ayant au moins cette note sont en priorité Moyenne. Les autres sont en priorité Basse."
+
+#: inc/Modules/Settings/Admin_Screen.php:192
+#: inc/Modules/Settings/Api_Key.php:45
+msgid "OpenRouter API key"
+msgstr "Clé d’API OpenRouter"
+
+#: inc/Modules/Settings/Admin_Screen.php:204
+msgid "Try a headline"
+msgstr "Tester un titre"
+
+#: inc/Modules/Settings/Admin_Screen.php:207
+msgid "Asks the selected model the saved questions. Each try is a paid request."
+msgstr "Pose les questions enregistrées au modèle sélectionné. Chaque test est une requête payante."
+
+#: inc/Modules/Settings/Admin_Screen.php:211
+msgid "Daily budget (USD)"
+msgstr "Budget quotidien (USD)"
+
+#: inc/Modules/Settings/Admin_Screen.php:216
+msgid "Scoring stops for the day once this is spent. 0 means no limit."
+msgstr "La notation s’arrête pour la journée une fois ce montant dépensé. 0 signifie aucune limite."
+
+#: inc/Modules/Settings/Admin_Screen.php:220
+msgid "Jobs at once"
+msgstr "Tâches simultanées"
+
+#: inc/Modules/Settings/Admin_Screen.php:226
+msgid "How many posts are scored at the same time."
+msgstr "Nombre d’articles notés en même temps."
+
+#: inc/Modules/Settings/Admin_Screen.php:230
+msgid "Today"
+msgstr "Aujourd’hui"
+
+#: inc/Modules/Settings/Admin_Screen.php:237
+msgid "Uninstall"
+msgstr "Désinstallation"
+
+#: inc/Modules/Settings/Admin_Screen.php:240
+msgid "Delete all Wire Desk data when the plugin is deleted"
+msgstr "Supprimer toutes les données de Wire Desk lors de la suppression de l’extension"
+
+#: inc/Modules/Settings/Admin_Screen.php:241
+msgid "Drops the Wire Desk table and deletes its settings. This can't be undone."
+msgstr "Supprime la table de Wire Desk et ses réglages. Cette action est irréversible."
+
+#: inc/Modules/Settings/Api_Key.php:82
+msgid "The OpenRouter API key is not valid, so it was not saved."
+msgstr "La clé d’API OpenRouter n’est pas valide, elle n’a donc pas été enregistrée."
+
+#: inc/Modules/Settings/Api_Key.php:90
+msgid "The OpenRouter API key could not be encrypted, so it was not saved."
+msgstr "La clé d’API OpenRouter n’a pas pu être chiffrée, elle n’a donc pas été enregistrée."
+
+#: inc/Modules/Settings/Rescore_Controller.php:70
+msgid "Sorry, you are not allowed to re-score posts."
+msgstr "Désolé, vous n’avez pas l’autorisation de renoter des articles."
+
+#: inc/Modules/Settings/Settings.php:104
+msgid "Wire Desk settings"
+msgstr "Réglages de Wire Desk"
+
+#: inc/Modules/Settings/Settings.php:111
+msgid "Delete data on uninstall"
+msgstr "Supprimer les données à la désinstallation"
+
+#: inc/Modules/Settings/Settings.php:112
+msgid "Delete the Wire Desk table and settings when the plugin is deleted."
+msgstr "Supprimer la table et les réglages de Wire Desk lors de la suppression de l’extension."
+
+#: inc/Modules/Settings/Settings.php:233
+msgid "Title only"
+msgstr "Titre uniquement"
+
+#: inc/Modules/Settings/Settings.php:234
+msgid "Title and excerpt (or first paragraph)"
+msgstr "Titre et extrait (ou premier paragraphe)"
+
+#: inc/Modules/Settings/Settings.php:235
+msgid "Title and body"
+msgstr "Titre et contenu"
+
+#: inc/Modules/Settings/Settings.php:286
+msgid "The High threshold must be above the Medium threshold."
+msgstr "Le seuil de priorité Haute doit être supérieur au seuil de priorité Moyenne."
+
+#: inc/Modules/Settings/Settings.php:296
+msgid "The model ID is not valid."
+msgstr "L’ID du modèle n’est pas valide."
+
+#. translators: %d: maximum number of questions.
+#: inc/Modules/Settings/Settings.php:381
+#, php-format
+msgid "Only the first %d questions were saved."
+msgstr "Seules les %d premières questions ont été enregistrées."
+
+#: inc/Modules/Settings/Term_Search_Controller.php:81
+msgid "Sorry, you are not allowed to search terms."
+msgstr "Désolé, vous n’avez pas l’autorisation de rechercher des termes."
+
+#: inc/Modules/Settings/Try_Controller.php:95
+msgid "Sorry, you are not allowed to try headlines."
+msgstr "Désolé, vous n’avez pas l’autorisation de tester des titres."
+
+#: inc/Modules/Settings/Try_Controller.php:109
+#: build/admin-ui.js:1
+msgid "Enter a headline."
+msgstr "Saisissez un titre."
+
+#: inc/Modules/Settings/Usage_Notice.php:45
+#: templates/settings-field-usage.php:34
+msgid "Resume now"
+msgstr "Reprendre maintenant"
+
+#: inc/Modules/Settings/Usage_Notice.php:53
+msgid "Change the budget"
+msgstr "Modifier le budget"
+
+#: inc/Modules/Settings/Usage_Notice.php:66
+msgid "Sorry, you are not allowed to resume scoring."
+msgstr "Désolé, vous n’avez pas l’autorisation de reprendre la notation."
+
+#. translators: 1: number of failed requests, 2: time scoring resumes.
+#: inc/Modules/Settings/Usage_Notice.php:98
+#, php-format
+msgid "Wire Desk paused scoring after %1$d failed requests in a row. It tries again at %2$s."
+msgstr "Wire Desk a suspendu la notation après %1$d requêtes échouées consécutives. Nouvel essai à %2$s."
+
+#. translators: %s: error message.
+#: inc/Modules/Settings/Usage_Notice.php:105
+#, php-format
+msgid "Last error: %s"
+msgstr "Dernière erreur : %s"
+
+#. translators: %s: daily budget in US dollars.
+#: inc/Modules/Settings/Usage_Notice.php:117
+#, php-format
+msgid "Wire Desk has spent today's budget of $%s. Scoring continues tomorrow."
+msgstr "Wire Desk a dépensé le budget du jour ($%s). La notation reprendra demain."
+
+#: inc/Scoring/Post_Scorer.php:61
+msgid "The post does not exist."
+msgstr "L’article n’existe pas."
+
+#: inc/Scoring/Post_Scorer.php:67
+msgid "The post could not be added to the Wire Desk table."
+msgstr "L’article n’a pas pu être ajouté à la table de Wire Desk."
+
+#: inc/Scoring/Post_Scorer.php:96
+msgid "The score could not be saved."
+msgstr "La note n’a pas pu être enregistrée."
+
+#: inc/Scoring/Scorer.php:36
+msgid "Add at least one question to score posts."
+msgstr "Ajoutez au moins une question pour noter les articles."
+
+#. translators: %s: question text.
+#: inc/Scoring/Scorer.php:49
+#, php-format
+msgid "No answer to: %s"
+msgstr "Aucune réponse à : %s"
+
+#: templates/settings-field-api-key.php:23
+msgid "Enter a new key to replace the saved one"
+msgstr "Saisissez une nouvelle clé pour remplacer celle enregistrée"
+
+#. translators: %s: PHP constant name.
+#: templates/settings-field-api-key.php:32
+#, php-format
+msgid "The key is set by the %s constant, which takes precedence over this field."
+msgstr "La clé est définie par la constante %s, qui est prioritaire sur ce champ."
+
+#. translators: %s: last characters of the saved key, such as …a1b2.
+#: templates/settings-field-api-key.php:42
+#, php-format
+msgid "A key ending in %s is saved, encrypted."
+msgstr "Une clé chiffrée se terminant par %s est enregistrée."
+
+#: templates/settings-field-api-key.php:50
+msgid "Remove the saved key"
+msgstr "Retirer la clé enregistrée"
+
+#: templates/settings-field-api-key.php:54
+msgid "The saved key could not be decrypted, probably because the site's security keys changed. Enter it again."
+msgstr "La clé enregistrée n’a pas pu être déchiffrée, probablement parce que les clés de sécurité du site ont changé. Saisissez-la à nouveau."
+
+#: templates/settings-field-api-key.php:56
+msgid "Using the key from the OpenRouter connector. A key saved here takes precedence."
+msgstr "Utilisation de la clé du connecteur OpenRouter. Une clé enregistrée ici est prioritaire."
+
+#. translators: %s: PHP constant name.
+#: templates/settings-field-api-key.php:62
+#, php-format
+msgid "Saved encrypted. You can also define the %s constant in wp-config.php instead."
+msgstr "Enregistrée chiffrée. Vous pouvez aussi définir la constante %s dans wp-config.php."
+
+#: templates/settings-field-model.php:24
+msgid "Enter an OpenRouter model ID instead, e.g. typesafe/jev-1.13."
+msgstr "Saisissez plutôt un ID de modèle OpenRouter, par ex. typesafe/jev-1.13."
+
+#. translators: %s: model ID.
+#: templates/settings-field-model.php:32
+#, php-format
+msgid "%s (not in the list)"
+msgstr "%s (absent de la liste)"
+
+#: templates/settings-field-post-types.php:24
+msgid "Every post of these types is wire content."
+msgstr "Tous les articles de ces types sont des dépêches."
+
+#: templates/settings-field-questions.php:21
+#: templates/settings-question-row.php:28
+#: build/admin-ui.js:1
+msgid "Question"
+msgstr "Question"
+
+#: templates/settings-field-questions.php:22
+#: templates/settings-question-row.php:32
+msgid "Expected answer"
+msgstr "Réponse attendue"
+
+#: templates/settings-field-questions.php:23
+#: templates/settings-question-row.php:38
+msgid "Weight"
+msgstr "Poids"
+
+#: templates/settings-field-questions.php:24
+#: templates/settings-question-row.php:46
+#: build/editor.js:2
+msgid "Required"
+msgstr "Obligatoire"
+
+#: templates/settings-field-questions.php:25
+msgid "Actions"
+msgstr "Actions"
+
+#: templates/settings-field-questions.php:63
+msgid "Add question"
+msgstr "Ajouter une question"
+
+#. translators: %d: maximum number of questions.
+#: templates/settings-field-questions.php:70
+#, php-format
+msgid "The model answers each question yes or no. A post scores higher the more answers match. If a required question doesn't match, the post is Low. Up to %d questions."
+msgstr "Le modèle répond par oui ou par non à chaque question. Plus il y a de réponses correspondantes, plus la note de l’article est élevée. Si une question obligatoire ne correspond pas, l’article est en priorité Basse. Jusqu’à %d questions."
+
+#: templates/settings-field-rescore.php:13
+msgid "Newest"
+msgstr "Derniers"
+
+#: templates/settings-field-rescore.php:24
+msgid "posts"
+msgstr "articles"
+
+#: templates/settings-field-terms.php:36
+msgid "Taxonomy"
+msgstr "Taxonomie"
+
+#. translators: 1: taxonomy name, such as Categories, 2: post type names, such as Posts, Wire items.
+#: templates/settings-field-terms.php:44
+#, php-format
+msgid "%1$s (%2$s)"
+msgstr "%1$s (%2$s)"
+
+#: templates/settings-field-terms.php:53
+msgid "Search terms"
+msgstr "Rechercher des termes"
+
+#: templates/settings-field-terms.php:59
+msgid "Search to add a term"
+msgstr "Rechercher un terme à ajouter"
+
+#: templates/settings-field-terms.php:66
+msgid "Choose a taxonomy, then search its terms. Posts with any of the picked terms are wire content. Untick a term to remove it."
+msgstr "Choisissez une taxonomie, puis recherchez ses termes. Les articles ayant l’un des termes choisis sont des dépêches. Décochez un terme pour le retirer."
+
+#: templates/settings-field-try.php:13
+msgid "Headline"
+msgstr "Titre"
+
+#: templates/settings-field-try.php:19
+msgid "Paste a wire headline"
+msgstr "Collez un titre de dépêche"
+
+#: templates/settings-field-try.php:23
+msgid "Try it"
+msgstr "Tester"
+
+#. translators: 1: amount spent today in US dollars, 2: daily budget in US dollars, 3: posts scored today.
+#: templates/settings-field-usage.php:18
+#, php-format
+msgid "$%1$s of $%2$s spent, %3$s post scored."
+msgid_plural "$%1$s of $%2$s spent, %3$s posts scored."
+msgstr[0] "$%1$s sur $%2$s dépensés, %3$s article noté."
+msgstr[1] "$%1$s sur $%2$s dépensés, %3$s articles notés."
+
+#. translators: 1: amount spent today in US dollars, 2: posts scored today.
+#: templates/settings-field-usage.php:25
+#, php-format
+msgid "$%1$s spent, %2$s post scored."
+msgid_plural "$%1$s spent, %2$s posts scored."
+msgstr[0] "$%1$s dépensés, %2$s article noté."
+msgstr[1] "$%1$s dépensés, %2$s articles notés."
+
+#: templates/settings-question-row.php:33
+#: build/admin-ui.js:2
+msgid "Yes"
+msgstr "Oui"
+
+#: templates/settings-question-row.php:34
+#: build/admin-ui.js:2
+msgid "No"
+msgstr "Non"
+
+#: templates/settings-question-row.php:49
+msgid "Remove"
+msgstr "Retirer"
+
+#: build/admin-ui.js:1
+msgid "No terms found."
+msgstr "Aucun terme trouvé."
+
+#: build/admin-ui.js:1
+msgid "The search failed. Try again."
+msgstr "La recherche a échoué. Réessayez."
+
+#: build/admin-ui.js:1
+msgid "Answer"
+msgstr "Réponse"
+
+#: build/admin-ui.js:1
+msgid "Expected"
+msgstr "Attendue"
+
+#: build/admin-ui.js:1
+msgid "Met"
+msgstr "Respectée"
+
+#. translators: 1: Yes or No, 2: confidence percentage.
+#: build/admin-ui.js:2
+#, js-format
+msgid "%1$s (%2$d%%)"
+msgstr "%1$s (%2$d %%)"
+
+#. translators: 1: score from 0 to 100, 2: band name.
+#: build/admin-ui.js:3
+#, js-format
+msgid "Score %1$d: %2$s"
+msgstr "Note %1$d : %2$s"
+
+#. translators: %s: model ID.
+#: build/admin-ui.js:4
+#, js-format
+msgid "Answered by %s."
+msgstr "Réponse de %s."
+
+#: build/admin-ui.js:4
+#: build/admin-ui.js:5
+msgid "The request failed. Try again."
+msgstr "La requête a échoué. Réessayez."
+
+#. translators: %d: number of posts.
+#: build/admin-ui.js:5
+#, js-format
+msgid "Queued %d post. It is scored in the background."
+msgid_plural "Queued %d posts. They are scored in the background."
+msgstr[0] "%d article mis en file. Il est noté en arrière-plan."
+msgstr[1] "%d articles mis en file. Ils sont notés en arrière-plan."
+
+#: build/editor.js:1
+msgid "Wire Desk could not be reached."
+msgstr "Impossible de joindre Wire Desk."
+
+#: build/editor.js:1
+msgid "Met:"
+msgstr "Respectée :"
+
+#: build/editor.js:1
+msgid "Not met:"
+msgstr "Non respectée :"
+
+#. translators: %d: the model's probability of yes, as a percentage.
+#: build/editor.js:2
+#, js-format
+msgid "%d%% yes"
+msgstr "%d %% oui"
+
+#. translators: 1: model ID, 2: time since the post was scored, such as 5 minutes ago.
+#: build/editor.js:3
+#, js-format
+msgid "Scored by %1$s %2$s"
+msgstr "Noté par %1$s %2$s"
+
+#: build/editor.js:3
+msgid "This post will be scored again shortly."
+msgstr "Cet article sera de nouveau noté sous peu."

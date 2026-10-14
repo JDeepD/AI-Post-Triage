@@ -19,11 +19,6 @@ Thumbs.db
 # Build output
 build/
 
-# Generated language files
-/languages/*
-!/languages/.gitkeep
-!/languages/*.pot
-
 # Environment
 .env
 

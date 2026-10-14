@@ -392,26 +392,28 @@ You can test the workflows locally using [act](https://github.com/nektos/act), w
 
 All strings use the `wire-desk` text domain. PHP strings load from the `languages/` folder through `Core\I18n`, and the admin and editor scripts load theirs through `wp_set_script_translations()`. Translations from translate.wordpress.org load on their own and take precedence.
 
+Wire Desk ships with Spanish (`es_ES`) and French (`fr_FR`) translations. Each locale has these files in `languages/`, all committed:
+
+- `wire-desk-{locale}.po`: the translation source, the only file to edit by hand.
+- `wire-desk-{locale}.mo` and `wire-desk-{locale}.l10n.php`: PHP strings. WordPress 6.5+ prefers the faster `.l10n.php` file.
+- `wire-desk-{locale}-{md5}.json`: one per built script, for the admin and editor strings.
+
 ### Updating the POT file
 
-`languages/wire-desk.pot` is committed so translators can work from it. Regenerate it after changing any strings, from a production build so the script strings point at the built files:
+`languages/wire-desk.pot` is committed so translators can work from it. Regenerate it after changing any strings, from a production build so the script strings point at the built files. Then merge the changes into each `.po` file, translate the new strings, and compile:
 
 ```bash
 npm run build:prod
 npm run i18n:make-pot
+npm run i18n:update-po
+npm run i18n:compile
 ```
 
 ### Adding a translation
 
-1. Translate `languages/wire-desk.pot` into `languages/wire-desk-{locale}.po`, for example `wire-desk-es_ES.po`, with a tool like Poedit.
-2. Compile the PHP translations, then the script translations:
-
-   ```bash
-   npm run wp-env:cli -- wp i18n make-mo languages
-   npm run i18n:make-json
-   ```
-
-3. Commit the `.po`, `.mo` and `.json` files, and allow them in `.gitignore`, which only lets the POT through by default.
+1. Translate `languages/wire-desk.pot` into `languages/wire-desk-{locale}.po`, for example `wire-desk-de_DE.po`, with a tool like Poedit. Set the `Language` and `Plural-Forms` headers.
+2. Compile it with `npm run i18n:compile`, which runs `i18n:make-mo`, `i18n:make-php` and `i18n:make-json`.
+3. Commit the `.po` file and the compiled files, and add the locale to `I18nTest::locales()`.
 
 `make-json` names each JSON file after an MD5 hash of the script path, such as `build/editor.js`. WordPress looks for that exact name, so don't rename a built script without regenerating the POT and the JSON files. Also avoid entry names ending in `min`: `make-json` treats `admin.js` as a minified `a.js` and writes the wrong hash, which is why the admin bundle is called `admin-ui`.
 
