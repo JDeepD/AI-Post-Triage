@@ -27,6 +27,7 @@ final class Main {
 		Core\Schema::class,
 		Core\Capabilities::class,
 		Core\Assets::class,
+		Jobs\Post_Listener::class,
 		Modules\CLI::class,
 		Modules\Settings\Admin_Screen::class,
 		Modules\Settings\Settings::class,

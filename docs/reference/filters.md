@@ -12,6 +12,7 @@
   - [`wire_desk/openrouter_api_key`](#wire_deskopenrouter_api_key)
   - [`wire_desk/unsupported_models`](#wire_deskunsupported_models)
   - [`wire_desk/state`](#wire_deskstate)
+  - [`wire_desk/is_wire_content`](#wire_deskis_wire_content)
 
 ## `wire_desk/template_args`
 
@@ -114,3 +115,16 @@ apply_filters( 'wire_desk/state', array $state, WP_Post $post );
 
 - `$state (array<string, string>)`: Facts about the post. `headline` is always set; `summary` or `body` depend on the "Model reads" setting, and `newsroom` holds the newsroom context when one is saved.
 - `$post (WP_Post)`: The post being scored.
+
+## `wire_desk/is_wire_content`
+
+Filters whether a post is wire content. By default a post is wire content when its post type is one of the wire post types, or it has one of the wire terms. Runs when a post is saved or its wire terms change.
+
+```php
+apply_filters( 'wire_desk/is_wire_content', bool $is_wire, WP_Post $post );
+```
+
+### Parameters
+
+- `$is_wire (bool)`: Whether the post is wire content.
+- `$post (WP_Post)`: The post being saved.
