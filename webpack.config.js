@@ -20,7 +20,7 @@ const path = require( 'path' );
  * Blocks are handled separately via the `--package-manifest` flag in `@wordpress/scripts`
  */
 const scriptEntries = {
-	admin: path.resolve( process.cwd(), 'src/admin/index.ts' ),
+	'admin-ui': path.resolve( process.cwd(), 'src/admin/index.ts' ),
 	editor: path.resolve( process.cwd(), 'src/editor/index.tsx' ),
 };
 

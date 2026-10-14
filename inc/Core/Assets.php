@@ -64,8 +64,10 @@ final class Assets implements Registrable {
 	 */
 	public function register_admin_assets(): void {
 		// Register admin script and style.
-		$this->register_script( self::ADMIN_HANDLE, 'admin' );
-		$this->register_style( self::ADMIN_HANDLE, 'admin', [ 'common' ] );
+		$this->register_script( self::ADMIN_HANDLE, 'admin-ui' );
+		$this->register_style( self::ADMIN_HANDLE, 'admin-ui', [ 'common' ] );
+
+		wp_set_script_translations( self::ADMIN_HANDLE, I18n::DOMAIN, I18n::languages_path() );
 	}
 
 	/**
@@ -74,6 +76,8 @@ final class Assets implements Registrable {
 	public function register_editor_assets(): void {
 		$this->register_script( self::EDITOR_HANDLE, 'editor' );
 		$this->register_style( self::EDITOR_HANDLE, 'editor', [ 'wp-components' ] );
+
+		wp_set_script_translations( self::EDITOR_HANDLE, I18n::DOMAIN, I18n::languages_path() );
 	}
 
 	/**

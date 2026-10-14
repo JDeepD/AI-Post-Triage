@@ -9,7 +9,7 @@
  *
  * Plugin Name:       Wire Desk
  * Plugin URI:        https://github.com/JDeepD/wire-desk
- * Description:       Flags high-priority wire-ingested stories with a decision model and gives editors a review queue to decide what gets published.
+ * Description:       Flags high-priority wire-ingested posts with a decision model and gives editors a review queue to decide what gets published.
  * Version:           0.0.1
  * Author:            Jaydeep Das
  * Author URI:        https://github.com/JDeepD
