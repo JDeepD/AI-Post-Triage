@@ -1,5 +1,5 @@
 === Wire Desk ===
-Contributors:      jdeepd
+Contributors:      jdeep
 Tags:              news, wire, newsroom, editorial, ai
 License:           GPLv3 or later
 License URI:       https://www.gnu.org/licenses/gpl-3.0.html
@@ -27,6 +27,24 @@ Newsrooms that ingest wire copy get far more posts than editors can read. Wire D
 = Disclaimer =
 
 Wire Desk sends the parts of each post you choose (the headline by default) to a third-party decision model through OpenRouter, using your own API key. You are responsible for making sure your wire agency agreements and data policies allow this. Wire Desk only suggests priorities; editors always decide what gets published.
+
+== External services ==
+
+Wire Desk connects to [OpenRouter](https://openrouter.ai/), a service that gives access to AI models through one API. It uses OpenRouter to score wire posts with the decision model you pick, and to list the models you can pick from.
+
+**Scoring posts.** Wire Desk sends a request to `https://openrouter.ai/api/v1/systemone` when a post is scored. That happens when a wire post is saved with Automatic scoring on, when an editor adds a post to the review queue or re-scores it, when you use Try a headline, and when you run `wp wire-desk score`, `rescore` or `backfill`. Each request contains:
+
+* the post's headline, plus its excerpt (or first paragraph) or its body if you choose that under **Model reads**
+* your newsroom context, if you set one
+* your questions and the model ID
+* your OpenRouter API key
+* your site's address
+
+No post content is sent until an OpenRouter API key is set.
+
+**Listing models.** Wire Desk fetches the list of decision models from `https://openrouter.ai/api/v1/models` when the settings screen opens (at most once a day, as it's cached) and when `wp wire-desk health-check` runs. This request contains no post content and no API key. Like any request from WordPress, it includes your site's address.
+
+OpenRouter passes each scoring request to the provider of the model you picked, whose own terms may also apply. See OpenRouter's [Terms of Service](https://openrouter.ai/terms) and [Privacy Policy](https://openrouter.ai/privacy).
 
 == Installation ==
 
