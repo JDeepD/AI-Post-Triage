@@ -21,6 +21,7 @@ const path = require( 'path' );
  */
 const scriptEntries = {
 	admin: path.resolve( process.cwd(), 'src/admin/index.ts' ),
+	editor: path.resolve( process.cwd(), 'src/editor/index.tsx' ),
 };
 
 /**

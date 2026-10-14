@@ -1,0 +1,67 @@
+/**
+ * Block editor panel styles.
+ */
+
+@use "../shared/bands";
+
+.wire-desk-panel-summary {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 8px;
+	margin: 0 0 12px;
+}
+
+.wire-desk-panel-summary .wire-desk-score {
+	margin-left: 0;
+}
+
+.wire-desk-panel-state {
+	color: #757575;
+}
+
+.wire-desk-panel-error {
+	color: #cc1818;
+}
+
+.wire-desk-panel-answers {
+	margin: 0 0 12px;
+}
+
+.wire-desk-panel-answers li {
+	display: flex;
+	gap: 8px;
+	margin: 0 0 8px;
+}
+
+.wire-desk-panel-mark {
+	flex: none;
+	font-weight: 600;
+	width: 1em;
+}
+
+.wire-desk-panel-answers .is-met .wire-desk-panel-mark {
+	color: #008a20;
+}
+
+.wire-desk-panel-answers .is-missed .wire-desk-panel-mark {
+	color: #cc1818;
+}
+
+.wire-desk-panel-question {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.wire-desk-panel-meta {
+	color: #757575;
+	font-size: 12px;
+}
+
+.wire-desk-panel-actions {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 16px;
+}

@@ -26,7 +26,8 @@ final class Assets implements Registrable {
 	/**
 	 * Asset handles
 	 */
-	public const ADMIN_HANDLE = self::PREFIX . 'admin';
+	public const ADMIN_HANDLE  = self::PREFIX . 'admin';
+	public const EDITOR_HANDLE = self::PREFIX . 'editor';
 
 	/**
 	 * Assets to defer for better performance.
@@ -50,6 +51,7 @@ final class Assets implements Registrable {
 	 */
 	public function register_hooks(): void {
 		add_action( 'admin_enqueue_scripts', [ $this, 'register_admin_assets' ] );
+		add_action( 'enqueue_block_editor_assets', [ $this, 'register_editor_assets' ], 1 );
 
 		// Add defer attribute to certain plugin bundles to improve admin load performance.
 		add_filter( 'script_loader_tag', [ $this, 'defer_scripts' ], 10, 2 );
@@ -64,6 +66,14 @@ final class Assets implements Registrable {
 		// Register admin script and style.
 		$this->register_script( self::ADMIN_HANDLE, 'admin' );
 		$this->register_style( self::ADMIN_HANDLE, 'admin', [ 'common' ] );
+	}
+
+	/**
+	 * Register assets for the block editor.
+	 */
+	public function register_editor_assets(): void {
+		$this->register_script( self::EDITOR_HANDLE, 'editor' );
+		$this->register_style( self::EDITOR_HANDLE, 'editor', [ 'wp-components' ] );
 	}
 
 	/**

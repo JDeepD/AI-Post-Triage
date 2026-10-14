@@ -54,4 +54,21 @@ class AssetsTest extends TestCase {
 		$expected_tag = '<script defer src="test.js"></script>';
 		$this->assertSame( $expected_tag, $assets->defer_scripts( $script_tag, $handle_to_test ) );
 	}
+
+	/**
+	 * Test that the editor panel's script and style are registered for the block editor.
+	 */
+	public function test_register_editor_assets(): void {
+		$assets = new Assets();
+		$assets->register_hooks();
+
+		$this->assertSame( 1, has_action( 'enqueue_block_editor_assets', [ $assets, 'register_editor_assets' ] ) );
+
+		$assets->register_editor_assets();
+
+		$this->assertTrue( wp_script_is( Assets::EDITOR_HANDLE, 'registered' ) );
+		$this->assertTrue( wp_style_is( Assets::EDITOR_HANDLE, 'registered' ) );
+		$this->assertContains( 'wp-plugins', wp_scripts()->registered[ Assets::EDITOR_HANDLE ]->deps );
+		$this->assertContains( 'wp-components', wp_styles()->registered[ Assets::EDITOR_HANDLE ]->deps );
+	}
 }

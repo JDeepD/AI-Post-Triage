@@ -32,6 +32,7 @@ final class Main {
 		Jobs\Score_Job::class,
 		Jobs\Usage::class,
 		Modules\CLI::class,
+		Modules\Editor\Editor_Panel::class,
 		Modules\Queue\Queue_Screen::class,
 		Modules\REST\Posts_Controller::class,
 		Modules\Settings\Admin_Screen::class,

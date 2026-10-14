@@ -2,6 +2,8 @@
  * Admin styles.
  */
 
+@use "../../shared/bands";
+
 .wire-desk-terms-taxonomy {
 	margin: 0 0 16px;
 }
@@ -110,37 +112,6 @@
 
 .wire-desk-queue .column-date {
 	width: 16em;
-}
-
-.wire-desk-band {
-	background: #f0f0f1;
-	border-radius: 2px;
-	color: #50575e;
-	display: inline-block;
-	font-size: 12px;
-	font-weight: 600;
-	line-height: 1.8;
-	padding: 0 8px;
-}
-
-.wire-desk-band-high {
-	background: #fcf0f1;
-	color: #b32d2e;
-}
-
-.wire-desk-band-medium {
-	background: #fcf9e8;
-	color: #8a6d00;
-}
-
-.wire-desk-band-low {
-	background: #f0f6fc;
-	color: #2271b1;
-}
-
-.wire-desk-score {
-	color: #646970;
-	margin-left: 4px;
 }
 
 .wire-desk-muted {
