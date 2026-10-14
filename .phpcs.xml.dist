@@ -98,6 +98,26 @@
 		</properties>
 	</rule>
 
+	<!-- Hook names use "/" after the prefix, e.g. wire_desk/capability_map. -->
+	<rule ref="WordPress.NamingConventions.ValidHookName">
+		<properties>
+			<property name="additionalWordDelimiters" value="/" />
+		</properties>
+	</rule>
+
+	<!-- Plugin capabilities, passed as Core\Capabilities constants. -->
+	<rule ref="WordPress.WP.Capabilities.Undetermined">
+		<severity>0</severity>
+	</rule>
+	<rule ref="WordPress.WP.Capabilities">
+		<properties>
+			<property name="custom_capabilities" type="array">
+				<element value="wire_desk_manage" />
+				<element value="wire_desk_review" />
+			</property>
+		</properties>
+	</rule>
+
 	<!-- PHP Text translation domain. Javascript domain is set in the eslint config. -->
 	<rule ref="WordPress.WP.I18n">
 		<properties>

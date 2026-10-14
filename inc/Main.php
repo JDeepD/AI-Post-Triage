@@ -25,6 +25,7 @@ final class Main {
 	 */
 	private const REGISTRABLE_CLASSES = [
 		Core\Schema::class,
+		Core\Capabilities::class,
 		Core\Assets::class,
 		Modules\CLI::class,
 		Modules\Settings\Admin_Screen::class,

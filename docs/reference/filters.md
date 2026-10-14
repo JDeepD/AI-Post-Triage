@@ -8,6 +8,7 @@
 - [`wire_desk/template_file_names`](#wire_desktemplate_file_names)
   - [`wire_desk/located_template`](#wire_desklocated_template)
   - [`wire_desk/template_paths`](#wire_desktemplate_paths)
+  - [`wire_desk/capability_map`](#wire_deskcapability_map)
 
 ## `wire_desk/template_args`
 
@@ -61,3 +62,15 @@ apply_filters( 'wire_desk/template_paths', array $paths );
 ### Parameters
 
 - `$paths (array<int, string>)`: List of paths to search for templates, keyed by their priority (lower number = higher priority).
+
+## `wire_desk/capability_map`
+
+Filters the capability each Wire Desk capability is granted from. Values must be primitive capabilities, such as `edit_posts`. A Wire Desk capability added to a role directly takes precedence.
+
+```php
+apply_filters( 'wire_desk/capability_map', array $map );
+```
+
+### Parameters
+
+- `$map (array<string, string>)`: Wire Desk capability => capability that grants it. Defaults to `wire_desk_manage` => `manage_options` and `wire_desk_review` => `edit_others_posts`.

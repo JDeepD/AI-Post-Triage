@@ -10,6 +10,7 @@ declare(strict_types = 1);
 namespace JDeepD\Wire_Desk\Modules\Settings;
 
 use JDeepD\Wire_Desk\Core\Assets;
+use JDeepD\Wire_Desk\Core\Capabilities;
 use JDeepD\Wire_Desk\Core\Templates;
 use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
 
@@ -33,6 +34,7 @@ final class Admin_Screen implements Registrable {
 	public function register_hooks(): void {
 		add_action( 'admin_menu', [ $this, 'register_screen' ] );
 		add_action( 'admin_init', [ $this, 'register_fields' ] );
+		add_filter( 'option_page_capability_' . Settings::SETTING_GROUP, [ $this, 'get_capability' ] );
 		add_filter( 'plugin_action_links_' . plugin_basename( WIRE_DESK_FILE ), [ $this, 'add_action_links' ], 2 );
 	}
 
@@ -61,7 +63,7 @@ final class Admin_Screen implements Registrable {
 		$hook_suffix = add_options_page(
 			__( 'Wire Desk', 'wire-desk' ),
 			__( 'Wire Desk', 'wire-desk' ),
-			'manage_options',
+			Capabilities::MANAGE,
 			self::SCREEN_ID,
 			[ $this, 'render_screen' ]
 		);
@@ -70,6 +72,13 @@ final class Admin_Screen implements Registrable {
 		if ( false !== $hook_suffix ) {
 			add_action( "load-{$hook_suffix}", [ $this, 'enqueue_scripts' ], 10, 0 );
 		}
+	}
+
+	/**
+	 * The capability needed to view and save the settings screen.
+	 */
+	public function get_capability(): string {
+		return Capabilities::MANAGE;
 	}
 
 	/**

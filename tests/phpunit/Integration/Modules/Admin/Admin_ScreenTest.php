@@ -10,6 +10,7 @@ declare( strict_types = 1 );
 namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Admin;
 
 use JDeepD\Wire_Desk\Core\Assets;
+use JDeepD\Wire_Desk\Core\Capabilities;
 use JDeepD\Wire_Desk\Modules\Settings\Admin_Screen;
 use JDeepD\Wire_Desk\Modules\Settings\Settings;
 use JDeepD\Wire_Desk\Tests\TestCase;
@@ -30,6 +31,7 @@ class Admin_ScreenTest extends TestCase {
 
 		$this->assertNotFalse( \has_action( 'admin_menu', [ $screen, 'register_screen' ] ) );
 		$this->assertNotFalse( \has_action( 'admin_init', [ $screen, 'register_fields' ] ) );
+		$this->assertNotFalse( \has_filter( 'option_page_capability_' . Settings::SETTING_GROUP, [ $screen, 'get_capability' ] ) );
 		$this->assertNotFalse( \has_filter( 'plugin_action_links_' . \plugin_basename( WIRE_DESK_FILE ), [ $screen, 'add_action_links' ] ) );
 	}
 
@@ -69,11 +71,32 @@ class Admin_ScreenTest extends TestCase {
 
 		$this->assertIsArray( $submenu['options-general.php'] ?? null );
 		$this->assertContains(
-			[ 'Wire Desk', 'manage_options', Admin_Screen::SCREEN_ID, 'Wire Desk' ],
+			[ 'Wire Desk', Capabilities::MANAGE, Admin_Screen::SCREEN_ID, 'Wire Desk' ],
 			$submenu['options-general.php'],
 			'Settings page should be added to the admin menu'
 		);
 		$this->assertTrue( wp_script_is( Assets::ADMIN_HANDLE, 'enqueued' ), 'Admin script should be enqueued' );
+	}
+
+	/**
+	 * Test that the settings screen needs the manage capability.
+	 */
+	public function test_get_capability_returns_manage_capability(): void {
+		$this->assertSame( Capabilities::MANAGE, ( new Admin_Screen() )->get_capability() );
+	}
+
+	/**
+	 * Test that editors can't see the settings screen.
+	 */
+	public function test_register_screen_hides_settings_from_editors(): void {
+		global $submenu;
+
+		$submenu = []; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Reset for the test.
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+
+		( new Admin_Screen() )->register_screen();
+
+		$this->assertEmpty( $submenu['options-general.php'] ?? [] );
 	}
 
 	/**
