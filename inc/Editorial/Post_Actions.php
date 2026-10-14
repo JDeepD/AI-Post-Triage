@@ -28,6 +28,16 @@ final class Post_Actions {
 	public const RESCORE = 'rescore';
 
 	/**
+	 * Adding a post to Wire Desk, reported to wire_desk/post_action.
+	 */
+	public const ADD = 'add';
+
+	/**
+	 * Post statuses that can't be added.
+	 */
+	private const UNADDABLE_STATUSES = [ 'auto-draft', 'inherit', 'trash' ];
+
+	/**
 	 * Wire post table.
 	 *
 	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
@@ -100,6 +110,7 @@ final class Post_Actions {
 			'wire_desk_published'      => __( 'Published posts can\'t be dismissed.', 'wire-desk' ),
 			'wire_desk_not_dismissed'  => __( 'Only dismissed posts can be restored.', 'wire-desk' ),
 			'wire_desk_db_error'       => __( 'The wire post could not be updated.', 'wire-desk' ),
+			'wire_desk_cannot_add'     => __( 'This post can\'t be added to the review queue.', 'wire-desk' ),
 		];
 	}
 
@@ -121,9 +132,9 @@ final class Post_Actions {
 
 		if ( true === $result ) {
 			/**
-			 * Fires after an editor publishes, dismisses, restores or re-scores a wire post.
+			 * Fires after an editor publishes, dismisses, restores, re-scores or adds a wire post.
 			 *
-			 * @param string $action  One of publish, dismiss, restore and rescore.
+			 * @param string $action  One of publish, dismiss, restore, rescore and add.
 			 * @param int    $post_id Post ID.
 			 * @param int    $user_id User who took the action.
 			 */
@@ -131,6 +142,53 @@ final class Post_Actions {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Adds a post to Wire Desk and schedules it to be scored, whatever its post type or age.
+	 *
+	 * A post already in Wire Desk is scheduled again, like a re-score.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return true|\WP_Error
+	 */
+	public function add( int $post_id ): bool|\WP_Error {
+		if ( ! current_user_can( Capabilities::REVIEW ) ) {
+			return self::forbidden();
+		}
+
+		$post = get_post( $post_id );
+
+		if ( ! $post instanceof WP_Post ) {
+			return self::error( 'wire_desk_not_found', 404 );
+		}
+
+		if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+			return self::forbidden();
+		}
+
+		if ( in_array( $post->post_status, self::UNADDABLE_STATUSES, true ) || wp_is_post_revision( $post ) ) {
+			return self::error( 'wire_desk_cannot_add', 400 );
+		}
+
+		if ( null === $this->repository->get( $post->ID ) ) {
+			if ( ! $this->repository->add_queued( $post->ID, $post->post_date ) ) {
+				return self::db_error();
+			}
+
+			if ( 'publish' === $post->post_status ) {
+				$this->repository->set_state( $post->ID, Wire_Post::STATE_PUBLISHED );
+			}
+		}
+
+		if ( Queue::schedule( $post->ID ) ) {
+			$this->repository->set_attempts( $post->ID, 0 );
+		}
+
+		/** This action is documented in inc/Editorial/Post_Actions.php */
+		do_action( 'wire_desk/post_action', self::ADD, $post->ID, get_current_user_id() );
+
+		return true;
 	}
 
 	/**

@@ -36,7 +36,7 @@ do_action( 'wire_desk/scored', JDeepD\Wire_Desk\Scoring\Result $result );
 
 ## `wire_desk/post_action`
 
-Fires after an editor publishes, dismisses, restores or re-scores a wire post, from the review queue, the REST API or the command line. It doesn't fire when the action fails.
+Fires after an editor publishes, dismisses, restores or re-scores a wire post, from the review queue, the REST API or the command line, or adds a post with "Add to review queue" on a post list. It doesn't fire when the action fails.
 
 ```php
 do_action( 'wire_desk/post_action', string $action, int $post_id, int $user_id );
@@ -44,6 +44,6 @@ do_action( 'wire_desk/post_action', string $action, int $post_id, int $user_id )
 
 ### Parameters
 
-- `$action (string)`: One of `publish`, `dismiss`, `restore` and `rescore`.
+- `$action (string)`: One of `publish`, `dismiss`, `restore`, `rescore` and `add`.
 - `$post_id (int)`: Post ID.
 - `$user_id (int)`: The user who took the action.

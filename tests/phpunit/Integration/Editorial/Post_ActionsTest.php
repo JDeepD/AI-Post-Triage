@@ -378,6 +378,73 @@ class Post_ActionsTest extends TestCase {
 	}
 
 	/**
+	 * Test that add() adds a post that isn't in Wire Desk and schedules it, whatever its age.
+	 */
+	public function test_add_adds_and_schedules(): void {
+		$post_id = self::factory()->post->create(
+			[
+				'post_status' => 'draft',
+				'post_date'   => '2020-01-01 00:00:00',
+			]
+		);
+
+		$this->assertNull( $this->repository->get( $post_id ) );
+		$this->assertTrue( $this->actions->add( $post_id ) );
+
+		$row = $this->repository->get( $post_id );
+
+		$this->assertSame( Wire_Post::STATE_QUEUED, $row?->state );
+		$this->assertSame( '2020-01-01 00:00:00', $row?->post_date );
+		$this->assertTrue( Queue::is_scheduled( $post_id ) );
+		$this->assertSame( [ [ Post_Actions::ADD, $post_id, get_current_user_id() ] ], $this->fired );
+	}
+
+	/**
+	 * Test that a published post is added as published.
+	 */
+	public function test_add_published_post(): void {
+		$post_id = self::factory()->post->create( [ 'post_status' => 'publish' ] );
+
+		$this->assertTrue( $this->actions->add( $post_id ) );
+		$this->assertSame( Wire_Post::STATE_PUBLISHED, $this->repository->get( $post_id )?->state );
+	}
+
+	/**
+	 * Test that adding a post already in Wire Desk keeps its state and schedules it again.
+	 */
+	public function test_add_existing_post(): void {
+		$this->repository->set_state( $this->post_id, Wire_Post::STATE_DISMISSED );
+
+		$this->assertTrue( $this->actions->add( $this->post_id ) );
+		$this->assertSame( Wire_Post::STATE_DISMISSED, $this->repository->get( $this->post_id )?->state );
+		$this->assertTrue( Queue::is_scheduled( $this->post_id ) );
+	}
+
+	/**
+	 * Test the errors.
+	 */
+	public function test_add_errors(): void {
+		$trashed = self::factory()->post->create( [ 'post_status' => 'trash' ] );
+
+		$this->assertSame( 'wire_desk_cannot_add', $this->error_code( $this->actions->add( $trashed ) ) );
+		$this->assertSame( 'wire_desk_not_found', $this->error_code( $this->actions->add( 999999 ) ) );
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'author' ] ) );
+
+		$this->assertSame( 'wire_desk_forbidden', $this->error_code( $this->actions->add( self::factory()->post->create() ) ) );
+		$this->assertSame( [], $this->fired );
+	}
+
+	/**
+	 * The error code of a result.
+	 *
+	 * @param true|\WP_Error $result Result.
+	 */
+	private function error_code( bool|\WP_Error $result ): string {
+		return is_wp_error( $result ) ? (string) $result->get_error_code() : '';
+	}
+
+	/**
 	 * A post's row.
 	 *
 	 * @param int $post_id Post ID.
