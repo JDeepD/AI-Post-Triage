@@ -80,6 +80,7 @@ function delete_options(): void {
 		PLUGIN_PREFIX . 'version', // Set by Main::activate().
 		PLUGIN_PREFIX . 'db_version', // Set by Core\Schema.
 		PLUGIN_PREFIX . 'delete_data_on_uninstall', // Set by Modules\Settings\Settings.
+		PLUGIN_PREFIX . 'settings', // Set by Modules\Settings\Settings.
 	];
 
 	foreach ( $options as $option ) {

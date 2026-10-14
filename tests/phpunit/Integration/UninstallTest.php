@@ -37,6 +37,7 @@ class UninstallTest extends TestCase {
 	 */
 	protected function tearDown(): void {
 		delete_option( Settings::DELETE_DATA_OPTION_KEY );
+		delete_option( Settings::OPTION_KEY );
 		delete_transient( Schema::FAILURE_TRANSIENT );
 		Schema::install();
 
@@ -50,11 +51,13 @@ class UninstallTest extends TestCase {
 	 */
 	public function test_uninstall_keeps_data_by_default(): void {
 		delete_option( Settings::DELETE_DATA_OPTION_KEY );
+		update_option( Settings::OPTION_KEY, Settings::defaults() );
 
 		$this->run_uninstall();
 
 		$this->assertTrue( Schema::table_exists() );
 		$this->assertSame( Schema::VERSION, (int) get_option( Schema::VERSION_OPTION ) );
+		$this->assertIsArray( get_option( Settings::OPTION_KEY ) );
 		$this->assertNotFalse( get_transient( Schema::FAILURE_TRANSIENT ) );
 	}
 
@@ -63,12 +66,14 @@ class UninstallTest extends TestCase {
 	 */
 	public function test_uninstall_deletes_data_when_enabled(): void {
 		update_option( Settings::DELETE_DATA_OPTION_KEY, true );
+		update_option( Settings::OPTION_KEY, Settings::defaults() );
 
 		$this->run_uninstall();
 
 		$this->assertFalse( Schema::table_exists() );
 		$this->assertFalse( get_option( Schema::VERSION_OPTION ) );
 		$this->assertFalse( get_option( Settings::DELETE_DATA_OPTION_KEY ) );
+		$this->assertFalse( get_option( Settings::OPTION_KEY ) );
 		$this->assertFalse( get_transient( Schema::FAILURE_TRANSIENT ) );
 	}
 
