@@ -11,6 +11,7 @@ namespace JDeepD\Wire_Desk\Modules\Queue;
 
 use JDeepD\Wire_Desk\Data\Wire_Post;
 use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
+use JDeepD\Wire_Desk\Editorial\Post_Actions;
 use WP_List_Table;
 use WP_Post;
 
@@ -198,6 +199,7 @@ final class Queue_List_Table extends WP_List_Table {
 	 */
 	public function get_columns(): array {
 		return [
+			'cb'    => '<input type="checkbox" />',
 			'title' => __( 'Title', 'wire-desk' ),
 			'band'  => __( 'Priority', 'wire-desk' ),
 			'state' => __( 'Status', 'wire-desk' ),
@@ -211,6 +213,23 @@ final class Queue_List_Table extends WP_List_Table {
 	 */
 	public function no_items(): void {
 		esc_html_e( 'No wire posts found.', 'wire-desk' );
+	}
+
+	/**
+	 * The checkbox column.
+	 *
+	 * @param \JDeepD\Wire_Desk\Data\Wire_Post $item Row.
+	 */
+	public function column_cb( $item ): string {
+		$post  = get_post( $item->post_id );
+		$title = $post instanceof WP_Post ? _draft_or_post_title( $post ) : esc_html__( '(deleted)', 'wire-desk' );
+
+		return sprintf(
+			'<input id="cb-select-%1$d" type="checkbox" name="post[]" value="%1$d" /><label for="cb-select-%1$d"><span class="screen-reader-text">%2$s</span></label>',
+			$item->post_id,
+			/* translators: %s: post title. */
+			sprintf( __( 'Select %s', 'wire-desk' ), $title )
+		);
 	}
 
 	/**
@@ -318,6 +337,116 @@ final class Queue_List_Table extends WP_List_Table {
 	}
 
 	/**
+	 * The actions each view offers in bulk.
+	 *
+	 * @return array<string, string[]>
+	 */
+	public static function view_actions(): array {
+		$open = [ Post_Actions::PUBLISH, Post_Actions::DISMISS, Post_Actions::RESCORE ];
+
+		return [
+			'needs-review' => $open,
+			'waiting'      => $open,
+			'failed'       => $open,
+			'published'    => [ Post_Actions::RESCORE ],
+			'dismissed'    => [ Post_Actions::RESTORE, Post_Actions::RESCORE ],
+			'all'          => [ Post_Actions::PUBLISH, Post_Actions::DISMISS, Post_Actions::RESTORE, Post_Actions::RESCORE ],
+		];
+	}
+
+	/**
+	 * Row actions a post offers the current user.
+	 *
+	 * @param \JDeepD\Wire_Desk\Data\Wire_Post $item Row.
+	 * @return string[]
+	 */
+	public static function row_action_names( Wire_Post $item ): array {
+		$post = get_post( $item->post_id );
+
+		if ( ! $post instanceof WP_Post || ! current_user_can( 'edit_post', $post->ID ) ) {
+			return [];
+		}
+
+		$actions = [];
+
+		if ( Wire_Post::STATE_PUBLISHED !== $item->state && 'publish' !== $post->post_status && current_user_can( 'publish_post', $post->ID ) ) {
+			$actions[] = Post_Actions::PUBLISH;
+		}
+
+		if ( Wire_Post::STATE_DISMISSED === $item->state ) {
+			$actions[] = Post_Actions::RESTORE;
+		} elseif ( Wire_Post::STATE_PUBLISHED !== $item->state ) {
+			$actions[] = Post_Actions::DISMISS;
+		}
+
+		$actions[] = Post_Actions::RESCORE;
+
+		return $actions;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @return array<string, string>
+	 */
+	protected function get_bulk_actions(): array {
+		return array_intersect_key( Post_Actions::labels(), array_flip( self::view_actions()[ $this->view ] ) );
+	}
+
+	/**
+	 * Edit and action links under the title.
+	 *
+	 * @param \JDeepD\Wire_Desk\Data\Wire_Post $item        Row.
+	 * @param string                           $column_name Column.
+	 * @param string                           $primary     Primary column.
+	 */
+	protected function handle_row_actions( $item, $column_name, $primary ): string {
+		if ( $primary !== $column_name || ! $item instanceof Wire_Post ) {
+			return '';
+		}
+
+		$post  = get_post( $item->post_id );
+		$title = $post instanceof WP_Post ? wp_strip_all_tags( _draft_or_post_title( $post ) ) : '';
+		$links = [];
+		$edit  = $post instanceof WP_Post ? get_edit_post_link( $post->ID ) : null;
+
+		if ( $edit ) {
+			$links['edit'] = sprintf(
+				'<a href="%1$s" aria-label="%2$s">%3$s</a>',
+				esc_url( $edit ),
+				/* translators: %s: post title. */
+				esc_attr( sprintf( __( 'Edit &#8220;%s&#8221;', 'wire-desk' ), $title ) ),
+				esc_html__( 'Edit', 'wire-desk' )
+			);
+		}
+
+		$labels = Post_Actions::labels();
+
+		foreach ( self::row_action_names( $item ) as $action ) {
+			$links[ $action ] = sprintf(
+				'<a href="%1$s" aria-label="%2$s">%3$s</a>',
+				esc_url(
+					wp_nonce_url(
+						add_query_arg(
+							[
+								'action' => $action,
+								'post'   => $item->post_id,
+							],
+							$this->current_url()
+						),
+						Queue_Screen::nonce_action( $action, $item->post_id )
+					)
+				),
+				/* translators: 1: action, such as Dismiss, 2: post title. */
+				esc_attr( sprintf( __( '%1$s &#8220;%2$s&#8221;', 'wire-desk' ), $labels[ $action ], $title ) ),
+				esc_html( $labels[ $action ] )
+			);
+		}
+
+		return $this->row_actions( $links );
+	}
+
+	/**
 	 * {@inheritDoc}
 	 *
 	 * @return array<string, string>
@@ -408,6 +537,20 @@ final class Queue_List_Table extends WP_List_Table {
 			esc_url( $url ),
 			esc_html( $label ),
 			$arrow
+		);
+	}
+
+	/**
+	 * The URL of the page being shown.
+	 */
+	private function current_url(): string {
+		return $this->url(
+			array_filter(
+				[
+					'before' => $this->before,
+					'after'  => $this->after,
+				]
+			)
 		);
 	}
 

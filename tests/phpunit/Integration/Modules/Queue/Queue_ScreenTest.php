@@ -14,6 +14,7 @@ use JDeepD\Wire_Desk\Core\Capabilities;
 use JDeepD\Wire_Desk\Core\Schema;
 use JDeepD\Wire_Desk\Data\Wire_Post;
 use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
+use JDeepD\Wire_Desk\Editorial\Post_Actions;
 use JDeepD\Wire_Desk\Modules\Queue\Queue_Screen;
 use JDeepD\Wire_Desk\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -49,7 +50,7 @@ class Queue_ScreenTest extends TestCase {
 			$GLOBALS[ $global ] = []; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Reset between tests.
 		}
 
-		unset( $_GET['view'] );
+		unset( $_GET['view'], $_GET['wire_desk_action'], $_GET['wire_desk_done'], $_REQUEST['_wpnonce'], $_REQUEST['_wp_http_referer'] );
 		set_current_screen( 'front' );
 
 		parent::tearDown();
@@ -64,6 +65,7 @@ class Queue_ScreenTest extends TestCase {
 
 		$this->assertSame( 10, has_action( 'admin_menu', [ $screen, 'register_screen' ] ) );
 		$this->assertSame( 10, has_filter( 'set_screen_option_' . Queue_Screen::PER_PAGE_OPTION, [ $screen, 'save_per_page' ] ) );
+		$this->assertSame( 10, has_filter( 'removable_query_args', [ $screen, 'removable_query_args' ] ) );
 	}
 
 	/**
@@ -215,6 +217,251 @@ class Queue_ScreenTest extends TestCase {
 		$output = (string) ob_get_clean();
 
 		$this->assertStringContainsString( '<input type="hidden" name="view" value="dismissed" />', $output );
+	}
+
+	/**
+	 * Test that a request without an action does nothing.
+	 */
+	public function test_handle_action_without_action(): void {
+		$this->assertNull( ( new Queue_Screen( $this->repository ) )->handle_action( [ 'view' => 'failed' ] ) );
+		$this->assertNull(
+			( new Queue_Screen( $this->repository ) )->handle_action(
+				[
+					'action' => 'delete',
+					'post'   => 1,
+				]
+			)
+		);
+	}
+
+	/**
+	 * Test that submitting the filter drops the form's nonce, referer and paging from the address.
+	 */
+	public function test_handle_action_cleans_filter_submission(): void {
+		$url = ( new Queue_Screen( $this->repository ) )->handle_action(
+			[
+				'page'             => Queue_Screen::SCREEN_ID,
+				'view'             => 'failed',
+				'band'             => 'high',
+				'filter_action'    => 'Filter',
+				'action'           => Post_Actions::DISMISS,
+				'_wpnonce'         => 'abc',
+				'_wp_http_referer' => '/wp-admin/admin.php?page=wire-desk',
+				'post'             => [ 1, 2 ],
+			]
+		);
+
+		$this->assertSame( admin_url( 'admin.php?page=wire-desk&view=failed&band=high' ), $url );
+	}
+
+	/**
+	 * Test that a row action runs with its nonce and goes back with the result.
+	 */
+	public function test_handle_action_runs_row_action(): void {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+
+		$post_id = $this->scored_post();
+
+		$_REQUEST['_wpnonce']         = wp_create_nonce( Queue_Screen::nonce_action( Post_Actions::DISMISS, $post_id ) );
+		$_REQUEST['_wp_http_referer'] = '/wp-admin/admin.php?page=wire-desk&band=high&before=12&wire_desk_action=publish&wire_desk_done=4';
+
+		$url = ( new Queue_Screen( $this->repository ) )->handle_action(
+			[
+				'action' => Post_Actions::DISMISS,
+				'post'   => (string) $post_id,
+			]
+		);
+
+		$this->assertSame( Wire_Post::STATE_DISMISSED, $this->repository->get( $post_id )?->state );
+		$this->assertSame( '/wp-admin/admin.php?page=wire-desk&band=high&before=12&wire_desk_action=dismiss&wire_desk_done=1', $url );
+	}
+
+	/**
+	 * Test that a row action with another post's nonce is refused.
+	 */
+	public function test_handle_action_checks_row_nonce(): void {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+
+		$post_id = $this->scored_post();
+
+		$_REQUEST['_wpnonce'] = wp_create_nonce( Queue_Screen::nonce_action( Post_Actions::DISMISS, $post_id + 1 ) );
+
+		try {
+			( new Queue_Screen( $this->repository ) )->handle_action(
+				[
+					'action' => Post_Actions::DISMISS,
+					'post'   => $post_id,
+				]
+			);
+			$this->fail( 'The action ran without a valid nonce.' );
+		} catch ( \WPDieException $e ) {
+			$this->assertSame( Wire_Post::STATE_SCORED, $this->repository->get( $post_id )?->state );
+		}
+	}
+
+	/**
+	 * Test that a bulk action from the bottom menu runs on each post and counts failures.
+	 */
+	public function test_handle_action_runs_bulk_action(): void {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+
+		$first     = $this->scored_post();
+		$second    = $this->scored_post();
+		$published = $this->scored_post();
+		$this->repository->set_state( $published, Wire_Post::STATE_PUBLISHED );
+
+		$_REQUEST['_wpnonce'] = wp_create_nonce( 'bulk-wire-posts' );
+
+		$url = ( new Queue_Screen( $this->repository ) )->handle_action(
+			[
+				'action'  => '-1',
+				'action2' => Post_Actions::DISMISS,
+				'post'    => [ (string) $first, (string) $second, (string) $published ],
+			]
+		);
+
+		$this->assertSame( Wire_Post::STATE_DISMISSED, $this->repository->get( $first )?->state );
+		$this->assertSame( Wire_Post::STATE_DISMISSED, $this->repository->get( $second )?->state );
+		$this->assertSame( Wire_Post::STATE_PUBLISHED, $this->repository->get( $published )?->state );
+		$this->assertStringContainsString( 'wire_desk_action=dismiss&wire_desk_done=2&wire_desk_failed=1&wire_desk_error=wire_desk_published', (string) $url );
+	}
+
+	/**
+	 * Test that a bulk action needs the bulk nonce.
+	 */
+	public function test_handle_action_checks_bulk_nonce(): void {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+
+		$post_id = $this->scored_post();
+
+		$_REQUEST['_wpnonce'] = wp_create_nonce( Queue_Screen::nonce_action( Post_Actions::DISMISS, $post_id ) );
+
+		$this->expectException( \WPDieException::class );
+
+		( new Queue_Screen( $this->repository ) )->handle_action(
+			[
+				'action' => Post_Actions::DISMISS,
+				'post'   => [ $post_id ],
+			]
+		);
+	}
+
+	/**
+	 * Test the notices for each action's result.
+	 */
+	public function test_notices(): void {
+		$this->assertSame(
+			[
+				[
+					'type'    => 'success',
+					'message' => '1 post published.',
+				],
+			],
+			Queue_Screen::notices(
+				[
+					'wire_desk_action' => 'publish',
+					'wire_desk_done'   => '1',
+				]
+			)
+		);
+		$this->assertSame(
+			'3 posts dismissed.',
+			Queue_Screen::notices(
+				[
+					'wire_desk_action' => 'dismiss',
+					'wire_desk_done'   => '3',
+				]
+			)[0]['message']
+		);
+		$this->assertSame(
+			'2 posts restored to the queue.',
+			Queue_Screen::notices(
+				[
+					'wire_desk_action' => 'restore',
+					'wire_desk_done'   => '2',
+				]
+			)[0]['message']
+		);
+		$this->assertSame(
+			'1 post will be scored again shortly.',
+			Queue_Screen::notices(
+				[
+					'wire_desk_action' => 'rescore',
+					'wire_desk_done'   => '1',
+				]
+			)[0]['message']
+		);
+		$this->assertSame(
+			[
+				[
+					'type'    => 'error',
+					'message' => '1 post could not be updated. Published posts can\'t be dismissed.',
+				],
+			],
+			Queue_Screen::notices(
+				[
+					'wire_desk_action' => 'dismiss',
+					'wire_desk_failed' => '1',
+					'wire_desk_error'  => 'wire_desk_published',
+				]
+			)
+		);
+		$this->assertSame(
+			'2 posts could not be updated.',
+			Queue_Screen::notices(
+				[
+					'wire_desk_action' => 'publish',
+					'wire_desk_failed' => '2',
+					'wire_desk_error'  => 'other',
+				]
+			)[0]['message']
+		);
+		$this->assertSame(
+			[],
+			Queue_Screen::notices(
+				[
+					'wire_desk_action' => 'delete',
+					'wire_desk_done'   => '1',
+				]
+			)
+		);
+		$this->assertSame( [], Queue_Screen::notices( [] ) );
+	}
+
+	/**
+	 * Test that the result arguments are removed from the address bar.
+	 */
+	public function test_removable_query_args(): void {
+		$this->assertSame( array_merge( [ 'message' ], Queue_Screen::RESULT_ARGS ), ( new Queue_Screen() )->removable_query_args( [ 'message' ] ) );
+	}
+
+	/**
+	 * Test that the screen shows the last action's result.
+	 */
+	public function test_render_screen_shows_notice(): void {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+		set_current_screen( Queue_Screen::HOOK_SUFFIX );
+
+		$_GET['wire_desk_action'] = 'dismiss';
+		$_GET['wire_desk_done']   = '2';
+
+		ob_start();
+		( new Queue_Screen( $this->repository ) )->render_screen();
+		$output = (string) ob_get_clean();
+
+		$this->assertMatchesRegularExpression( '#notice-success is-dismissible">\s*<p>2 posts dismissed.</p>#', $output );
+	}
+
+	/**
+	 * A draft wire post scored Medium.
+	 */
+	private function scored_post(): int {
+		$post_id = self::factory()->post->create( [ 'post_status' => 'draft' ] );
+
+		$this->repository->add_queued( $post_id, (string) get_post( $post_id )?->post_date );
+		$this->repository->save_score( $post_id, Wire_Post::BAND_MEDIUM, 50, 'typesafe/jev-1.13', md5( (string) $post_id ), 0.0, [] );
+
+		return $post_id;
 	}
 
 	/**

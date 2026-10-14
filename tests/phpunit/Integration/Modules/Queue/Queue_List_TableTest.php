@@ -12,6 +12,7 @@ namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Queue;
 use JDeepD\Wire_Desk\Core\Schema;
 use JDeepD\Wire_Desk\Data\Wire_Post;
 use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
+use JDeepD\Wire_Desk\Editorial\Post_Actions;
 use JDeepD\Wire_Desk\Modules\Queue\Queue_List_Table;
 use JDeepD\Wire_Desk\Modules\Queue\Queue_Screen;
 use JDeepD\Wire_Desk\Tests\TestCase;
@@ -260,6 +261,111 @@ class Queue_List_TableTest extends TestCase {
 	}
 
 	/**
+	 * Test that each row has a checkbox.
+	 */
+	public function test_renders_checkbox(): void {
+		[ $post_id ] = $this->wire_posts( 1 );
+
+		$html = $this->render( $this->table() );
+
+		$this->assertStringContainsString( '<input id="cb-select-' . $post_id . '" type="checkbox" name="post[]" value="' . $post_id . '" />', $html );
+		$this->assertMatchesRegularExpression( '#<input id="cb-select-all-\d+" type="checkbox" />#', $html );
+	}
+
+	/**
+	 * Test that each view offers its bulk actions.
+	 */
+	public function test_bulk_actions_per_view(): void {
+		$this->wire_posts( 1 );
+
+		$needs_review = $this->render( $this->table() );
+
+		$this->assertStringContainsString( '<option value="publish">Publish</option>', $needs_review );
+		$this->assertStringContainsString( '<option value="dismiss">Dismiss</option>', $needs_review );
+		$this->assertStringContainsString( '<option value="rescore">Re-score</option>', $needs_review );
+		$this->assertStringNotContainsString( '<option value="restore">', $needs_review );
+
+		$dismissed = $this->render( $this->table( [ 'view' => 'dismissed' ] ) );
+
+		$this->assertStringContainsString( '<option value="restore">Restore</option>', $dismissed );
+		$this->assertStringNotContainsString( '<option value="dismiss">', $dismissed );
+
+		$published = $this->render( $this->table( [ 'view' => 'published' ] ) );
+
+		$this->assertStringContainsString( '<option value="rescore">Re-score</option>', $published );
+		$this->assertStringNotContainsString( '<option value="publish">', $published );
+
+		foreach ( Queue_List_Table::view_actions() as $actions ) {
+			$this->assertSame( [], array_diff( $actions, array_keys( Post_Actions::labels() ) ) );
+		}
+	}
+
+	/**
+	 * Test the row actions for each state.
+	 */
+	public function test_row_action_names(): void {
+		[ $scored ]    = $this->wire_posts( 1 );
+		[ $dismissed ] = $this->wire_posts( 1, Wire_Post::STATE_DISMISSED );
+		$published     = self::factory()->post->create();
+		$this->repository->add_queued( $published, '2024-01-01 00:00:00' );
+		$this->repository->set_state( $published, Wire_Post::STATE_PUBLISHED );
+
+		$this->assertSame( [ 'publish', 'dismiss', 'rescore' ], Queue_List_Table::row_action_names( $this->row( $scored ) ) );
+		$this->assertSame( [ 'publish', 'restore', 'rescore' ], Queue_List_Table::row_action_names( $this->row( $dismissed ) ) );
+		$this->assertSame( [ 'rescore' ], Queue_List_Table::row_action_names( $this->row( $published ) ) );
+	}
+
+	/**
+	 * Test that users who can't publish don't get Publish, and users who can't edit get nothing.
+	 */
+	public function test_row_action_names_follow_capabilities(): void {
+		[ $post_id ] = $this->wire_posts( 1 );
+
+		add_role(
+			'wire_desk_test_reviewer',
+			'Reviewer',
+			[
+				'read'              => true,
+				'edit_posts'        => true,
+				'edit_others_posts' => true,
+			]
+		);
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'wire_desk_test_reviewer' ] ) );
+
+		$this->assertSame( [ 'dismiss', 'rescore' ], Queue_List_Table::row_action_names( $this->row( $post_id ) ) );
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
+
+		$this->assertSame( [], Queue_List_Table::row_action_names( $this->row( $post_id ) ) );
+
+		remove_role( 'wire_desk_test_reviewer' );
+	}
+
+	/**
+	 * Test that row action links carry the page, the action and a nonce for that post.
+	 */
+	public function test_renders_row_actions(): void {
+		[ $post_id ] = $this->wire_posts( 1 );
+
+		$html = $this->render( $this->table( [ 'band' => 'medium' ] ) );
+
+		$this->assertStringContainsString( '<div class="row-actions">', $html );
+		$this->assertMatchesRegularExpression( '#<span class=\'edit\'><a href="[^"]*post=' . $post_id . '&(amp;|\#038;)action=edit"#', $html );
+		$this->assertStringContainsString( 'aria-label="Dismiss &#8220;Post title', $html );
+
+		preg_match( '#href="([^"]*action=dismiss[^"]*)"#', $html, $match );
+		$url   = html_entity_decode( $match[1] ?? '' );
+		$query = [];
+		wp_parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query );
+
+		$this->assertSame( 'wire-desk', $query['page'] ?? null );
+		$this->assertSame( 'medium', $query['band'] ?? null );
+		$this->assertSame( (string) $post_id, $query['post'] ?? null );
+		$this->assertSame( 1, wp_verify_nonce( (string) ( $query['_wpnonce'] ?? '' ), Queue_Screen::nonce_action( 'dismiss', $post_id ) ) );
+	}
+
+	/**
 	 * Test that the empty message is shown.
 	 */
 	public function test_no_items(): void {
@@ -276,6 +382,19 @@ class Queue_List_TableTest extends TestCase {
 		$table->prepare_items();
 
 		return $table;
+	}
+
+	/**
+	 * A post's row.
+	 *
+	 * @param int $post_id Post ID.
+	 */
+	private function row( int $post_id ): Wire_Post {
+		$row = $this->repository->get( $post_id );
+
+		$this->assertInstanceOf( Wire_Post::class, $row );
+
+		return $row;
 	}
 
 	/**

@@ -58,6 +58,22 @@ final class Post_Actions {
 	}
 
 	/**
+	 * Messages for the errors actions return, keyed by error code.
+	 *
+	 * @return array<string, string>
+	 */
+	public static function error_messages(): array {
+		return [
+			'wire_desk_unknown_action' => __( 'Unknown action.', 'wire-desk' ),
+			'wire_desk_forbidden'      => __( 'Sorry, you are not allowed to do that.', 'wire-desk' ),
+			'wire_desk_not_found'      => __( 'The wire post does not exist.', 'wire-desk' ),
+			'wire_desk_published'      => __( 'Published posts can\'t be dismissed.', 'wire-desk' ),
+			'wire_desk_not_dismissed'  => __( 'Only dismissed posts can be restored.', 'wire-desk' ),
+			'wire_desk_db_error'       => __( 'The wire post could not be updated.', 'wire-desk' ),
+		];
+	}
+
+	/**
 	 * Runs an action on a wire post as the current user.
 	 *
 	 * @param string $action  One of the action constants.
@@ -70,7 +86,7 @@ final class Post_Actions {
 			self::DISMISS => $this->dismiss( $post_id ),
 			self::RESTORE => $this->restore( $post_id ),
 			self::RESCORE => $this->rescore( $post_id ),
-			default       => new \WP_Error( 'wire_desk_unknown_action', __( 'Unknown action.', 'wire-desk' ), [ 'status' => 400 ] ),
+			default       => self::error( 'wire_desk_unknown_action', 400 ),
 		};
 
 		if ( true === $result ) {
@@ -143,7 +159,7 @@ final class Post_Actions {
 		[ , $row ] = $found;
 
 		if ( Wire_Post::STATE_PUBLISHED === $row->state ) {
-			return new \WP_Error( 'wire_desk_published', __( 'Published posts can\'t be dismissed.', 'wire-desk' ), [ 'status' => 409 ] );
+			return self::error( 'wire_desk_published', 409 );
 		}
 
 		Queue::unschedule( $post_id );
@@ -167,7 +183,7 @@ final class Post_Actions {
 		[ , $row ] = $found;
 
 		if ( Wire_Post::STATE_DISMISSED !== $row->state ) {
-			return new \WP_Error( 'wire_desk_not_dismissed', __( 'Only dismissed posts can be restored.', 'wire-desk' ), [ 'status' => 409 ] );
+			return self::error( 'wire_desk_not_dismissed', 409 );
 		}
 
 		if ( null !== $row->scored_at ) {
@@ -216,7 +232,7 @@ final class Post_Actions {
 		$row  = $this->repository->get( $post_id );
 
 		if ( ! $post instanceof WP_Post || null === $row ) {
-			return new \WP_Error( 'wire_desk_not_found', __( 'The wire post does not exist.', 'wire-desk' ), [ 'status' => 404 ] );
+			return self::error( 'wire_desk_not_found', 404 );
 		}
 
 		if ( ! current_user_can( 'edit_post', $post->ID ) ) {
@@ -230,13 +246,23 @@ final class Post_Actions {
 	 * The error for a failed database write.
 	 */
 	private static function db_error(): \WP_Error {
-		return new \WP_Error( 'wire_desk_db_error', __( 'The wire post could not be updated.', 'wire-desk' ), [ 'status' => 500 ] );
+		return self::error( 'wire_desk_db_error', 500 );
 	}
 
 	/**
 	 * The error for a user who isn't allowed to act.
 	 */
 	private static function forbidden(): \WP_Error {
-		return new \WP_Error( 'wire_desk_forbidden', __( 'Sorry, you are not allowed to do that.', 'wire-desk' ), [ 'status' => 403 ] );
+		return self::error( 'wire_desk_forbidden', 403 );
+	}
+
+	/**
+	 * An action error.
+	 *
+	 * @param string $code   One of the codes in error_messages().
+	 * @param int    $status HTTP status.
+	 */
+	private static function error( string $code, int $status ): \WP_Error {
+		return new \WP_Error( $code, self::error_messages()[ $code ], [ 'status' => $status ] );
 	}
 }
