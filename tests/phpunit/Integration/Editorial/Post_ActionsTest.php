@@ -344,6 +344,53 @@ class Post_ActionsTest extends TestCase {
 	}
 
 	/**
+	 * Test the actions offered for each state.
+	 */
+	public function test_available_by_state(): void {
+		$this->assertSame( [ 'publish', 'dismiss', 'rescore' ], Post_Actions::available( $this->row( $this->post_id ) ) );
+
+		$this->repository->set_state( $this->post_id, Wire_Post::STATE_DISMISSED );
+		$this->assertSame( [ 'publish', 'restore', 'rescore' ], Post_Actions::available( $this->row( $this->post_id ) ) );
+
+		$published = $this->wire_post( [ 'post_status' => 'publish' ] );
+		$this->repository->set_state( $published, Wire_Post::STATE_PUBLISHED );
+		$this->assertSame( [ 'rescore' ], Post_Actions::available( $this->row( $published ) ) );
+	}
+
+	/**
+	 * Test that the actions offered follow the user's capabilities.
+	 */
+	public function test_available_follows_capabilities(): void {
+		wp_set_current_user( self::factory()->user->create( [ 'role' => self::REVIEWER ] ) );
+		$this->assertSame( [ 'dismiss', 'rescore' ], Post_Actions::available( $this->row( $this->post_id ) ) );
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'author' ] ) );
+		$this->assertSame( [], Post_Actions::available( $this->row( $this->post_id ) ) );
+	}
+
+	/**
+	 * Test that a row whose post is gone offers nothing.
+	 */
+	public function test_available_without_post(): void {
+		$this->repository->add_queued( 999999, '2024-01-01 00:00:00' );
+
+		$this->assertSame( [], Post_Actions::available( $this->row( 999999 ) ) );
+	}
+
+	/**
+	 * A post's row.
+	 *
+	 * @param int $post_id Post ID.
+	 */
+	private function row( int $post_id ): Wire_Post {
+		$row = $this->repository->get( $post_id );
+
+		$this->assertInstanceOf( Wire_Post::class, $row );
+
+		return $row;
+	}
+
+	/**
 	 * Creates a draft post in the table.
 	 *
 	 * @param array<string, mixed> $args Post arguments.

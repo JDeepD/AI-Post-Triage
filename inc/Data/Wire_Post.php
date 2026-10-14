@@ -173,6 +173,35 @@ final class Wire_Post {
 	}
 
 	/**
+	 * States, keyed by slug.
+	 *
+	 * @return array<string, int>
+	 */
+	public static function state_slugs(): array {
+		return [
+			'queued'    => self::STATE_QUEUED,
+			'scored'    => self::STATE_SCORED,
+			'failed'    => self::STATE_FAILED,
+			'dismissed' => self::STATE_DISMISSED,
+			'published' => self::STATE_PUBLISHED,
+		];
+	}
+
+	/**
+	 * Bands, keyed by slug.
+	 *
+	 * @return array<string, int>
+	 */
+	public static function band_slugs(): array {
+		return [
+			'high'       => self::BAND_HIGH,
+			'medium'     => self::BAND_MEDIUM,
+			'low'        => self::BAND_LOW,
+			'not-scored' => self::BAND_NONE,
+		];
+	}
+
+	/**
 	 * State names, keyed by STATE_* constant.
 	 *
 	 * @return array<int, string>

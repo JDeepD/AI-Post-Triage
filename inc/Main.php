@@ -33,6 +33,7 @@ final class Main {
 		Jobs\Usage::class,
 		Modules\CLI::class,
 		Modules\Queue\Queue_Screen::class,
+		Modules\REST\Posts_Controller::class,
 		Modules\Settings\Admin_Screen::class,
 		Modules\Settings\Rescore_Controller::class,
 		Modules\Settings\Settings::class,

@@ -58,6 +58,36 @@ final class Post_Actions {
 	}
 
 	/**
+	 * The actions the current user can take on a wire post.
+	 *
+	 * @param \JDeepD\Wire_Desk\Data\Wire_Post $item Row.
+	 * @return string[]
+	 */
+	public static function available( Wire_Post $item ): array {
+		$post = get_post( $item->post_id );
+
+		if ( ! $post instanceof WP_Post || ! current_user_can( Capabilities::REVIEW ) || ! current_user_can( 'edit_post', $post->ID ) ) {
+			return [];
+		}
+
+		$actions = [];
+
+		if ( Wire_Post::STATE_PUBLISHED !== $item->state && 'publish' !== $post->post_status && current_user_can( 'publish_post', $post->ID ) ) {
+			$actions[] = self::PUBLISH;
+		}
+
+		if ( Wire_Post::STATE_DISMISSED === $item->state ) {
+			$actions[] = self::RESTORE;
+		} elseif ( Wire_Post::STATE_PUBLISHED !== $item->state ) {
+			$actions[] = self::DISMISS;
+		}
+
+		$actions[] = self::RESCORE;
+
+		return $actions;
+	}
+
+	/**
 	 * Messages for the errors actions return, keyed by error code.
 	 *
 	 * @return array<string, string>

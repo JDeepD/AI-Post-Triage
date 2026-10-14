@@ -51,7 +51,7 @@ Code contributions, bug reports, and feature requests are welcome! The following
 │
 │   # Project documentation.
 ├── docs/
-│   ├── reference/     # Hook, constant and WP-CLI references.
+│   ├── reference/     # Hook, constant, WP-CLI and REST references.
 │   └── DEVELOPMENT.md # 👈 You are here.
 │
 │   # Reusable framework library (shared across plugins).

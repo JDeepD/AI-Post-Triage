@@ -18,7 +18,7 @@ Built on [rtCamp/plugin-skeleton-d](https://github.com/rtCamp/plugin-skeleton-d)
 - **[Development Guide](docs/DEVELOPMENT.md)** - Local setup, commands, testing, and contribution guidelines.
 
 **Reference:**
-[Action Hooks](docs/reference/actions.md) | [Filter Hooks](docs/reference/filters.md) | [Constants](docs/reference/constants.md) | [WP-CLI Commands](docs/reference/cli.md)
+[Action Hooks](docs/reference/actions.md) | [Filter Hooks](docs/reference/filters.md) | [Constants](docs/reference/constants.md) | [WP-CLI Commands](docs/reference/cli.md) | [REST API](docs/reference/rest.md)
 
 ## Project Structure
 

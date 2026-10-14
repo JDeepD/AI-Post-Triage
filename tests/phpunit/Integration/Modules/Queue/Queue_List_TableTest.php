@@ -301,48 +301,6 @@ class Queue_List_TableTest extends TestCase {
 	}
 
 	/**
-	 * Test the row actions for each state.
-	 */
-	public function test_row_action_names(): void {
-		[ $scored ]    = $this->wire_posts( 1 );
-		[ $dismissed ] = $this->wire_posts( 1, Wire_Post::STATE_DISMISSED );
-		$published     = self::factory()->post->create();
-		$this->repository->add_queued( $published, '2024-01-01 00:00:00' );
-		$this->repository->set_state( $published, Wire_Post::STATE_PUBLISHED );
-
-		$this->assertSame( [ 'publish', 'dismiss', 'rescore' ], Queue_List_Table::row_action_names( $this->row( $scored ) ) );
-		$this->assertSame( [ 'publish', 'restore', 'rescore' ], Queue_List_Table::row_action_names( $this->row( $dismissed ) ) );
-		$this->assertSame( [ 'rescore' ], Queue_List_Table::row_action_names( $this->row( $published ) ) );
-	}
-
-	/**
-	 * Test that users who can't publish don't get Publish, and users who can't edit get nothing.
-	 */
-	public function test_row_action_names_follow_capabilities(): void {
-		[ $post_id ] = $this->wire_posts( 1 );
-
-		add_role(
-			'wire_desk_test_reviewer',
-			'Reviewer',
-			[
-				'read'              => true,
-				'edit_posts'        => true,
-				'edit_others_posts' => true,
-			]
-		);
-
-		wp_set_current_user( self::factory()->user->create( [ 'role' => 'wire_desk_test_reviewer' ] ) );
-
-		$this->assertSame( [ 'dismiss', 'rescore' ], Queue_List_Table::row_action_names( $this->row( $post_id ) ) );
-
-		wp_set_current_user( self::factory()->user->create( [ 'role' => 'subscriber' ] ) );
-
-		$this->assertSame( [], Queue_List_Table::row_action_names( $this->row( $post_id ) ) );
-
-		remove_role( 'wire_desk_test_reviewer' );
-	}
-
-	/**
 	 * Test that row action links carry the page, the action and a nonce for that post.
 	 */
 	public function test_renders_row_actions(): void {
@@ -382,19 +340,6 @@ class Queue_List_TableTest extends TestCase {
 		$table->prepare_items();
 
 		return $table;
-	}
-
-	/**
-	 * A post's row.
-	 *
-	 * @param int $post_id Post ID.
-	 */
-	private function row( int $post_id ): Wire_Post {
-		$row = $this->repository->get( $post_id );
-
-		$this->assertInstanceOf( Wire_Post::class, $row );
-
-		return $row;
 	}
 
 	/**

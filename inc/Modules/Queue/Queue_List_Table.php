@@ -106,7 +106,7 @@ final class Queue_List_Table extends WP_List_Table {
 		$views = self::view_states();
 
 		$this->view   = array_key_exists( $view, $views ) ? $view : self::DEFAULT_VIEW;
-		$this->band   = array_key_exists( $band, self::band_slugs() ) ? $band : '';
+		$this->band   = array_key_exists( $band, Wire_Post::band_slugs() ) ? $band : '';
 		$this->before = is_numeric( $query['before'] ?? null ) ? max( 0, (int) $query['before'] ) : 0;
 		$this->after  = $this->before ? 0 : ( is_numeric( $query['after'] ?? null ) ? max( 0, (int) $query['after'] ) : 0 );
 	}
@@ -140,20 +140,6 @@ final class Queue_List_Table extends WP_List_Table {
 			'published'    => __( 'Published', 'wire-desk' ),
 			'dismissed'    => __( 'Dismissed', 'wire-desk' ),
 			'all'          => __( 'All', 'wire-desk' ),
-		];
-	}
-
-	/**
-	 * Bands, keyed by slug.
-	 *
-	 * @return array<string, int>
-	 */
-	public static function band_slugs(): array {
-		return [
-			'high'       => Wire_Post::BAND_HIGH,
-			'medium'     => Wire_Post::BAND_MEDIUM,
-			'low'        => Wire_Post::BAND_LOW,
-			'not-scored' => Wire_Post::BAND_NONE,
 		];
 	}
 
@@ -260,7 +246,7 @@ final class Queue_List_Table extends WP_List_Table {
 	 */
 	public function column_band( Wire_Post $item ): string {
 		$labels = Wire_Post::band_labels();
-		$slug   = (string) array_search( $item->band, self::band_slugs(), true );
+		$slug   = (string) array_search( $item->band, Wire_Post::band_slugs(), true );
 		$html   = '<span class="wire-desk-band wire-desk-band-' . esc_attr( $slug ) . '">' . esc_html( $labels[ $item->band ] ?? $labels[ Wire_Post::BAND_NONE ] ) . '</span>';
 
 		if ( null !== $item->scored_at ) {
@@ -355,36 +341,6 @@ final class Queue_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Row actions a post offers the current user.
-	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post $item Row.
-	 * @return string[]
-	 */
-	public static function row_action_names( Wire_Post $item ): array {
-		$post = get_post( $item->post_id );
-
-		if ( ! $post instanceof WP_Post || ! current_user_can( 'edit_post', $post->ID ) ) {
-			return [];
-		}
-
-		$actions = [];
-
-		if ( Wire_Post::STATE_PUBLISHED !== $item->state && 'publish' !== $post->post_status && current_user_can( 'publish_post', $post->ID ) ) {
-			$actions[] = Post_Actions::PUBLISH;
-		}
-
-		if ( Wire_Post::STATE_DISMISSED === $item->state ) {
-			$actions[] = Post_Actions::RESTORE;
-		} elseif ( Wire_Post::STATE_PUBLISHED !== $item->state ) {
-			$actions[] = Post_Actions::DISMISS;
-		}
-
-		$actions[] = Post_Actions::RESCORE;
-
-		return $actions;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 *
 	 * @return array<string, string>
@@ -422,7 +378,7 @@ final class Queue_List_Table extends WP_List_Table {
 
 		$labels = Post_Actions::labels();
 
-		foreach ( self::row_action_names( $item ) as $action ) {
+		foreach ( Post_Actions::available( $item ) as $action ) {
 			$links[ $action ] = sprintf(
 				'<a href="%1$s" aria-label="%2$s">%3$s</a>',
 				esc_url(
@@ -485,7 +441,7 @@ final class Queue_List_Table extends WP_List_Table {
 			<label for="wire-desk-band-filter" class="screen-reader-text"><?php esc_html_e( 'Filter by priority', 'wire-desk' ); ?></label>
 			<select name="band" id="wire-desk-band-filter">
 				<option value=""><?php esc_html_e( 'All priorities', 'wire-desk' ); ?></option>
-				<?php foreach ( self::band_slugs() as $slug => $band ) : ?>
+				<?php foreach ( Wire_Post::band_slugs() as $slug => $band ) : ?>
 					<option value="<?php echo esc_attr( $slug ); ?>" <?php selected( $this->band, $slug ); ?>><?php echo esc_html( Wire_Post::band_labels()[ $band ] ); ?></option>
 				<?php endforeach; ?>
 			</select>
@@ -593,7 +549,7 @@ final class Queue_List_Table extends WP_List_Table {
 		}
 
 		if ( '' !== $this->band ) {
-			$filters['band'] = self::band_slugs()[ $this->band ];
+			$filters['band'] = Wire_Post::band_slugs()[ $this->band ];
 		}
 
 		return $filters;
