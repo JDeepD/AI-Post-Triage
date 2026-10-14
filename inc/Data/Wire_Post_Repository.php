@@ -31,7 +31,7 @@ final class Wire_Post_Repository {
 	/**
 	 * Columns selected for a Wire_Post.
 	 */
-	private const COLUMNS = 'post_id, post_date, state, band, score, model, HEX(hash) AS hash, cost, scored_at, error, details';
+	private const COLUMNS = 'post_id, post_date, state, band, score, model, HEX(hash) AS hash, cost, scored_at, error, attempts, details';
 
 	/**
 	 * Cached value for a post with no row.
@@ -81,7 +81,7 @@ final class Wire_Post_Repository {
 
 		$result = $wpdb->query(
 			$wpdb->prepare(
-				'UPDATE %i SET state = IF( state IN ( %d, %d ), state, %d ), band = %d, score = %d, model = %s, hash = UNHEX( %s ), cost = %s, scored_at = %s, error = %s, details = %s WHERE post_id = %d',
+				'UPDATE %i SET state = IF( state IN ( %d, %d ), state, %d ), band = %d, score = %d, model = %s, hash = UNHEX( %s ), cost = %s, scored_at = %s, error = %s, attempts = 0, details = %s WHERE post_id = %d',
 				Schema::table_name(),
 				Wire_Post::STATE_DISMISSED,
 				Wire_Post::STATE_PUBLISHED,
@@ -121,6 +121,30 @@ final class Wire_Post_Repository {
 				Wire_Post::STATE_PUBLISHED,
 				Wire_Post::STATE_FAILED,
 				mb_substr( $error, 0, 255 ),
+				$post_id
+			)
+		);
+
+		$this->invalidate( [ $post_id ] );
+
+		return false !== $result;
+	}
+
+	/**
+	 * Records how many times in a row scoring a post has failed.
+	 *
+	 * @param int $post_id  Post ID.
+	 * @param int $attempts Failed attempts.
+	 * @return bool False on a database error.
+	 */
+	public function set_attempts( int $post_id, int $attempts ): bool {
+		global $wpdb;
+
+		$result = $wpdb->query(
+			$wpdb->prepare(
+				'UPDATE %i SET attempts = %d WHERE post_id = %d',
+				Schema::table_name(),
+				min( 255, max( 0, $attempts ) ),
 				$post_id
 			)
 		);

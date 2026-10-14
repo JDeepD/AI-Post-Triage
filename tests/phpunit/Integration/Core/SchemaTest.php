@@ -73,7 +73,7 @@ class SchemaTest extends TestCase {
 		$this->assertTrue( Schema::install() );
 		$this->assertTrue( Schema::table_exists() );
 		$this->assertSame(
-			[ 'post_id', 'post_date', 'state', 'band', 'score', 'model', 'hash', 'cost', 'scored_at', 'error', 'details' ],
+			[ 'post_id', 'post_date', 'state', 'band', 'score', 'model', 'hash', 'cost', 'scored_at', 'error', 'attempts', 'details' ],
 			$this->get_columns()
 		);
 	}
@@ -132,6 +132,7 @@ class SchemaTest extends TestCase {
 		( new Schema() )->maybe_upgrade();
 
 		$this->assertContains( 'details', $this->get_columns() );
+		$this->assertContains( 'attempts', $this->get_columns() );
 		$this->assertArrayHasKey( 'state_band_date', $this->get_indexes() );
 		$this->assertTrue( Schema::is_current() );
 	}

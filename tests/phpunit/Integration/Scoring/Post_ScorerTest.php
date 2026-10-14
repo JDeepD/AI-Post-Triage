@@ -18,6 +18,7 @@ use JDeepD\Wire_Desk\Scoring\Post_Scorer;
 use JDeepD\Wire_Desk\Scoring\Result;
 use JDeepD\Wire_Desk\Scoring\Scorer;
 use JDeepD\Wire_Desk\Scoring\State_Builder;
+use JDeepD\Wire_Desk\Tests\Fakes\Fake_Decision_Client;
 use JDeepD\Wire_Desk\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
@@ -37,7 +38,7 @@ class Post_ScorerTest extends TestCase {
 	/**
 	 * Fake decision client.
 	 *
-	 * @var \JDeepD\Wire_Desk\Tests\Integration\Scoring\Fake_Decision_Client
+	 * @var \JDeepD\Wire_Desk\Tests\Fakes\Fake_Decision_Client
 	 */
 	private Fake_Decision_Client $client;
 
@@ -438,46 +439,5 @@ class Post_ScorerTest extends TestCase {
 	 */
 	private function update_settings( array $settings ): void {
 		update_option( Settings::OPTION_KEY, $settings + Settings::get() );
-	}
-}
-
-/**
- * A decision client that records what it was asked.
- */
-class Fake_Decision_Client implements Decision_Client {
-	/**
-	 * Calls made.
-	 *
-	 * @var array<int, array{state: array<string, string>, questions: array<mixed>, model: string}>
-	 */
-	public array $calls = [];
-
-	/**
-	 * What it returns.
-	 *
-	 * @var \JDeepD\Wire_Desk\Decisions\Decision|\WP_Error
-	 */
-	private Decision|\WP_Error $result;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param \JDeepD\Wire_Desk\Decisions\Decision|\WP_Error $result What it returns.
-	 */
-	public function __construct( Decision|\WP_Error $result ) {
-		$this->result = $result;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public function decide( array $state, array $questions, string $model ): Decision|\WP_Error {
-		$this->calls[] = [
-			'state'     => $state,
-			'questions' => $questions,
-			'model'     => $model,
-		];
-
-		return $this->result;
 	}
 }

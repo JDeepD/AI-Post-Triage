@@ -125,8 +125,8 @@ final class Post_Listener implements Registrable {
 			$this->repository->add_queued( $post->ID, $post->post_date );
 			$row = $this->repository->get( $post->ID );
 
-			if ( Settings::get()['auto_score'] ) {
-				Queue::schedule( $post->ID );
+			if ( Settings::get()['auto_score'] && Queue::schedule( $post->ID ) ) {
+				$this->repository->set_attempts( $post->ID, 0 );
 			}
 		}
 

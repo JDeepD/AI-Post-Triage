@@ -28,6 +28,7 @@ final class Main {
 		Core\Capabilities::class,
 		Core\Assets::class,
 		Jobs\Post_Listener::class,
+		Jobs\Score_Job::class,
 		Modules\CLI::class,
 		Modules\Settings\Admin_Screen::class,
 		Modules\Settings\Settings::class,

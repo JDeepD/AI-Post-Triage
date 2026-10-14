@@ -327,11 +327,11 @@ class Post_ListenerTest extends TestCase {
 	}
 
 	/**
-	 * Test that scheduling an already scheduled post reports it as scheduled.
+	 * Test that a post with a waiting job isn't scheduled again.
 	 */
 	public function test_schedule_is_idempotent(): void {
 		$this->assertTrue( Queue::schedule( 4242 ) );
-		$this->assertTrue( Queue::schedule( 4242 ) );
+		$this->assertFalse( Queue::schedule( 4242 ) );
 		$this->assertTrue( Queue::is_scheduled( 4242 ) );
 		$this->assertCount( 1, $this->jobs( 4242 ) );
 

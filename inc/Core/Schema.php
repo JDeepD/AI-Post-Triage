@@ -18,7 +18,7 @@ final class Schema implements Registrable {
 	/**
 	 * Schema version. Bump it whenever get_table_sql() changes.
 	 */
-	public const VERSION = 1;
+	public const VERSION = 2;
 
 	/**
 	 * Option holding the installed schema version.
@@ -140,6 +140,7 @@ hash binary(16) NULL default NULL,
 cost decimal(12,8) NOT NULL default 0,
 scored_at datetime NULL default NULL,
 error varchar(255) NOT NULL default '',
+attempts tinyint(3) unsigned NOT NULL default 0,
 details longtext NULL,
 PRIMARY KEY  (post_id),
 KEY state_date (state,post_date),

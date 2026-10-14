@@ -108,6 +108,13 @@ final class Wire_Post {
 	public readonly ?array $details;
 
 	/**
+	 * Failed scoring attempts in a row.
+	 *
+	 * @var int
+	 */
+	public readonly int $attempts;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param int                       $post_id   Post ID.
@@ -121,6 +128,7 @@ final class Wire_Post {
 	 * @param ?string                   $scored_at When it was last scored (GMT).
 	 * @param string                    $error     Last scoring error.
 	 * @param ?array<int|string, mixed> $details   Per-question answers.
+	 * @param int                       $attempts  Failed scoring attempts in a row.
 	 */
 	public function __construct(
 		int $post_id,
@@ -133,7 +141,8 @@ final class Wire_Post {
 		float $cost,
 		?string $scored_at,
 		string $error,
-		?array $details
+		?array $details,
+		int $attempts = 0
 	) {
 		$this->post_id   = $post_id;
 		$this->post_date = $post_date;
@@ -146,6 +155,7 @@ final class Wire_Post {
 		$this->scored_at = $scored_at;
 		$this->error     = $error;
 		$this->details   = $details;
+		$this->attempts  = $attempts;
 	}
 
 	/**
@@ -182,6 +192,7 @@ final class Wire_Post {
 			isset( $row['scored_at'] ) ? (string) $row['scored_at'] : null,
 			(string) $row['error'],
 			is_array( $details ) ? $details : null,
+			(int) ( $row['attempts'] ?? 0 ),
 		);
 	}
 }
