@@ -15,6 +15,7 @@ use JDeepD\Wire_Desk\Core\Templates;
 use JDeepD\Wire_Desk\Decisions\Model_Catalogue;
 use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
 use JDeepD\Wire_Desk\Jobs\Usage;
+use JDeepD\Wire_Desk\Modules\Queue\Queue_Screen;
 
 /**
  * Class - Admin_Screen
@@ -36,7 +37,7 @@ final class Admin_Screen implements Registrable {
 	 * {@inheritDoc}
 	 */
 	public function register_hooks(): void {
-		add_action( 'admin_menu', [ $this, 'register_screen' ] );
+		add_action( 'admin_menu', [ $this, 'register_screen' ], 20 );
 		add_action( 'admin_init', [ $this, 'register_fields' ] );
 		add_filter( 'option_page_capability_' . Settings::SETTING_GROUP, [ $this, 'get_capability' ] );
 		add_filter( 'plugin_action_links_' . plugin_basename( WIRE_DESK_FILE ), [ $this, 'add_action_links' ], 2 );
@@ -60,21 +61,11 @@ final class Admin_Screen implements Registrable {
 	}
 
 	/**
-	 * Hook the settings screen into the Admin menu.
+	 * Adds the settings screen to the Wire Desk menu.
 	 */
 	public function register_screen(): void {
-		$hook_suffix = add_menu_page(
-			__( 'Wire Desk', 'wire-desk' ),
-			__( 'Wire Desk', 'wire-desk' ),
-			Capabilities::MANAGE,
-			self::SCREEN_ID,
-			[ $this, 'render_screen' ],
-			'dashicons-rss',
-			26
-		);
-
-		add_submenu_page(
-			self::SCREEN_ID,
+		$hook_suffix = add_submenu_page(
+			Queue_Screen::SCREEN_ID,
 			__( 'Wire Desk Settings', 'wire-desk' ),
 			__( 'Settings', 'wire-desk' ),
 			Capabilities::MANAGE,
@@ -82,7 +73,9 @@ final class Admin_Screen implements Registrable {
 			[ $this, 'render_screen' ]
 		);
 
-		add_action( "load-{$hook_suffix}", [ $this, 'enqueue_scripts' ], 10, 0 );
+		if ( $hook_suffix ) {
+			add_action( "load-{$hook_suffix}", [ $this, 'enqueue_scripts' ], 10, 0 );
+		}
 	}
 
 	/**

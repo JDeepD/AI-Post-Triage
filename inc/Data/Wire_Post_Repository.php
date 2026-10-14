@@ -326,16 +326,19 @@ final class Wire_Post_Repository {
 	}
 
 	/**
-	 * Counts rows.
+	 * Counts rows, stopping at a limit when one is given.
 	 *
 	 * @param array{state?: int, band?: int} $filters Filters.
+	 * @param int                            $max     Highest count needed, or 0 to count every row.
 	 */
-	public function count( array $filters = [] ): int {
+	public function count( array $filters = [], int $max = 0 ): int {
 		global $wpdb;
 
 		[ $where, $args ] = $this->where( $filters );
 
-		$query = $wpdb->prepare( 'SELECT COUNT(*) FROM %i' . $this->where_sql( $where ), Schema::table_name(), ...$args );
+		$query = $max > 0
+			? $wpdb->prepare( 'SELECT COUNT(*) FROM ( SELECT 1 FROM %i' . $this->where_sql( $where ) . ' LIMIT %d ) AS capped', Schema::table_name(), ...[ ...$args, $max ] )
+			: $wpdb->prepare( 'SELECT COUNT(*) FROM %i' . $this->where_sql( $where ), Schema::table_name(), ...$args );
 		$key   = 'count:' . md5( $query ) . ':' . wp_cache_get_last_changed( self::CACHE_GROUP );
 		$count = wp_cache_get( $key, self::CACHE_GROUP );
 

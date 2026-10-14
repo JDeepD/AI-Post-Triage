@@ -337,6 +337,17 @@ class Wire_Post_RepositoryTest extends TestCase {
 	}
 
 	/**
+	 * Test that count() stops at the limit given.
+	 */
+	public function test_count_stops_at_max(): void {
+		$this->add_rows();
+
+		$this->assertSame( 3, $this->repository->count( [], 3 ) );
+		$this->assertSame( 5, $this->repository->count( [], 10 ) );
+		$this->assertSame( 2, $this->repository->count( [ 'state' => Wire_Post::STATE_QUEUED ], 2 ) );
+	}
+
+	/**
 	 * Test that newest_ids() returns the newest IDs.
 	 */
 	public function test_newest_ids(): void {

@@ -13,6 +13,7 @@ use JDeepD\Wire_Desk\Core\Assets;
 use JDeepD\Wire_Desk\Core\Capabilities;
 use JDeepD\Wire_Desk\Decisions\Model_Catalogue;
 use JDeepD\Wire_Desk\Jobs\Usage;
+use JDeepD\Wire_Desk\Modules\Queue\Queue_Screen;
 use JDeepD\Wire_Desk\Modules\Settings\Admin_Screen;
 use JDeepD\Wire_Desk\Modules\Settings\Settings;
 use JDeepD\Wire_Desk\Tests\TestCase;
@@ -60,7 +61,7 @@ class Admin_ScreenTest extends TestCase {
 
 		$screen->register_hooks();
 
-		$this->assertNotFalse( \has_action( 'admin_menu', [ $screen, 'register_screen' ] ) );
+		$this->assertSame( 20, \has_action( 'admin_menu', [ $screen, 'register_screen' ] ) );
 		$this->assertNotFalse( \has_action( 'admin_init', [ $screen, 'register_fields' ] ) );
 		$this->assertNotFalse( \has_filter( 'option_page_capability_' . Settings::SETTING_GROUP, [ $screen, 'get_capability' ] ) );
 		$this->assertNotFalse( \has_filter( 'plugin_action_links_' . \plugin_basename( WIRE_DESK_FILE ), [ $screen, 'add_action_links' ] ) );
@@ -78,42 +79,40 @@ class Admin_ScreenTest extends TestCase {
 	}
 
 	/**
-	 * Test that register_screen adds the top-level menu, its Settings page and the load hook.
+	 * Test that register_screen adds Settings under the Wire Desk menu, after the queue, with its load hook.
 	 */
-	public function test_register_screen_adds_menu_and_settings_page(): void {
-		global $menu, $submenu;
+	public function test_register_screen_adds_settings_page_under_queue(): void {
+		global $submenu;
 
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 
+		( new Queue_Screen() )->register_screen();
 		( new Admin_Screen() )->register_screen();
 
 		( new Assets() )->register_admin_assets();
-		do_action( 'load-' . get_plugin_page_hookname( Admin_Screen::SCREEN_ID, '' ) ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+		do_action( 'load-' . get_plugin_page_hookname( Admin_Screen::SCREEN_ID, Queue_Screen::SCREEN_ID ) ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 
-		$top_level = array_values( array_filter( (array) $menu, static fn ( $item ): bool => Admin_Screen::SCREEN_ID === ( $item[2] ?? null ) ) );
+		$items = $submenu[ Queue_Screen::SCREEN_ID ] ?? [];
 
-		$this->assertCount( 1, $top_level );
-		$this->assertSame( 'Wire Desk', $top_level[0][0] );
-		$this->assertSame( Capabilities::MANAGE, $top_level[0][1] );
-		$this->assertSame( 'dashicons-rss', $top_level[0][6] );
-		$this->assertSame( 'Settings', $submenu[ Admin_Screen::SCREEN_ID ][0][0] ?? null );
+		$this->assertSame( [ 'Review queue', 'Settings' ], array_column( $items, 0 ) );
+		$this->assertSame( Capabilities::MANAGE, $items[1][1] );
+		$this->assertSame( Admin_Screen::SCREEN_ID, $items[1][2] );
 		$this->assertTrue( wp_script_is( Assets::ADMIN_HANDLE, 'enqueued' ) );
 		$this->assertTrue( wp_style_is( Assets::ADMIN_HANDLE, 'enqueued' ) );
 	}
 
 	/**
-	 * Test that editors can't open the settings menu.
+	 * Test that editors don't get the Settings page.
 	 */
 	public function test_register_screen_hides_settings_from_editors(): void {
-		global $menu;
+		global $submenu;
 
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
 
+		( new Queue_Screen() )->register_screen();
 		( new Admin_Screen() )->register_screen();
 
-		$top_level = array_values( array_filter( (array) $menu, static fn ( $item ): bool => Admin_Screen::SCREEN_ID === ( $item[2] ?? null ) ) );
-
-		$this->assertFalse( current_user_can( $top_level[0][1] ?? 'do_not_allow' ) );
+		$this->assertSame( [ 'Review queue' ], array_column( $submenu[ Queue_Screen::SCREEN_ID ] ?? [], 0 ) );
 	}
 
 	/**

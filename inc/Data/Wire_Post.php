@@ -173,6 +173,21 @@ final class Wire_Post {
 	}
 
 	/**
+	 * State names, keyed by STATE_* constant.
+	 *
+	 * @return array<int, string>
+	 */
+	public static function state_labels(): array {
+		return [
+			self::STATE_QUEUED    => __( 'Waiting to be scored', 'wire-desk' ),
+			self::STATE_SCORED    => __( 'Needs review', 'wire-desk' ),
+			self::STATE_FAILED    => __( 'Scoring failed', 'wire-desk' ),
+			self::STATE_DISMISSED => __( 'Dismissed', 'wire-desk' ),
+			self::STATE_PUBLISHED => __( 'Published', 'wire-desk' ),
+		];
+	}
+
+	/**
 	 * Builds a Wire_Post from a database row.
 	 *
 	 * @param array<string, mixed> $row Row selected by Wire_Post_Repository.
