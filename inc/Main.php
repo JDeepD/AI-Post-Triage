@@ -24,6 +24,7 @@ final class Main {
 	 * @var class-string<\JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable>[]
 	 */
 	private const REGISTRABLE_CLASSES = [
+		Core\Schema::class,
 		Core\Assets::class,
 		Modules\CLI::class,
 		Modules\Settings\Admin_Screen::class,
@@ -79,6 +80,8 @@ final class Main {
 
 		// For simple stuff, you can do it here.
 		update_option( 'wire_desk_version', WIRE_DESK_VERSION );
+
+		Core\Schema::install();
 	}
 
 	/**

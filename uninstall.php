@@ -47,8 +47,24 @@ function run_uninstaller(): void {
  */
 function uninstall(): void {
 	// Add additional uninstall routines here.
+	drop_tables();
 	delete_options();
 	delete_transients();
+}
+
+/**
+ * Drops the plugin's tables.
+ */
+function drop_tables(): void {
+	global $wpdb;
+
+	$tables = [
+		$wpdb->prefix . PLUGIN_PREFIX . 'post', // Created by Core\Schema.
+	];
+
+	foreach ( $tables as $table ) {
+		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $table ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- Removing the plugin's own table.
+	}
 }
 
 /**
@@ -58,6 +74,7 @@ function delete_options(): void {
 	$options = [
 		// Add more options as needed.
 		PLUGIN_PREFIX . 'version', // Set by Main::activate().
+		PLUGIN_PREFIX . 'db_version', // Set by Core\Schema.
 	];
 
 	foreach ( $options as $option ) {
@@ -74,7 +91,9 @@ function delete_transients(): void {
 	 *
 	 * @var string[] $transients
 	 */
-	$transients = [];
+	$transients = [
+		PLUGIN_PREFIX . 'db_install_failed', // Set by Core\Schema.
+	];
 
 	foreach ( $transients as $transient ) {
 		delete_transient( $transient );

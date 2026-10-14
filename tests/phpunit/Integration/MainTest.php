@@ -9,6 +9,7 @@ declare( strict_types = 1 );
 
 namespace JDeepD\Wire_Desk\Tests\Integration;
 
+use JDeepD\Wire_Desk\Core\Schema;
 use JDeepD\Wire_Desk\Main;
 use JDeepD\Wire_Desk\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -58,6 +59,19 @@ class MainTest extends TestCase {
 		Main::activate();
 
 		$this->assertEquals( WIRE_DESK_VERSION, get_option( 'wire_desk_version' ) );
+	}
+
+	/**
+	 * Test that activate() installs the post table.
+	 */
+	public function test_activate_installs_schema(): void {
+		$this->reset_main_instance();
+		delete_option( Schema::VERSION_OPTION );
+
+		Main::activate();
+
+		$this->assertTrue( Schema::table_exists() );
+		$this->assertTrue( Schema::is_current() );
 	}
 
 	/**
