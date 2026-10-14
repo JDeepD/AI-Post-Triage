@@ -1,0 +1,57 @@
+{
+	"name": "jdeepd/wire-desk",
+	"type": "wordpress-plugin",
+	"license": "GPL-3.0-or-later",
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"phpstan/extension-installer": true
+		},
+		"platform": {
+			"php": "8.2"
+		},
+		"preferred-install": "dist",
+		"process-timeout": 0,
+		"optimize-autoloader": true,
+		"sort-packages": true
+	},
+	"minimum-stability": "alpha",
+	"prefer-stable": true,
+	"autoload": {
+		"psr-4": {
+			"JDeepD\\Wire_Desk\\": "inc/",
+			"JDeepD\\Wire_Desk\\Framework\\": "framework/",
+			"JDeepD\\Wire_Desk\\Tests\\": "tests/phpunit/"
+		}
+	},
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "https://github.com/rtCamp/coding-standards-d.git"
+		}
+	],
+	"require": {
+		"php": "^8.2",
+		"woocommerce/action-scheduler": "^4.2"
+	},
+	"require-dev": {
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.2",
+		"php-stubs/wordpress-stubs": "7.1 as 6.9.4",
+		"php-stubs/wp-cli-stubs": "^2.12",
+		"phpstan/extension-installer": "^1.3",
+		"phpstan/phpstan": "^2.2.16",
+		"phpstan/phpstan-deprecation-rules": "^2.0.5",
+		"phpstan/phpstan-phpunit": "^2.0.21",
+		"rtcamp/coding-standards-d": "^0.1.1",
+		"szepeviktor/phpstan-wordpress": "^2.0.4",
+		"wp-phpunit/wp-phpunit": "^7.1",
+		"yoast/phpunit-polyfills": "^4.0"
+	},
+	"scripts": {
+		"format": "phpcbf",
+		"lint": "phpcs",
+		"phpstan": "phpstan analyse --memory-limit=1G",
+		"test": "vendor/bin/phpunit -c phpunit.xml.dist",
+		"test-multisite": "WP_MULTISITE=1 phpunit --exclude-group=ms-excluded"
+	}
+}

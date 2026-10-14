@@ -1,0 +1,33 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"meta": {
+		"title": "Wire Desk Demo",
+		"description": "Flags high-priority wire-ingested stories with a decision model and gives editors a review queue to decide what gets published.",
+		"author": "Jaydeep Das",
+		"categories": [ "news", "editorial", "ai" ]
+	},
+	"landingPage": "/wp-admin/plugins.php",
+	"preferredVersions": {
+		"php": "8.5",
+		"wp": "latest"
+	},
+	"features": {
+		"networking": true
+	},
+	"steps": [
+		{
+			"step": "login",
+			"username": "admin"
+		},
+		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "url",
+				"url": "https://github.com/JDeepD/wire-desk/releases/latest/download/wire-desk.zip"
+			},
+			"options": {
+				"activate": true
+			}
+		}
+	]
+}

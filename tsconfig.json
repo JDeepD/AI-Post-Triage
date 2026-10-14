@@ -1,0 +1,23 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	// Point this to your TS ruleset.
+	"extends": "./tsconfig.base.json",
+
+	// Project-specific config.
+	"compilerOptions": {
+		"noEmit": true,
+		"rootDir": ".",
+		"outDir": "./build",
+		"paths": {
+			"@/*": [ "./src/*" ]
+		},
+		"types": [ "node" ]
+	},
+	"include": [ "**/*.cjs", "**/*.mjs", "**/*.ts", "**/*.tsx", "**/*.json" ],
+	"exclude": [
+		"**/build/*",
+		"vendor/*",
+		"node_modules/*",
+		"eslint.config.mjs"
+	]
+}

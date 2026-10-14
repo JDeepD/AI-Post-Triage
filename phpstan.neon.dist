@@ -1,0 +1,41 @@
+# https://phpstan.org/config-reference
+
+parameters:
+	# Rules
+	treatPhpDocTypesAsCertain: false
+	inferPrivatePropertyTypeFromConstructor: true
+	checkExplicitMixedMissingReturn: true
+	checkFunctionNameCase: true
+	checkInternalClassCaseSensitivity: true
+	checkTooWideReturnTypesInProtectedAndPublicMethods: true
+	polluteScopeWithAlwaysIterableForeach: false
+	polluteScopeWithLoopInitialAssignments: false
+	reportAlwaysTrueInLastCondition: true
+	reportStaticMethodSignatures: true
+	reportWrongPhpDocTypeInVarTag: true
+
+	# Configuration
+	level: 8
+	tmpDir: tests/_output/phpstan
+	phpVersion:
+		min: 80200
+		max: 80500
+	bootstrapFiles:
+		- wire-desk.php
+	paths:
+		- wire-desk.php
+		- uninstall.php
+		- framework/
+		- inc/
+		- templates/
+	excludePaths:
+		analyse:
+			- tests/
+			- vendor/
+		analyseAndScan:
+			- node_modules (?)
+	scanFiles:
+		- vendor/php-stubs/wp-cli-stubs/wp-cli-stubs.php
+		- vendor/woocommerce/action-scheduler/functions.php
+	scanDirectories:
+		- vendor/woocommerce/action-scheduler/classes
