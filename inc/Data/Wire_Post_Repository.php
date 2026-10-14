@@ -1,0 +1,445 @@
+<?php
+/**
+ * Reads and writes the wire post table.
+ *
+ * @package JDeepD\Wire_Desk
+ */
+
+declare( strict_types = 1 );
+
+namespace JDeepD\Wire_Desk\Data;
+
+use JDeepD\Wire_Desk\Core\Schema;
+
+/**
+ * Class - Wire_Post_Repository
+ *
+ * phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom table, cached in the object cache.
+ * phpcs:disable WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- Queries are built from placeholders and prepared before running.
+ */
+final class Wire_Post_Repository {
+	/**
+	 * Object cache group.
+	 */
+	public const CACHE_GROUP = 'wire-desk';
+
+	/**
+	 * Maximum rows per page.
+	 */
+	public const MAX_PAGE_SIZE = 100;
+
+	/**
+	 * Columns selected for a Wire_Post.
+	 */
+	private const COLUMNS = 'post_id, post_date, state, band, score, model, HEX(hash) AS hash, cost, scored_at, error, details';
+
+	/**
+	 * Cached value for a post with no row.
+	 */
+	private const NO_ROW = 0;
+
+	/**
+	 * Adds a post to the table as queued, or updates its date if it is already there.
+	 *
+	 * @param int    $post_id   Post ID.
+	 * @param string $post_date Post date.
+	 * @return bool False on a database error.
+	 */
+	public function add_queued( int $post_id, string $post_date ): bool {
+		global $wpdb;
+
+		$result = $wpdb->query(
+			$wpdb->prepare(
+				'INSERT INTO %i ( post_id, post_date, state ) VALUES ( %d, %s, %d ) ON DUPLICATE KEY UPDATE post_date = %s',
+				Schema::table_name(),
+				$post_id,
+				$post_date,
+				Wire_Post::STATE_QUEUED,
+				$post_date
+			)
+		);
+
+		$this->invalidate( [ $post_id ] );
+
+		return false !== $result;
+	}
+
+	/**
+	 * Saves a score. Dismissed and published posts keep their state.
+	 *
+	 * @param int                      $post_id Post ID.
+	 * @param int                      $band    One of the Wire_Post::BAND_* constants.
+	 * @param int                      $score   Score from 0 to 100.
+	 * @param string                   $model   Model ID.
+	 * @param string                   $hash    Input fingerprint, as 32 hex characters.
+	 * @param float                    $cost    Cost in US dollars.
+	 * @param array<int|string, mixed> $details Per-question answers.
+	 * @return bool False on a database error.
+	 */
+	public function save_score( int $post_id, int $band, int $score, string $model, string $hash, float $cost, array $details ): bool {
+		global $wpdb;
+
+		$result = $wpdb->query(
+			$wpdb->prepare(
+				'UPDATE %i SET state = IF( state IN ( %d, %d ), state, %d ), band = %d, score = %d, model = %s, hash = UNHEX( %s ), cost = %s, scored_at = %s, error = %s, details = %s WHERE post_id = %d',
+				Schema::table_name(),
+				Wire_Post::STATE_DISMISSED,
+				Wire_Post::STATE_PUBLISHED,
+				Wire_Post::STATE_SCORED,
+				$band,
+				$score,
+				$model,
+				$hash,
+				sprintf( '%.8F', $cost ),
+				current_time( 'mysql', true ),
+				'',
+				(string) wp_json_encode( $details ),
+				$post_id
+			)
+		);
+
+		$this->invalidate( [ $post_id ] );
+
+		return false !== $result;
+	}
+
+	/**
+	 * Saves a scoring error. Dismissed and published posts keep their state.
+	 *
+	 * @param int    $post_id Post ID.
+	 * @param string $error   Error message.
+	 * @return bool False on a database error.
+	 */
+	public function save_error( int $post_id, string $error ): bool {
+		global $wpdb;
+
+		$result = $wpdb->query(
+			$wpdb->prepare(
+				'UPDATE %i SET state = IF( state IN ( %d, %d ), state, %d ), error = %s WHERE post_id = %d',
+				Schema::table_name(),
+				Wire_Post::STATE_DISMISSED,
+				Wire_Post::STATE_PUBLISHED,
+				Wire_Post::STATE_FAILED,
+				mb_substr( $error, 0, 255 ),
+				$post_id
+			)
+		);
+
+		$this->invalidate( [ $post_id ] );
+
+		return false !== $result;
+	}
+
+	/**
+	 * Changes a post's state.
+	 *
+	 * @param int $post_id Post ID.
+	 * @param int $state   One of the Wire_Post::STATE_* constants.
+	 * @return bool False for an unknown state or a database error.
+	 */
+	public function set_state( int $post_id, int $state ): bool {
+		global $wpdb;
+
+		if ( ! in_array( $state, self::states(), true ) ) {
+			return false;
+		}
+
+		$result = $wpdb->query(
+			$wpdb->prepare( 'UPDATE %i SET state = %d WHERE post_id = %d', Schema::table_name(), $state, $post_id )
+		);
+
+		$this->invalidate( [ $post_id ] );
+
+		return false !== $result;
+	}
+
+	/**
+	 * Deletes a post's row.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return bool False on a database error.
+	 */
+	public function delete( int $post_id ): bool {
+		global $wpdb;
+
+		$result = $wpdb->query(
+			$wpdb->prepare( 'DELETE FROM %i WHERE post_id = %d', Schema::table_name(), $post_id )
+		);
+
+		$this->invalidate( [ $post_id ] );
+
+		return false !== $result;
+	}
+
+	/**
+	 * Clears the per-question details of posts older than a date.
+	 *
+	 * @param string $before Post date to clear details before.
+	 * @param int    $limit  Maximum rows to clear.
+	 * @return int Rows cleared.
+	 */
+	public function prune_details( string $before, int $limit = 1000 ): int {
+		global $wpdb;
+
+		$post_ids = array_map(
+			'intval',
+			$wpdb->get_col(
+				$wpdb->prepare(
+					'SELECT post_id FROM %i WHERE post_date < %s AND details IS NOT NULL ORDER BY post_date LIMIT %d',
+					Schema::table_name(),
+					$before,
+					max( 1, $limit )
+				)
+			)
+		);
+
+		if ( ! $post_ids ) {
+			return 0;
+		}
+
+		$result = $wpdb->query(
+			$wpdb->prepare(
+				'UPDATE %i SET details = NULL WHERE post_id IN ( ' . implode( ', ', array_fill( 0, count( $post_ids ), '%d' ) ) . ' )',
+				Schema::table_name(),
+				...$post_ids
+			)
+		);
+
+		$this->invalidate( $post_ids );
+
+		return (int) $result;
+	}
+
+	/**
+	 * Gets a post's row.
+	 *
+	 * @param int $post_id Post ID.
+	 */
+	public function get( int $post_id ): ?Wire_Post {
+		return $this->get_many( [ $post_id ] )[ $post_id ] ?? null;
+	}
+
+	/**
+	 * Gets several rows, in the order given. Posts without a row are left out.
+	 *
+	 * @param int[] $post_ids Post IDs.
+	 * @return array<int, \JDeepD\Wire_Desk\Data\Wire_Post> Keyed by post ID.
+	 */
+	public function get_many( array $post_ids ): array {
+		$post_ids = array_values( array_unique( array_filter( array_map( 'intval', $post_ids ), static fn ( int $id ): bool => $id > 0 ) ) );
+
+		if ( ! $post_ids ) {
+			return [];
+		}
+
+		$keys   = array_map( [ $this, 'row_key' ], $post_ids );
+		$cached = wp_cache_get_multiple( $keys, self::CACHE_GROUP );
+		$found  = [];
+
+		foreach ( $post_ids as $index => $post_id ) {
+			if ( false !== ( $cached[ $keys[ $index ] ] ?? false ) ) {
+				$found[ $post_id ] = $cached[ $keys[ $index ] ];
+			}
+		}
+
+		$missing = array_values( array_diff( $post_ids, array_keys( $found ) ) );
+
+		if ( $missing ) {
+			$found += $this->fetch( $missing );
+		}
+
+		$posts = [];
+		foreach ( $post_ids as $post_id ) {
+			if ( ( $found[ $post_id ] ?? null ) instanceof Wire_Post ) {
+				$posts[ $post_id ] = $found[ $post_id ];
+			}
+		}
+
+		return $posts;
+	}
+
+	/**
+	 * Gets a page of rows, newest first.
+	 *
+	 * @param array{state?: int, band?: int}              $filters Filters.
+	 * @param array{post_date: string, post_id: int}|null $cursor  Row to page from.
+	 * @param int                                         $limit   Rows per page, up to MAX_PAGE_SIZE.
+	 * @param bool                                        $newer   Get rows newer than the cursor instead of older.
+	 * @return \JDeepD\Wire_Desk\Data\Wire_Post[]
+	 */
+	public function page( array $filters = [], ?array $cursor = null, int $limit = 20, bool $newer = false ): array {
+		global $wpdb;
+
+		[ $where, $args ] = $this->where( $filters );
+
+		$operator = $newer ? '>' : '<';
+		$order_by = $newer ? ' ORDER BY post_date ASC, post_id ASC' : ' ORDER BY post_date DESC, post_id DESC';
+
+		if ( null !== $cursor ) {
+			$where[] = "( post_date {$operator} %s OR ( post_date = %s AND post_id {$operator} %d ) )";
+			array_push( $args, $cursor['post_date'], $cursor['post_date'], $cursor['post_id'] );
+		}
+
+		$query = $wpdb->prepare(
+			'SELECT post_id FROM %i' . $this->where_sql( $where ) . $order_by . ' LIMIT %d',
+			Schema::table_name(),
+			...[ ...$args, max( 1, min( self::MAX_PAGE_SIZE, $limit ) ) ]
+		);
+
+		$key      = 'page:' . md5( $query ) . ':' . wp_cache_get_last_changed( self::CACHE_GROUP );
+		$post_ids = wp_cache_get( $key, self::CACHE_GROUP );
+
+		if ( ! is_array( $post_ids ) ) {
+			$post_ids = array_map( 'intval', $wpdb->get_col( $query ) );
+			wp_cache_set( $key, $post_ids, self::CACHE_GROUP );
+		}
+
+		if ( $newer ) {
+			$post_ids = array_reverse( $post_ids );
+		}
+
+		return array_values( $this->get_many( $post_ids ) );
+	}
+
+	/**
+	 * Counts rows.
+	 *
+	 * @param array{state?: int, band?: int} $filters Filters.
+	 */
+	public function count( array $filters = [] ): int {
+		global $wpdb;
+
+		[ $where, $args ] = $this->where( $filters );
+
+		$query = $wpdb->prepare( 'SELECT COUNT(*) FROM %i' . $this->where_sql( $where ), Schema::table_name(), ...$args );
+		$key   = 'count:' . md5( $query ) . ':' . wp_cache_get_last_changed( self::CACHE_GROUP );
+		$count = wp_cache_get( $key, self::CACHE_GROUP );
+
+		if ( ! is_int( $count ) ) {
+			$count = (int) $wpdb->get_var( $query );
+			wp_cache_set( $key, $count, self::CACHE_GROUP );
+		}
+
+		return $count;
+	}
+
+	/**
+	 * Gets the IDs of the newest posts.
+	 *
+	 * @param int $limit Maximum IDs.
+	 * @return int[]
+	 */
+	public function newest_ids( int $limit ): array {
+		global $wpdb;
+
+		return array_map(
+			'intval',
+			$wpdb->get_col(
+				$wpdb->prepare(
+					'SELECT post_id FROM %i ORDER BY post_date DESC, post_id DESC LIMIT %d',
+					Schema::table_name(),
+					max( 1, $limit )
+				)
+			)
+		);
+	}
+
+	/**
+	 * All states.
+	 *
+	 * @return int[]
+	 */
+	public static function states(): array {
+		return [
+			Wire_Post::STATE_QUEUED,
+			Wire_Post::STATE_SCORED,
+			Wire_Post::STATE_FAILED,
+			Wire_Post::STATE_DISMISSED,
+			Wire_Post::STATE_PUBLISHED,
+		];
+	}
+
+	/**
+	 * Fetches rows from the database and caches them, including posts with no row.
+	 *
+	 * @param int[] $post_ids Post IDs.
+	 * @return array<int, \JDeepD\Wire_Desk\Data\Wire_Post|int> Keyed by post ID.
+	 */
+	private function fetch( array $post_ids ): array {
+		global $wpdb;
+
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT ' . self::COLUMNS . ' FROM %i WHERE post_id IN ( ' . implode( ', ', array_fill( 0, count( $post_ids ), '%d' ) ) . ' )',
+				Schema::table_name(),
+				...$post_ids
+			),
+			ARRAY_A
+		);
+
+		$found = array_fill_keys( $post_ids, self::NO_ROW );
+
+		foreach ( (array) $rows as $row ) {
+			$post = Wire_Post::from_row( (array) $row );
+
+			$found[ $post->post_id ] = $post;
+		}
+
+		$values = [];
+		foreach ( $found as $post_id => $value ) {
+			$values[ $this->row_key( $post_id ) ] = $value;
+		}
+
+		wp_cache_set_multiple( $values, self::CACHE_GROUP );
+
+		return $found;
+	}
+
+	/**
+	 * Builds WHERE conditions from filters.
+	 *
+	 * @param array{state?: int, band?: int} $filters Filters.
+	 * @return array{0: string[], 1: array<int, int|string>} Conditions and their arguments.
+	 */
+	private function where( array $filters ): array {
+		$where = [];
+		$args  = [];
+
+		foreach ( [ 'state', 'band' ] as $column ) {
+			if ( isset( $filters[ $column ] ) ) {
+				$where[] = "{$column} = %d";
+				$args[]  = (int) $filters[ $column ];
+			}
+		}
+
+		return [ $where, $args ];
+	}
+
+	/**
+	 * Joins WHERE conditions.
+	 *
+	 * @param string[] $where Conditions.
+	 */
+	private function where_sql( array $where ): string {
+		return $where ? ' WHERE ' . implode( ' AND ', $where ) : '';
+	}
+
+	/**
+	 * Cache key for a row.
+	 *
+	 * @param int $post_id Post ID.
+	 */
+	private function row_key( int $post_id ): string {
+		return 'post:' . $post_id;
+	}
+
+	/**
+	 * Clears cached rows, pages and counts.
+	 *
+	 * @param int[] $post_ids Post IDs.
+	 */
+	private function invalidate( array $post_ids ): void {
+		wp_cache_delete_multiple( array_map( [ $this, 'row_key' ], $post_ids ), self::CACHE_GROUP );
+		wp_cache_set_last_changed( self::CACHE_GROUP );
+	}
+}
