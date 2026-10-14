@@ -1,0 +1,20 @@
+{
+	"answers": {
+		"q_breaking": {
+			"noul": 0.96,
+			"type": "noul"
+		},
+		"q_advisory": {
+			"noul": 0,
+			"type": "noul"
+		}
+	},
+	"id": "gen-dec-1789738314-X5e5eKGQdvR9rblyX250",
+	"model": "typesafe/jev-1.13-20260917",
+	"provider": "TypeSafe",
+	"usage": {
+		"cost": 1.9992e-5,
+		"input_tokens": 476,
+		"output_tokens": 70
+	}
+}

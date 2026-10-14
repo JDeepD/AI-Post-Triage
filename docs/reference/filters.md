@@ -9,6 +9,7 @@
   - [`wire_desk/located_template`](#wire_desklocated_template)
   - [`wire_desk/template_paths`](#wire_desktemplate_paths)
   - [`wire_desk/capability_map`](#wire_deskcapability_map)
+  - [`wire_desk/openrouter_api_key`](#wire_deskopenrouter_api_key)
 
 ## `wire_desk/template_args`
 
@@ -74,3 +75,15 @@ apply_filters( 'wire_desk/capability_map', array $map );
 ### Parameters
 
 - `$map (array<string, string>)`: Wire Desk capability => capability that grants it. Defaults to `wire_desk_manage` => `manage_options` and `wire_desk_review` => `edit_others_posts`.
+
+## `wire_desk/openrouter_api_key`
+
+Filters the OpenRouter API key. By default the key comes from the `WIRE_DESK_OPENROUTER_API_KEY` constant, or else from the OpenRouter connector under Settings → Connectors.
+
+```php
+apply_filters( 'wire_desk/openrouter_api_key', string $key );
+```
+
+### Parameters
+
+- `$key (string)`: API key. Empty when none is configured.
