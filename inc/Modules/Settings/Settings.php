@@ -26,6 +26,11 @@ final class Settings implements Registrable {
 	public const SETTING_GROUP = self::SETTING_PREFIX . 'settings';
 
 	/**
+	 * Option for deleting the plugin's data on uninstall.
+	 */
+	public const DELETE_DATA_OPTION_KEY = self::SETTING_PREFIX . 'delete_data_on_uninstall';
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public function register_hooks(): void {
@@ -42,7 +47,20 @@ final class Settings implements Registrable {
 		 *
 		 * @var array<string, array<string, mixed>> $settings
 		 */
-		$settings = [];
+		$settings = [
+			self::DELETE_DATA_OPTION_KEY => [
+				'type'              => 'boolean',
+				'label'             => __( 'Delete data on uninstall', 'wire-desk' ),
+				'description'       => __( 'Delete the Wire Desk table and settings when the plugin is deleted.', 'wire-desk' ),
+				'default'           => false,
+				'sanitize_callback' => 'rest_sanitize_boolean',
+				'show_in_rest'      => [
+					'schema' => [
+						'type' => 'boolean',
+					],
+				],
+			],
+		];
 
 		foreach ( $settings as $key => $args ) {
 			register_setting(
@@ -51,5 +69,12 @@ final class Settings implements Registrable {
 				$args
 			);
 		}
+	}
+
+	/**
+	 * Whether the plugin's data is deleted on uninstall.
+	 */
+	public static function delete_data_on_uninstall(): bool {
+		return (bool) get_option( self::DELETE_DATA_OPTION_KEY, false );
 	}
 }

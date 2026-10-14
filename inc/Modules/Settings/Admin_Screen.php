@@ -23,10 +23,16 @@ final class Admin_Screen implements Registrable {
 	public const SCREEN_ID = 'wire-desk';
 
 	/**
+	 * The settings section for plugin data.
+	 */
+	public const DATA_SECTION = 'wire_desk_data';
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public function register_hooks(): void {
 		add_action( 'admin_menu', [ $this, 'register_screen' ] );
+		add_action( 'admin_init', [ $this, 'register_fields' ] );
 		add_filter( 'plugin_action_links_' . plugin_basename( WIRE_DESK_FILE ), [ $this, 'add_action_links' ], 2 );
 	}
 
@@ -64,6 +70,41 @@ final class Admin_Screen implements Registrable {
 		if ( false !== $hook_suffix ) {
 			add_action( "load-{$hook_suffix}", [ $this, 'enqueue_scripts' ], 10, 0 );
 		}
+	}
+
+	/**
+	 * Register the settings sections and fields.
+	 */
+	public function register_fields(): void {
+		add_settings_section(
+			self::DATA_SECTION,
+			__( 'Data', 'wire-desk' ),
+			'__return_null',
+			self::SCREEN_ID
+		);
+
+		add_settings_field(
+			Settings::DELETE_DATA_OPTION_KEY,
+			__( 'Uninstall', 'wire-desk' ),
+			[ $this, 'render_delete_data_field' ],
+			self::SCREEN_ID,
+			self::DATA_SECTION
+		);
+	}
+
+	/**
+	 * Render the delete data on uninstall field.
+	 *
+	 * @internal Used by register_fields().
+	 */
+	public function render_delete_data_field(): void {
+		printf(
+			'<label for="%1$s"><input type="checkbox" id="%1$s" name="%1$s" value="1" %2$s /> %3$s</label><p class="description">%4$s</p>',
+			esc_attr( Settings::DELETE_DATA_OPTION_KEY ),
+			checked( Settings::delete_data_on_uninstall(), true, false ),
+			esc_html__( 'Delete all Wire Desk data when the plugin is deleted', 'wire-desk' ),
+			esc_html__( 'Drops the Wire Desk table and deletes its settings. This can\'t be undone.', 'wire-desk' )
+		);
 	}
 
 	/**

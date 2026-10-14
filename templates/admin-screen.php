@@ -7,10 +7,21 @@
 
 declare(strict_types = 1);
 
+use JDeepD\Wire_Desk\Modules\Settings\Admin_Screen;
+use JDeepD\Wire_Desk\Modules\Settings\Settings;
+
 ?>
 
 <div class="wrap">
 	<h1><?php esc_html_e( 'Wire Desk', 'wire-desk' ); ?></h1>
 
-	<div class="wire-desk-content"></div>
+	<div class="wire-desk-content">
+		<form action="options.php" method="post">
+			<?php
+			settings_fields( Settings::SETTING_GROUP );
+			do_settings_sections( Admin_Screen::SCREEN_ID );
+			submit_button();
+			?>
+		</form>
+	</div>
 </div>

@@ -11,6 +11,7 @@ namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Admin;
 
 use JDeepD\Wire_Desk\Core\Assets;
 use JDeepD\Wire_Desk\Modules\Settings\Admin_Screen;
+use JDeepD\Wire_Desk\Modules\Settings\Settings;
 use JDeepD\Wire_Desk\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
@@ -28,6 +29,7 @@ class Admin_ScreenTest extends TestCase {
 		$screen->register_hooks();
 
 		$this->assertNotFalse( \has_action( 'admin_menu', [ $screen, 'register_screen' ] ) );
+		$this->assertNotFalse( \has_action( 'admin_init', [ $screen, 'register_fields' ] ) );
 		$this->assertNotFalse( \has_filter( 'plugin_action_links_' . \plugin_basename( WIRE_DESK_FILE ), [ $screen, 'add_action_links' ] ) );
 	}
 
@@ -86,5 +88,42 @@ class Admin_ScreenTest extends TestCase {
 
 		$this->assertStringContainsString( '<div class="wrap">', $output );
 		$this->assertStringContainsString( 'wire-desk-content', $output );
+		$this->assertStringContainsString( 'action="options.php"', $output );
+		$this->assertStringContainsString( "name='option_page' value='" . Settings::SETTING_GROUP . "'", $output );
+	}
+
+	/**
+	 * Test that register_fields adds the delete data field.
+	 */
+	public function test_register_fields_adds_delete_data_field(): void {
+		global $wp_settings_sections, $wp_settings_fields;
+
+		require_once ABSPATH . 'wp-admin/includes/template.php';
+
+		( new Admin_Screen() )->register_fields();
+
+		$this->assertArrayHasKey( Admin_Screen::DATA_SECTION, $wp_settings_sections[ Admin_Screen::SCREEN_ID ] );
+		$this->assertArrayHasKey( Settings::DELETE_DATA_OPTION_KEY, $wp_settings_fields[ Admin_Screen::SCREEN_ID ][ Admin_Screen::DATA_SECTION ] );
+	}
+
+	/**
+	 * Test that the delete data field reflects the saved option.
+	 */
+	public function test_render_delete_data_field_reflects_option(): void {
+		$screen = new Admin_Screen();
+
+		update_option( Settings::DELETE_DATA_OPTION_KEY, false );
+		ob_start();
+		$screen->render_delete_data_field();
+		$unchecked = (string) ob_get_clean();
+
+		update_option( Settings::DELETE_DATA_OPTION_KEY, true );
+		ob_start();
+		$screen->render_delete_data_field();
+		$checked = (string) ob_get_clean();
+
+		$this->assertStringContainsString( 'name="' . Settings::DELETE_DATA_OPTION_KEY . '"', $unchecked );
+		$this->assertStringNotContainsString( "checked='checked'", $unchecked );
+		$this->assertStringContainsString( "checked='checked'", $checked );
 	}
 }

@@ -46,6 +46,10 @@ function run_uninstaller(): void {
  * The (site-specific) uninstall function.
  */
 function uninstall(): void {
+	if ( ! get_option( PLUGIN_PREFIX . 'delete_data_on_uninstall' ) ) {
+		return;
+	}
+
 	// Add additional uninstall routines here.
 	drop_tables();
 	delete_options();
@@ -75,6 +79,7 @@ function delete_options(): void {
 		// Add more options as needed.
 		PLUGIN_PREFIX . 'version', // Set by Main::activate().
 		PLUGIN_PREFIX . 'db_version', // Set by Core\Schema.
+		PLUGIN_PREFIX . 'delete_data_on_uninstall', // Set by Modules\Settings\Settings.
 	];
 
 	foreach ( $options as $option ) {
