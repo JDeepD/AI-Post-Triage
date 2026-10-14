@@ -31,6 +31,7 @@ final class Main {
 		Modules\Settings\Admin_Screen::class,
 		Modules\Settings\Settings::class,
 		Modules\Settings\Term_Search_Controller::class,
+		Modules\Settings\Try_Controller::class,
 	];
 
 	/**

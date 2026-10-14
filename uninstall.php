@@ -99,6 +99,7 @@ function delete_transients(): void {
 	 */
 	$transients = [
 		PLUGIN_PREFIX . 'db_install_failed', // Set by Core\Schema.
+		PLUGIN_PREFIX . 'models', // Set by Decisions\Model_Catalogue.
 	];
 
 	foreach ( $transients as $transient ) {

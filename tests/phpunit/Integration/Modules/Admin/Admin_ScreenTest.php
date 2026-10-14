@@ -11,6 +11,7 @@ namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Admin;
 
 use JDeepD\Wire_Desk\Core\Assets;
 use JDeepD\Wire_Desk\Core\Capabilities;
+use JDeepD\Wire_Desk\Decisions\Model_Catalogue;
 use JDeepD\Wire_Desk\Modules\Settings\Admin_Screen;
 use JDeepD\Wire_Desk\Modules\Settings\Settings;
 use JDeepD\Wire_Desk\Tests\TestCase;
@@ -29,6 +30,14 @@ class Admin_ScreenTest extends TestCase {
 
 		require_once ABSPATH . 'wp-admin/includes/template.php';
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
+		set_transient(
+			Model_Catalogue::TRANSIENT,
+			[
+				'cloudflare/clef'   => 'Cloudflare: Clef',
+				'typesafe/jev-1.13' => 'TypeSafe: Jev 1.13',
+			]
+		);
 	}
 
 	/**
@@ -140,6 +149,7 @@ class Admin_ScreenTest extends TestCase {
 				'wire-desk-high-threshold',
 				'wire-desk-medium-threshold',
 				'wire-desk-model',
+				'wire-desk-try',
 				'wire-desk-daily-budget',
 				'wire-desk-concurrency',
 				'wire-desk-delete-data-on-uninstall',
@@ -183,6 +193,51 @@ class Admin_ScreenTest extends TestCase {
 		$this->assertStringContainsString( 'name="' . Settings::DELETE_DATA_OPTION_KEY . '"', $output );
 		$this->assertSame( 4 + 1, substr_count( $output, 'data-wire-desk-remove-question' ) );
 		$this->assertStringContainsString( 'wire_desk_settings[questions][__INDEX__][question]', $output );
+	}
+
+	/**
+	 * Test that the model field lists the models by name.
+	 */
+	public function test_render_screen_lists_models_by_name(): void {
+		$output = $this->render_screen();
+
+		$this->assertMatchesRegularExpression( '#<select id="wire-desk-model" name="wire_desk_settings\[model\]">#', $output );
+		$this->assertMatchesRegularExpression( '#<option value="cloudflare/clef" >Cloudflare: Clef</option>#', $output );
+		$this->assertMatchesRegularExpression( "#<option value=\"typesafe/jev-1.13\"  selected='selected'>TypeSafe: Jev 1.13</option>#", $output );
+		$this->assertStringNotContainsString( 'not in the list', $output );
+	}
+
+	/**
+	 * Test that a saved model missing from the list stays selected.
+	 */
+	public function test_render_screen_keeps_unlisted_model(): void {
+		update_option( Settings::OPTION_KEY, [ 'model' => 'acme/decider-2' ] );
+
+		$this->assertMatchesRegularExpression( '#<option value="acme/decider-2" selected>\s*acme/decider-2 \(not in the list\)\s*</option>#', $this->render_screen() );
+	}
+
+	/**
+	 * Test that the model field falls back to a text box when the list can't be loaded.
+	 */
+	public function test_render_screen_falls_back_to_text_model_field(): void {
+		set_transient( Model_Catalogue::TRANSIENT, [], Model_Catalogue::FAILURE_TTL );
+
+		$output = $this->render_screen();
+
+		$this->assertStringNotContainsString( '<select id="wire-desk-model"', $output );
+		$this->assertMatchesRegularExpression( '#<input\s+type="text"\s+class="regular-text"\s+id="wire-desk-model"\s+name="wire_desk_settings\[model\]"\s+value="typesafe/jev-1.13"#', $output );
+		$this->assertStringContainsString( 'The model list could not be loaded from OpenRouter.', $output );
+	}
+
+	/**
+	 * Test that the try box isn't submitted with the settings.
+	 */
+	public function test_render_screen_try_box_has_no_setting(): void {
+		$output = $this->render_screen();
+
+		$this->assertMatchesRegularExpression( '#<textarea\s+id="wire-desk-try"\s+class="large-text"\s+rows="2"\s+maxlength="500"#', $output );
+		$this->assertStringNotContainsString( 'wire_desk_settings[try]', $output );
+		$this->assertStringContainsString( 'data-wire-desk-try-submit', $output );
 	}
 
 	/**

@@ -10,6 +10,7 @@
   - [`wire_desk/template_paths`](#wire_desktemplate_paths)
   - [`wire_desk/capability_map`](#wire_deskcapability_map)
   - [`wire_desk/openrouter_api_key`](#wire_deskopenrouter_api_key)
+  - [`wire_desk/unsupported_models`](#wire_deskunsupported_models)
 
 ## `wire_desk/template_args`
 
@@ -87,3 +88,15 @@ apply_filters( 'wire_desk/openrouter_api_key', string $key );
 ### Parameters
 
 - `$key (string)`: API key. Empty when none is configured.
+
+## `wire_desk/unsupported_models`
+
+Filters the model ID prefixes left out of the settings screen's model list. The list is cached for a day, so changes show up once the `wire_desk_models` transient expires or is deleted.
+
+```php
+apply_filters( 'wire_desk/unsupported_models', array $prefixes );
+```
+
+### Parameters
+
+- `$prefixes (string[])`: Model ID prefixes. Defaults to `scaledown/` and `respan/`, whose models expect a different input.

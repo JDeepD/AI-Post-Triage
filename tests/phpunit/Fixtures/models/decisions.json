@@ -1,0 +1,80 @@
+{
+	"data": [
+		{
+			"id": "typesafe/jev-1.13",
+			"name": "TypeSafe: Jev 1.13",
+			"architecture": {
+				"modality": "text->decisions",
+				"output_modalities": [ "decisions" ]
+			},
+			"pricing": { "prompt": "0.00000004", "completion": "0" }
+		},
+		{
+			"id": "~typesafe/jev-latest",
+			"name": "TypeSafe: Jev Latest",
+			"architecture": {
+				"modality": "text->decisions",
+				"output_modalities": [ "decisions" ]
+			},
+			"pricing": { "prompt": "0.00000004", "completion": "0" }
+		},
+		{
+			"id": "cloudflare/clef",
+			"name": "Cloudflare: Clef",
+			"architecture": {
+				"modality": "text+image->decisions",
+				"output_modalities": [ "decisions" ]
+			},
+			"pricing": { "prompt": "0.0000001", "completion": "0" }
+		},
+		{
+			"id": "scaledown/classify-1",
+			"name": "ScaleDown: Classify-1",
+			"architecture": {
+				"modality": "text+image+file->decisions",
+				"output_modalities": [ "decisions" ]
+			},
+			"pricing": { "prompt": "0.00000004", "completion": "0" }
+		},
+		{
+			"id": "respan/span-01",
+			"name": "Respan: Span-01",
+			"architecture": {
+				"modality": "text->decisions",
+				"output_modalities": [ "decisions" ]
+			},
+			"pricing": { "prompt": "0.00000004", "completion": "0" }
+		},
+		{
+			"id": "openai/gpt-6",
+			"name": "OpenAI: GPT-6",
+			"architecture": {
+				"modality": "text->text",
+				"output_modalities": [ "text" ]
+			},
+			"pricing": { "prompt": "0.000002", "completion": "0.000008" }
+		},
+		{
+			"id": "acme/decider-2",
+			"architecture": {
+				"modality": "text->decisions",
+				"output_modalities": [ "decisions" ]
+			}
+		},
+		{
+			"id": "not a model id",
+			"name": "Broken",
+			"architecture": {
+				"modality": "text->decisions",
+				"output_modalities": [ "decisions" ]
+			}
+		},
+		{
+			"name": "No ID",
+			"architecture": {
+				"modality": "text->decisions",
+				"output_modalities": [ "decisions" ]
+			}
+		}
+	]
+}

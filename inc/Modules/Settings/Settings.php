@@ -79,7 +79,7 @@ final class Settings implements Registrable {
 	/**
 	 * Model ID format, e.g. typesafe/jev-1.13.
 	 */
-	private const MODEL_PATTERN = '#^[a-z0-9._~-]+/[a-z0-9._:-]+$#i';
+	public const MODEL_PATTERN = '#^[a-z0-9._~-]+/[a-z0-9._:-]+$#i';
 
 	/**
 	 * {@inheritDoc}

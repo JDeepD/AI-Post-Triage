@@ -12,6 +12,7 @@ namespace JDeepD\Wire_Desk\Modules\Settings;
 use JDeepD\Wire_Desk\Core\Assets;
 use JDeepD\Wire_Desk\Core\Capabilities;
 use JDeepD\Wire_Desk\Core\Templates;
+use JDeepD\Wire_Desk\Decisions\Model_Catalogue;
 use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
 
 /**
@@ -183,11 +184,17 @@ final class Admin_Screen implements Registrable {
 				'description' => __( 'Posts scoring at least this much are Medium. The rest are Low.', 'wire-desk' ),
 			],
 			[
-				'key'         => 'model',
-				'title'       => __( 'Model', 'wire-desk' ),
+				'key'      => 'model',
+				'title'    => __( 'Model', 'wire-desk' ),
+				'section'  => 'wire_desk_model',
+				'template' => 'model',
+			],
+			[
+				'key'         => 'try',
+				'title'       => __( 'Try a headline', 'wire-desk' ),
 				'section'     => 'wire_desk_model',
-				'template'    => 'text',
-				'description' => __( 'OpenRouter model ID, e.g. typesafe/jev-1.13.', 'wire-desk' ),
+				'template'    => 'try',
+				'description' => __( 'Asks the selected model the saved questions. Each try is a paid request.', 'wire-desk' ),
 			],
 			[
 				'key'         => 'daily_budget',
@@ -237,7 +244,7 @@ final class Admin_Screen implements Registrable {
 				[ $this, 'render_field' ],
 				self::SCREEN_ID,
 				$field['section'],
-				in_array( $field['template'], [ 'checkbox', 'number', 'text', 'context' ], true )
+				in_array( $field['template'], [ 'checkbox', 'number', 'text', 'context', 'model' ], true )
 					? [ 'label_for' => $id ] + $field
 					: $field
 			);
@@ -284,6 +291,10 @@ final class Admin_Screen implements Registrable {
 			case 'questions':
 				$args['weights'] = Settings::weights();
 				$args['max']     = Settings::MAX_QUESTIONS;
+				break;
+
+			case 'model':
+				$args['models'] = Model_Catalogue::get();
 				break;
 		}
 

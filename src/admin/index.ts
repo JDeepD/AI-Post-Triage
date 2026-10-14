@@ -3,7 +3,7 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import domReady from '@wordpress/dom-ready';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -14,6 +14,18 @@ import './styles/styles.scss';
 type Term = {
 	id: number;
 	name: string;
+};
+
+type TryAnswer = {
+	id: string;
+	question: string;
+	expected: 'yes' | 'no';
+	yes: number;
+};
+
+type TryResult = {
+	model: string;
+	answers: TryAnswer[];
 };
 
 const SEARCH_DELAY = 300;
@@ -198,6 +210,141 @@ const initTermSearch = ( fieldset: HTMLElement ): void => {
 	} );
 };
 
+/**
+ * Asks the selected model the saved questions about a headline.
+ *
+ * @param box The try box.
+ */
+const initTry = ( box: HTMLElement ): void => {
+	const headline = box.querySelector< HTMLTextAreaElement >(
+		'[data-wire-desk-try-headline]'
+	);
+	const submit = box.querySelector< HTMLButtonElement >(
+		'[data-wire-desk-try-submit]'
+	);
+	const spinner = box.querySelector< HTMLElement >(
+		'[data-wire-desk-try-spinner]'
+	);
+	const result = box.querySelector< HTMLElement >(
+		'[data-wire-desk-try-result]'
+	);
+
+	if ( ! headline || ! submit || ! spinner || ! result ) {
+		return;
+	}
+
+	const notice = ( text: string ): HTMLParagraphElement => {
+		const paragraph = document.createElement( 'p' );
+		paragraph.className = 'wire-desk-try-error';
+		paragraph.textContent = text;
+		return paragraph;
+	};
+
+	const cell = ( tag: 'td' | 'th', text: string ): HTMLElement => {
+		const element = document.createElement( tag );
+		element.textContent = text;
+		return element;
+	};
+
+	const render = ( data: TryResult ): void => {
+		const table = document.createElement( 'table' );
+		const head = document.createElement( 'tr' );
+		const body = document.createElement( 'tbody' );
+
+		table.className = 'widefat striped';
+		head.append(
+			cell( 'th', __( 'Question', 'wire-desk' ) ),
+			cell( 'th', __( 'Answer', 'wire-desk' ) ),
+			cell( 'th', __( 'Expected', 'wire-desk' ) )
+		);
+		table.createTHead().append( head );
+
+		data.answers.forEach( ( answer ) => {
+			const row = document.createElement( 'tr' );
+			const yes = answer.yes >= 0.5;
+			const confidence = Math.round(
+				( yes ? answer.yes : 1 - answer.yes ) * 100
+			);
+
+			row.append(
+				cell( 'td', answer.question ),
+				cell(
+					'td',
+					sprintf(
+						/* translators: 1: Yes or No, 2: confidence percentage. */
+						__( '%1$s (%2$d%%)', 'wire-desk' ),
+						yes
+							? __( 'Yes', 'wire-desk' )
+							: __( 'No', 'wire-desk' ),
+						confidence
+					)
+				),
+				cell(
+					'td',
+					'yes' === answer.expected
+						? __( 'Yes', 'wire-desk' )
+						: __( 'No', 'wire-desk' )
+				)
+			);
+			body.append( row );
+		} );
+
+		table.append( body );
+
+		const model = document.createElement( 'p' );
+		model.className = 'description';
+		model.textContent = sprintf(
+			/* translators: %s: model ID. */
+			__( 'Answered by %s.', 'wire-desk' ),
+			data.model
+		);
+
+		result.replaceChildren( table, model );
+	};
+
+	submit.addEventListener( 'click', async () => {
+		const text = headline.value.trim();
+
+		if ( ! text ) {
+			result.replaceChildren(
+				notice( __( 'Enter a headline.', 'wire-desk' ) )
+			);
+			headline.focus();
+			return;
+		}
+
+		const model =
+			document.querySelector< HTMLSelectElement | HTMLInputElement >(
+				'#wire-desk-model'
+			)?.value ?? '';
+
+		submit.disabled = true;
+		spinner.classList.add( 'is-active' );
+
+		try {
+			render(
+				await apiFetch< TryResult >( {
+					path: '/wire-desk/v1/try',
+					method: 'POST',
+					data: model
+						? { headline: text, model }
+						: { headline: text },
+				} )
+			);
+		} catch ( error ) {
+			result.replaceChildren(
+				notice(
+					( error as { message?: string } ).message ||
+						__( 'The request failed. Try again.', 'wire-desk' )
+				)
+			);
+		} finally {
+			submit.disabled = false;
+			spinner.classList.remove( 'is-active' );
+		}
+	} );
+};
+
 domReady( () => {
 	document
 		.querySelectorAll< HTMLElement >( '[data-wire-desk-questions-field]' )
@@ -206,4 +353,8 @@ domReady( () => {
 	document
 		.querySelectorAll< HTMLElement >( '[data-wire-desk-terms]' )
 		.forEach( initTermSearch );
+
+	document
+		.querySelectorAll< HTMLElement >( '[data-wire-desk-try]' )
+		.forEach( initTry );
 } );

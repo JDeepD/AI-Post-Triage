@@ -55,3 +55,26 @@
 .form-table .wire-desk-questions th:first-child {
 	width: 55%;
 }
+
+.wire-desk-try {
+	max-width: 1000px;
+}
+
+.wire-desk-try .spinner {
+	float: none;
+	margin-top: 0;
+}
+
+.wire-desk-try-result table {
+	margin-top: 12px;
+}
+
+.form-table .wire-desk-try-result th,
+.form-table .wire-desk-try-result td {
+	padding: 10px 12px;
+	width: auto;
+}
+
+.wire-desk-try-error {
+	color: #d63638;
+}
