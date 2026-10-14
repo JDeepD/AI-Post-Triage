@@ -11,6 +11,7 @@
   - [`wire_desk/capability_map`](#wire_deskcapability_map)
   - [`wire_desk/openrouter_api_key`](#wire_deskopenrouter_api_key)
   - [`wire_desk/unsupported_models`](#wire_deskunsupported_models)
+  - [`wire_desk/state`](#wire_deskstate)
 
 ## `wire_desk/template_args`
 
@@ -100,3 +101,16 @@ apply_filters( 'wire_desk/unsupported_models', array $prefixes );
 ### Parameters
 
 - `$prefixes (string[])`: Model ID prefixes. Defaults to `scaledown/` and `respan/`, whose models expect a different input.
+
+## `wire_desk/state`
+
+Filters what the model reads about a post. Values must be strings; empty values, non-string keys and non-scalar values are dropped. Everything in the state is part of the fingerprint, so changing it makes posts be scored again.
+
+```php
+apply_filters( 'wire_desk/state', array $state, WP_Post $post );
+```
+
+### Parameters
+
+- `$state (array<string, string>)`: Facts about the post. `headline` is always set; `summary` or `body` depend on the "Model reads" setting, and `newsroom` holds the newsroom context when one is saved.
+- `$post (WP_Post)`: The post being scored.

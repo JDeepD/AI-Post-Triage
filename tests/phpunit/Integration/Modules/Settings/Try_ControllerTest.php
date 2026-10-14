@@ -153,8 +153,8 @@ class Try_ControllerTest extends TestCase {
 		$this->assertInstanceOf( WP_REST_Response::class, $response );
 		$this->assertSame(
 			[
-				'headline' => 'Quake hits city',
 				'newsroom' => 'A national daily in Colombia.',
+				'headline' => 'Quake hits city',
 			],
 			$client->state
 		);

@@ -16,6 +16,7 @@ use JDeepD\Wire_Desk\Decisions\OpenRouter_Client;
 use JDeepD\Wire_Desk\Framework\Contracts\Abstracts\Abstract_REST_Controller;
 use JDeepD\Wire_Desk\Scoring\Rubric;
 use JDeepD\Wire_Desk\Scoring\Scorer;
+use JDeepD\Wire_Desk\Scoring\State_Builder;
 use WP_REST_Response;
 use WP_REST_Server;
 
@@ -108,13 +109,7 @@ final class Try_Controller extends Abstract_REST_Controller {
 			return new \WP_Error( 'rest_invalid_param', __( 'Enter a headline.', 'wire-desk' ), [ 'status' => 400 ] );
 		}
 
-		$state = [ 'headline' => $headline ];
-
-		if ( '' !== $settings['context'] ) {
-			$state['newsroom'] = $settings['context'];
-		}
-
-		$decision = ( $this->client ?? new OpenRouter_Client() )->decide( $state, $settings['questions'], $model );
+		$decision = ( $this->client ?? new OpenRouter_Client() )->decide( State_Builder::for_headline( $headline ), $settings['questions'], $model );
 
 		if ( is_wp_error( $decision ) ) {
 			return new \WP_Error(
