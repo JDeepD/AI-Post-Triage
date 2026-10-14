@@ -396,6 +396,40 @@ class Wire_Post_RepositoryTest extends TestCase {
 	}
 
 	/**
+	 * Test that a prune batch starts from a date and says how far it got.
+	 */
+	public function test_prune_details_batch(): void {
+		$this->add_rows();
+
+		foreach ( [ 1, 2, 3, 4, 5 ] as $post_id ) {
+			$this->repository->save_score( $post_id, Wire_Post::BAND_LOW, 10, 'typesafe/jev-1.13', md5( (string) $post_id ), 0.0, [ [ 'id' => 'q1' ] ] );
+		}
+
+		$this->assertSame(
+			[
+				'cleared' => 2,
+				'through' => '2026-10-11 09:00:00',
+			],
+			$this->repository->prune_details_batch( '2026-10-13 00:00:00', '', 2 )
+		);
+		$this->assertSame(
+			[
+				'cleared' => 2,
+				'through' => '2026-10-12 09:00:00',
+			],
+			$this->repository->prune_details_batch( '2026-10-13 00:00:00', '2026-10-11 09:00:00', 5 )
+		);
+		$this->assertSame(
+			[
+				'cleared' => 0,
+				'through' => '2026-10-12 09:00:00',
+			],
+			$this->repository->prune_details_batch( '2026-10-13 00:00:00', '2026-10-12 09:00:00', 5 )
+		);
+		$this->assertNotNull( $this->repository->get( 5 )?->details );
+	}
+
+	/**
 	 * Test that newest_ids() returns the newest IDs.
 	 */
 	public function test_newest_ids(): void {

@@ -10,6 +10,7 @@
 	<file>./framework/</file>
 	<file>./inc/</file>
 	<file>./templates/</file>
+	<file>./tests/performance/</file>
 	<file>./tests/phpunit/</file>
 	<file>./wire-desk.php</file>
 	<file>./uninstall.php</file>

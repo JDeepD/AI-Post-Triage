@@ -203,23 +203,38 @@ final class Wire_Post_Repository {
 	 * @return int Rows cleared.
 	 */
 	public function prune_details( string $before, int $limit = 1000 ): int {
+		return $this->prune_details_batch( $before, '', $limit )['cleared'];
+	}
+
+	/**
+	 * Clears the per-question details of the oldest posts in a date range, and says how far it got.
+	 *
+	 * Rows are read in post date order from `$after`, so the next batch can start from `through`
+	 * instead of reading the rows this one cleared again.
+	 *
+	 * @param string $before Post date to clear details before.
+	 * @param string $after  Post date to start from, or an empty string for the oldest post.
+	 * @param int    $limit  Maximum rows to clear.
+	 * @return array{cleared: int, through: string} Rows cleared, and the post date of the last one, or `$after` when none.
+	 */
+	public function prune_details_batch( string $before, string $after, int $limit = 1000 ): array {
 		global $wpdb;
 
-		$post_ids = array_map(
-			'intval',
-			$wpdb->get_col(
-				$wpdb->prepare(
-					'SELECT post_id FROM %i WHERE post_date < %s AND details IS NOT NULL ORDER BY post_date LIMIT %d',
-					Schema::table_name(),
-					$before,
-					max( 1, $limit )
-				)
-			)
+		$rows = (array) $wpdb->get_results(
+			'' === $after
+				? $wpdb->prepare( 'SELECT post_id, post_date FROM %i WHERE post_date < %s AND details IS NOT NULL ORDER BY post_date LIMIT %d', Schema::table_name(), $before, max( 1, $limit ) )
+				: $wpdb->prepare( 'SELECT post_id, post_date FROM %i WHERE post_date >= %s AND post_date < %s AND details IS NOT NULL ORDER BY post_date LIMIT %d', Schema::table_name(), $after, $before, max( 1, $limit ) ),
+			ARRAY_A
 		);
 
-		if ( ! $post_ids ) {
-			return 0;
+		if ( ! $rows ) {
+			return [
+				'cleared' => 0,
+				'through' => $after,
+			];
 		}
+
+		$post_ids = array_map( static fn ( $row ): int => (int) $row['post_id'], $rows );
 
 		$result = $wpdb->query(
 			$wpdb->prepare(
@@ -231,7 +246,10 @@ final class Wire_Post_Repository {
 
 		$this->invalidate( $post_ids );
 
-		return (int) $result;
+		return [
+			'cleared' => (int) $result,
+			'through' => (string) $rows[ count( $rows ) - 1 ]['post_date'],
+		];
 	}
 
 	/**

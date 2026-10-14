@@ -13,6 +13,8 @@ use JDeepD\Wire_Desk\Data\Wire_Post;
 use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
 use JDeepD\Wire_Desk\Jobs\Maintenance;
 use JDeepD\Wire_Desk\Jobs\Queue;
+use JDeepD\Wire_Desk\Scoring\Result;
+use JDeepD\Wire_Desk\Scoring\Score;
 use JDeepD\Wire_Desk\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
@@ -46,6 +48,7 @@ class MaintenanceTest extends TestCase {
 
 		$this->assertSame( 10, has_action( 'admin_init', [ $maintenance, 'schedule' ] ) );
 		$this->assertSame( 10, has_action( Maintenance::HOOK, [ $maintenance, 'run' ] ) );
+		$this->assertSame( 10, has_action( 'wire_desk/scored', [ $maintenance, 'on_scored' ] ) );
 	}
 
 	/**
@@ -129,6 +132,67 @@ class MaintenanceTest extends TestCase {
 		$this->assertSame( 1, ( new Maintenance( $this->repository ) )->prune_details( 30 ) );
 		$this->assertNull( $this->repository->get( $old )?->details );
 		$this->assertNotNull( $this->repository->get( $recent )?->details );
+	}
+
+	/**
+	 * Test that a finished prune remembers its cutoff, so the next one doesn't read cleared history again.
+	 */
+	public function test_prune_remembers_where_it_stopped(): void {
+		global $wpdb;
+
+		$this->scored( 100 );
+
+		$this->assertSame( '', Maintenance::pruned_before() );
+
+		( new Maintenance( $this->repository ) )->prune_details( 30 );
+
+		$mark = Maintenance::pruned_before();
+
+		$this->assertEqualsWithDelta( time() - 30 * DAY_IN_SECONDS, (int) strtotime( $mark . ' ' . wp_timezone_string() ), 5 );
+
+		$queries = [];
+		add_filter(
+			'query',
+			static function ( $query ) use ( &$queries ) {
+				$queries[] = $query;
+				return $query;
+			}
+		);
+
+		( new Maintenance( $this->repository ) )->prune_details( 30 );
+
+		$this->assertStringContainsString( $wpdb->prepare( 'post_date >= %s', $mark ), implode( "\n", $queries ) );
+	}
+
+	/**
+	 * Test that answers saved on a post older than the mark move the mark back, so they are cleared.
+	 */
+	public function test_old_post_scored_again_is_pruned(): void {
+		$maintenance = new Maintenance( $this->repository );
+		$maintenance->prune_details( 30 );
+
+		$old = $this->scored( 200 );
+
+		$this->assertSame( 0, $maintenance->prune_details( 30 ) );
+		$this->assertNotNull( $this->repository->get( $old )?->details );
+
+		$maintenance->on_scored( new Result( $old, new Score( 70, Wire_Post::BAND_HIGH, [] ), 'typesafe/jev-1.13', 0.0, false ) );
+
+		$this->assertSame( $this->repository->get( $old )?->post_date, Maintenance::pruned_before() );
+		$this->assertSame( 1, $maintenance->prune_details( 30 ) );
+		$this->assertNull( $this->repository->get( $old )?->details );
+	}
+
+	/**
+	 * Test that a longer retention than the mark clears nothing and keeps the mark.
+	 */
+	public function test_prune_with_longer_retention_keeps_mark(): void {
+		$maintenance = new Maintenance( $this->repository );
+		$maintenance->prune_details( 30 );
+		$mark = Maintenance::pruned_before();
+
+		$this->assertSame( 0, $maintenance->prune_details( 60 ) );
+		$this->assertSame( $mark, Maintenance::pruned_before() );
 	}
 
 	/**

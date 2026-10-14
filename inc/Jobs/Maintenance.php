@@ -11,6 +11,7 @@ namespace JDeepD\Wire_Desk\Jobs;
 
 use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
 use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\Wire_Desk\Scoring\Result;
 
 /**
  * Class - Maintenance
@@ -20,6 +21,11 @@ final class Maintenance implements Registrable {
 	 * Daily action.
 	 */
 	public const HOOK = 'wire_desk/prune';
+
+	/**
+	 * Option holding the post date before which answers are already cleared.
+	 */
+	public const PRUNED_OPTION = 'wire_desk_pruned_before';
 
 	/**
 	 * Days the per-question answers are kept by default.
@@ -58,6 +64,35 @@ final class Maintenance implements Registrable {
 	public function register_hooks(): void {
 		add_action( 'admin_init', [ $this, 'schedule' ] );
 		add_action( self::HOOK, [ $this, 'run' ] );
+		add_action( 'wire_desk/scored', [ $this, 'on_scored' ] );
+	}
+
+	/**
+	 * Moves the pruned mark back when a post older than it gets new answers, so they are cleared too.
+	 *
+	 * @param mixed $result Result.
+	 */
+	public function on_scored( $result ): void {
+		$pruned = self::pruned_before();
+
+		if ( ! $result instanceof Result || '' === $pruned ) {
+			return;
+		}
+
+		$row = $this->repository->get( $result->post_id );
+
+		if ( null !== $row && null !== $row->details && $row->post_date < $pruned ) {
+			update_option( self::PRUNED_OPTION, $row->post_date );
+		}
+	}
+
+	/**
+	 * The post date before which answers are already cleared, or an empty string before the first full prune.
+	 */
+	public static function pruned_before(): string {
+		$pruned = get_option( self::PRUNED_OPTION, '' );
+
+		return is_string( $pruned ) ? $pruned : '';
 	}
 
 	/**
@@ -115,14 +150,24 @@ final class Maintenance implements Registrable {
 	 */
 	public function prune_details( int $days, int $batches = 0 ): int {
 		$before  = wp_date( 'Y-m-d H:i:s', time() - max( 1, $days ) * DAY_IN_SECONDS ) ?: gmdate( 'Y-m-d H:i:s' );
+		$after   = min( self::pruned_before(), $before );
 		$cleared = 0;
 		$run     = 0;
 
 		do {
-			$count    = $this->repository->prune_details( $before, self::BATCH_SIZE );
-			$cleared += $count;
+			$batch    = $this->repository->prune_details_batch( $before, $after, self::BATCH_SIZE );
+			$cleared += $batch['cleared'];
+			$after    = $batch['through'];
 			++$run;
-		} while ( self::BATCH_SIZE === $count && ( 0 === $batches || $run < $batches ) );
+
+			if ( $after > self::pruned_before() ) {
+				update_option( self::PRUNED_OPTION, $after );
+			}
+		} while ( self::BATCH_SIZE === $batch['cleared'] && ( 0 === $batches || $run < $batches ) );
+
+		if ( self::BATCH_SIZE !== $batch['cleared'] && $before > self::pruned_before() ) {
+			update_option( self::PRUNED_OPTION, $before );
+		}
 
 		return $cleared;
 	}

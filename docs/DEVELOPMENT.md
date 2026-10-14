@@ -27,6 +27,7 @@ Code contributions, bug reports, and feature requests are welcome! The following
 - [Running Tests](#running-tests)
   - [PHPUnit](#phpunit)
     - [Running Tests](#running-tests-1)
+  - [Performance Check](#performance-check)
   - [GitHub Workflows](#github-workflows)
 - [Internationalization](#internationalization)
 - [Building the plugin for distribution](#building-the-plugin-for-distribution)
@@ -364,6 +365,20 @@ npm run test:php
 ```
 
 You should see the html coverage report in the `tests/_output/html` directory and the clover XML report in `tests/_output/php-coverage.xml`.
+
+### Performance Check
+
+`tests/performance/check.php` checks that Wire Desk holds up at about a million wire posts. It is a dev-only WP-CLI script, not part of the plugin zip, and runs in the test environment:
+
+```bash
+npm run perf -- seed           # Fill the wdperf_ tables with 1,000,000 posts (about 20 seconds). Add a number for a different size.
+npm run perf -- check          # Explain and time the queries that have to scale.
+npm run perf -- drop           # Drop the wdperf_ tables.
+```
+
+Only Wire Desk's table, the posts table and the postmeta table are redirected to the `wdperf_` tables. Options, users and Action Scheduler stay on the site's own tables, so PHPUnit is not affected.
+
+`check` runs each query with a cold and a warm object cache and explains it. It fails when a query reads a whole table, has no index, or sorts without one, or misses its time target. Targets include the queue page (under 250 ms cold and 100 ms warm), every query behind it (under 50 ms cold), the daily prune (under 100 ms) and the save hook (1 ms or less per save). The `stats` queries and the first prune over all history are expected to read a lot, so they are timed but not failed.
 
 ### GitHub Workflows
 
