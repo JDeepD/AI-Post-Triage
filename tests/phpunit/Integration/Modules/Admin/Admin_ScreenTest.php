@@ -22,6 +22,27 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass( Admin_Screen::class )]
 class Admin_ScreenTest extends TestCase {
 	/**
+	 * Load the admin functions the screen uses.
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+
+		require_once ABSPATH . 'wp-admin/includes/template.php';
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+
+	/**
+	 * Reset the admin menu and settings globals.
+	 */
+	protected function tearDown(): void {
+		foreach ( [ 'menu', 'submenu', 'wp_settings_sections', 'wp_settings_fields', 'wp_settings_errors' ] as $global ) {
+			$GLOBALS[ $global ] = []; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Reset between tests.
+		}
+
+		parent::tearDown();
+	}
+
+	/**
 	 * Test that register_hooks adds appropriate actions and filters.
 	 */
 	public function test_register_hooks_registers_admin_menu_and_plugin_action_links_hooks(): void {
@@ -39,43 +60,50 @@ class Admin_ScreenTest extends TestCase {
 	 * Test that add_action_links appends the settings link.
 	 */
 	public function test_add_action_links_appends_settings_link(): void {
-		$screen = new Admin_Screen();
-
-		$actual = $screen->add_action_links( [ '<a href="plugins.php">Plugins</a>' ] );
+		$actual = ( new Admin_Screen() )->add_action_links( [ '<a href="plugins.php">Plugins</a>' ] );
 
 		$this->assertCount( 2, $actual );
-		$this->assertStringContainsString( 'admin.php?page=wire-desk', $actual[1] );
+		$this->assertStringContainsString( 'admin.php?page=wire-desk-settings', $actual[1] );
 		$this->assertStringContainsString( 'Settings', $actual[1] );
 	}
 
 	/**
-	 * Test that register_screen adds the settings page and its load hook.
+	 * Test that register_screen adds the top-level menu, its Settings page and the load hook.
 	 */
-	public function test_register_screen_adds_settings_page_and_load_hook(): void {
-		$screen = new Admin_Screen();
+	public function test_register_screen_adds_menu_and_settings_page(): void {
+		global $menu, $submenu;
 
-		// Mock current user as administrator so the screen is registered.
-		$user = self::factory()->user->create( [ 'role' => 'administrator' ] );
-		wp_set_current_user( $user );
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
 
-		$screen->register_screen();
-		$hook_suffix = get_plugin_page_hookname( Admin_Screen::SCREEN_ID, 'options-general.php' );
+		( new Admin_Screen() )->register_screen();
 
-		// Register the admin scripts so they exist when enqueue_scripts is called.
-		$assets = new Assets();
-		$assets->register_admin_assets();
+		( new Assets() )->register_admin_assets();
+		do_action( 'load-' . get_plugin_page_hookname( Admin_Screen::SCREEN_ID, '' ) ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 
-		do_action( 'load-' . $hook_suffix ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+		$top_level = array_values( array_filter( (array) $menu, static fn ( $item ): bool => Admin_Screen::SCREEN_ID === ( $item[2] ?? null ) ) );
 
-		global $submenu;
+		$this->assertCount( 1, $top_level );
+		$this->assertSame( 'Wire Desk', $top_level[0][0] );
+		$this->assertSame( Capabilities::MANAGE, $top_level[0][1] );
+		$this->assertSame( 'dashicons-rss', $top_level[0][6] );
+		$this->assertSame( 'Settings', $submenu[ Admin_Screen::SCREEN_ID ][0][0] ?? null );
+		$this->assertTrue( wp_script_is( Assets::ADMIN_HANDLE, 'enqueued' ) );
+		$this->assertTrue( wp_style_is( Assets::ADMIN_HANDLE, 'enqueued' ) );
+	}
 
-		$this->assertIsArray( $submenu['options-general.php'] ?? null );
-		$this->assertContains(
-			[ 'Wire Desk', Capabilities::MANAGE, Admin_Screen::SCREEN_ID, 'Wire Desk' ],
-			$submenu['options-general.php'],
-			'Settings page should be added to the admin menu'
-		);
-		$this->assertTrue( wp_script_is( Assets::ADMIN_HANDLE, 'enqueued' ), 'Admin script should be enqueued' );
+	/**
+	 * Test that editors can't open the settings menu.
+	 */
+	public function test_register_screen_hides_settings_from_editors(): void {
+		global $menu;
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
+
+		( new Admin_Screen() )->register_screen();
+
+		$top_level = array_values( array_filter( (array) $menu, static fn ( $item ): bool => Admin_Screen::SCREEN_ID === ( $item[2] ?? null ) ) );
+
+		$this->assertFalse( current_user_can( $top_level[0][1] ?? 'do_not_allow' ) );
 	}
 
 	/**
@@ -86,67 +114,217 @@ class Admin_ScreenTest extends TestCase {
 	}
 
 	/**
-	 * Test that editors can't see the settings screen.
+	 * Test that register_fields adds every section and field.
 	 */
-	public function test_register_screen_hides_settings_from_editors(): void {
-		global $submenu;
-
-		$submenu = []; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Reset for the test.
-		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
-
-		( new Admin_Screen() )->register_screen();
-
-		$this->assertEmpty( $submenu['options-general.php'] ?? [] );
-	}
-
-	/**
-	 * Test that render_screen outputs the correct template.
-	 */
-	public function test_render_screen_outputs_admin_template_markup(): void {
-		$screen = new Admin_Screen();
-
-		ob_start();
-		$screen->render_screen();
-		$output = (string) ob_get_clean();
-
-		$this->assertStringContainsString( '<div class="wrap">', $output );
-		$this->assertStringContainsString( 'wire-desk-content', $output );
-		$this->assertStringContainsString( 'action="options.php"', $output );
-		$this->assertStringContainsString( "name='option_page' value='" . Settings::SETTING_GROUP . "'", $output );
-	}
-
-	/**
-	 * Test that register_fields adds the delete data field.
-	 */
-	public function test_register_fields_adds_delete_data_field(): void {
+	public function test_register_fields_adds_sections_and_fields(): void {
 		global $wp_settings_sections, $wp_settings_fields;
-
-		require_once ABSPATH . 'wp-admin/includes/template.php';
 
 		( new Admin_Screen() )->register_fields();
 
-		$this->assertArrayHasKey( Admin_Screen::DATA_SECTION, $wp_settings_sections[ Admin_Screen::SCREEN_ID ] );
-		$this->assertArrayHasKey( Settings::DELETE_DATA_OPTION_KEY, $wp_settings_fields[ Admin_Screen::SCREEN_ID ][ Admin_Screen::DATA_SECTION ] );
+		$this->assertSame( array_keys( Admin_Screen::sections() ), array_keys( $wp_settings_sections[ Admin_Screen::SCREEN_ID ] ) );
+
+		$registered = [];
+		foreach ( $wp_settings_fields[ Admin_Screen::SCREEN_ID ] as $fields ) {
+			$registered = array_merge( $registered, array_keys( $fields ) );
+		}
+
+		$this->assertSame(
+			[
+				'wire-desk-post-types',
+				'wire-desk-terms',
+				'wire-desk-auto-score',
+				'wire-desk-window-days',
+				'wire-desk-input',
+				'wire-desk-context',
+				'wire-desk-questions',
+				'wire-desk-high-threshold',
+				'wire-desk-medium-threshold',
+				'wire-desk-model',
+				'wire-desk-daily-budget',
+				'wire-desk-concurrency',
+				'wire-desk-delete-data-on-uninstall',
+			],
+			$registered
+		);
 	}
 
 	/**
-	 * Test that the delete data field reflects the saved option.
+	 * Test that the screen renders the settings form with the saved values.
 	 */
-	public function test_render_delete_data_field_reflects_option(): void {
-		$screen = new Admin_Screen();
+	public function test_render_screen_renders_form_with_saved_values(): void {
+		update_option(
+			Settings::OPTION_KEY,
+			[
+				'post_types'  => [ 'page' ],
+				'window_days' => 7,
+				'input'       => 'title_content',
+				'context'     => 'Regional newsroom',
+				'auto_score'  => false,
+			]
+		);
 
-		update_option( Settings::DELETE_DATA_OPTION_KEY, false );
-		ob_start();
-		$screen->render_delete_data_field();
-		$unchecked = (string) ob_get_clean();
+		$output = $this->render_screen();
 
+		$this->assertStringContainsString( 'action="options.php"', $output );
+		$this->assertStringContainsString( "name='option_page' value='" . Settings::SETTING_GROUP . "'", $output );
+
+		foreach ( Admin_Screen::sections() as $title ) {
+			$this->assertStringContainsString( '>' . esc_html( $title ) . '</h2>', $output );
+		}
+
+		$this->assertMatchesRegularExpression( '/name="wire_desk_settings\[post_types\]\[\]" value="page"\s+checked/', $output );
+		$this->assertStringContainsString( 'name="wire_desk_settings[window_days]"', $output );
+		$this->assertStringContainsString( 'value="7"', $output );
+		$this->assertMatchesRegularExpression( '/value="title_content"\s+checked/', $output );
+		$this->assertStringContainsString( 'Regional newsroom</textarea>', $output );
+		$this->assertStringContainsString( '<input type="hidden" name="wire_desk_settings[auto_score]" value="0" />', $output );
+		$this->assertStringContainsString( 'name="wire_desk_settings[model]"', $output );
+		$this->assertStringContainsString( 'value="typesafe/jev-1.13"', $output );
+		$this->assertStringContainsString( 'name="' . Settings::DELETE_DATA_OPTION_KEY . '"', $output );
+		$this->assertSame( 4 + 1, substr_count( $output, 'data-wire-desk-remove-question' ) );
+		$this->assertStringContainsString( 'wire_desk_settings[questions][__INDEX__][question]', $output );
+	}
+
+	/**
+	 * Test that the terms field shows the saved terms for their taxonomy.
+	 */
+	public function test_render_screen_shows_saved_terms(): void {
+		$category = self::factory()->category->create( [ 'name' => 'Wire Feed' ] );
+
+		update_option( Settings::OPTION_KEY, [ 'terms' => [ 'category' => [ $category ] ] ] );
+
+		$output = $this->render_screen();
+
+		$this->assertStringContainsString( 'data-taxonomy="category"', $output );
+		$this->assertMatchesRegularExpression( '/name="wire_desk_settings\[terms\]\[category\]\[\]" value="' . $category . '" checked \/>\s+Wire Feed/', $output );
+	}
+
+	/**
+	 * Test that settings errors are shown on the screen.
+	 */
+	public function test_render_screen_shows_settings_errors(): void {
+		add_settings_error( Settings::OPTION_KEY, 'model', 'The model ID is not valid.' );
+
+		$this->assertStringContainsString( 'The model ID is not valid.', $this->render_screen() );
+	}
+
+	/**
+	 * Test that submitting the rendered form saves the same settings.
+	 */
+	public function test_submitting_rendered_form_keeps_settings(): void {
+		$category = self::factory()->category->create();
+
+		update_option(
+			Settings::OPTION_KEY,
+			[
+				'post_types'       => [ 'post' ],
+				'terms'            => [ 'category' => [ $category ] ],
+				'auto_score'       => false,
+				'window_days'      => 0,
+				'input'            => 'title_excerpt',
+				'context'          => "National daily\nBogotá",
+				'high_threshold'   => 80,
+				'medium_threshold' => 30,
+				'model'            => 'typesafe/clef',
+				'daily_budget'     => 12.5,
+				'concurrency'      => 2,
+			]
+		);
 		update_option( Settings::DELETE_DATA_OPTION_KEY, true );
-		ob_start();
-		$screen->render_delete_data_field();
-		$checked = (string) ob_get_clean();
 
-		$this->assertStringContainsString( 'name="' . Settings::DELETE_DATA_OPTION_KEY . '"', $unchecked );
-		$this->assertStringNotContainsString( "checked='checked'", $unchecked );
-		$this->assertStringContainsString( "checked='checked'", $checked );
+		$saved     = Settings::get();
+		$submitted = $this->submit( $this->render_screen() );
+
+		$this->assertSame( $saved, Settings::sanitize( $submitted[ Settings::OPTION_KEY ] ?? null ) );
+		$this->assertSame( '1', $submitted[ Settings::DELETE_DATA_OPTION_KEY ] ?? null );
+	}
+
+	/**
+	 * Test that unticking every checkbox saves them as off.
+	 */
+	public function test_submitting_form_with_checkboxes_unticked_turns_them_off(): void {
+		update_option( Settings::OPTION_KEY, [ 'post_types' => [ 'post' ] ] );
+		update_option( Settings::DELETE_DATA_OPTION_KEY, true );
+
+		$submitted = $this->submit( $this->render_screen(), false );
+		$values    = Settings::sanitize( $submitted[ Settings::OPTION_KEY ] ?? null );
+
+		$this->assertSame( [], $values['post_types'] );
+		$this->assertFalse( $values['auto_score'] );
+		$this->assertFalse( $values['questions'][3]['required'] );
+		$this->assertSame( '0', $submitted[ Settings::DELETE_DATA_OPTION_KEY ] ?? null );
+	}
+
+	/**
+	 * Test that removing every question saves no questions.
+	 */
+	public function test_submitting_form_without_questions_removes_them(): void {
+		$html = (string) preg_replace( '#<tbody data-wire-desk-questions>.*?</tbody>#s', '<tbody data-wire-desk-questions></tbody>', $this->render_screen() );
+
+		$values = Settings::sanitize( $this->submit( $html )[ Settings::OPTION_KEY ] ?? null );
+
+		$this->assertSame( [], $values['questions'] );
+	}
+
+	/**
+	 * Renders the settings screen with its fields.
+	 */
+	private function render_screen(): string {
+		$screen = new Admin_Screen();
+		$screen->register_fields();
+
+		ob_start();
+		$screen->render_screen();
+		return (string) ob_get_clean();
+	}
+
+	/**
+	 * Builds the data a browser would submit for a rendered form.
+	 *
+	 * @param string $html    Rendered screen.
+	 * @param bool   $checked Whether to submit checkboxes as rendered, or all unticked.
+	 * @return array<string, mixed>
+	 */
+	private function submit( string $html, bool $checked = true ): array {
+		$document = new \DOMDocument();
+		libxml_use_internal_errors( true );
+		$document->loadHTML( '<?xml encoding="utf-8"?>' . $html );
+		libxml_clear_errors();
+
+		$xpath = new \DOMXPath( $document );
+		$pairs = [];
+
+		foreach ( $xpath->query( '//form//*[(self::input or self::select or self::textarea) and @name and not(ancestor::template)]' ) ?: [] as $element ) {
+			if ( ! $element instanceof \DOMElement ) {
+				continue;
+			}
+
+			$name = $element->getAttribute( 'name' );
+			$type = $element->getAttribute( 'type' );
+
+			if ( 'select' === $element->nodeName ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- DOM property.
+				$selected = $xpath->query( './/option[@selected]', $element );
+				$option   = $selected && $selected->length ? $selected->item( 0 ) : $xpath->query( './/option', $element )?->item( 0 );
+				$value    = $option instanceof \DOMElement ? $option->getAttribute( 'value' ) : '';
+			} elseif ( 'textarea' === $element->nodeName ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- DOM property.
+				$value = $element->textContent; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- DOM property.
+			} elseif ( in_array( $type, [ 'checkbox', 'radio' ], true ) ) {
+				if ( ! $element->hasAttribute( 'checked' ) || ( 'checkbox' === $type && ! $checked ) ) {
+					continue;
+				}
+				$value = $element->getAttribute( 'value' );
+			} elseif ( in_array( $type, [ 'submit', 'button', 'search' ], true ) ) {
+				continue;
+			} else {
+				$value = $element->getAttribute( 'value' );
+			}
+
+			$pairs[] = rawurlencode( $name ) . '=' . rawurlencode( $value );
+		}
+
+		$data = [];
+		parse_str( implode( '&', $pairs ), $data );
+
+		return $data;
 	}
 }

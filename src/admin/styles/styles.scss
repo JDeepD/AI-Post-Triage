@@ -1,0 +1,57 @@
+/**
+ * Admin styles.
+ */
+
+.wire-desk-terms-taxonomy {
+	margin: 0 0 16px;
+}
+
+.wire-desk-terms-taxonomy legend {
+	font-weight: 600;
+	margin-bottom: 4px;
+}
+
+.wire-desk-terms-selected {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 16px;
+	margin: 0 0 6px;
+}
+
+.wire-desk-terms-selected:empty {
+	display: none;
+}
+
+.wire-desk-terms-results {
+	margin: 4px 0 0;
+	max-width: 25em;
+}
+
+.wire-desk-terms-results li {
+	margin: 0;
+	padding: 2px 0;
+}
+
+.wire-desk-terms-message {
+	color: #646970;
+}
+
+.wire-desk-questions table {
+	margin-bottom: 12px;
+	max-width: 1000px;
+}
+
+.form-table .wire-desk-questions th,
+.form-table .wire-desk-questions td {
+	padding: 10px 12px;
+	vertical-align: middle;
+	width: auto;
+}
+
+.form-table .wire-desk-questions th {
+	white-space: nowrap;
+}
+
+.form-table .wire-desk-questions th:first-child {
+	width: 55%;
+}

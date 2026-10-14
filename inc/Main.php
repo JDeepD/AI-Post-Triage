@@ -30,6 +30,7 @@ final class Main {
 		Modules\CLI::class,
 		Modules\Settings\Admin_Screen::class,
 		Modules\Settings\Settings::class,
+		Modules\Settings\Term_Search_Controller::class,
 	];
 
 	/**

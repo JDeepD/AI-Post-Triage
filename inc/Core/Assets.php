@@ -63,7 +63,7 @@ final class Assets implements Registrable {
 	public function register_admin_assets(): void {
 		// Register admin script and style.
 		$this->register_script( self::ADMIN_HANDLE, 'admin' );
-		$this->register_style( self::ADMIN_HANDLE, 'admin' );
+		$this->register_style( self::ADMIN_HANDLE, 'admin', [ 'common' ] );
 	}
 
 	/**

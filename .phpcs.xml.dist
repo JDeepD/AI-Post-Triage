@@ -89,6 +89,7 @@
 	<!-- Allowed plugin prefixes -->
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<exclude-pattern>**/tests/**</exclude-pattern>
+		<exclude-pattern>templates/**</exclude-pattern>
 		<properties>
 			<property name="prefixes" type="array">
 				<element value="WIRE_DESK" /><!-- Constant -->
@@ -96,6 +97,11 @@
 				<element value="wire_desk_" /><!-- Function/variable -->
 			</property>
 		</properties>
+	</rule>
+
+	<!-- Templates are loaded inside a function by load_template(). -->
+	<rule ref="WordPress.WP.GlobalVariablesOverride">
+		<exclude-pattern>templates/**</exclude-pattern>
 	</rule>
 
 	<!-- Hook names use "/" after the prefix, e.g. wire_desk/capability_map. -->
