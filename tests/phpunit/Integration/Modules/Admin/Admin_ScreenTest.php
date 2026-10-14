@@ -12,6 +12,7 @@ namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Admin;
 use JDeepD\Wire_Desk\Core\Assets;
 use JDeepD\Wire_Desk\Core\Capabilities;
 use JDeepD\Wire_Desk\Decisions\Model_Catalogue;
+use JDeepD\Wire_Desk\Jobs\Usage;
 use JDeepD\Wire_Desk\Modules\Settings\Admin_Screen;
 use JDeepD\Wire_Desk\Modules\Settings\Settings;
 use JDeepD\Wire_Desk\Tests\TestCase;
@@ -152,6 +153,7 @@ class Admin_ScreenTest extends TestCase {
 				'wire-desk-try',
 				'wire-desk-daily-budget',
 				'wire-desk-concurrency',
+				'wire-desk-usage',
 				'wire-desk-delete-data-on-uninstall',
 			],
 			$registered
@@ -238,6 +240,38 @@ class Admin_ScreenTest extends TestCase {
 		$this->assertMatchesRegularExpression( '#<textarea\s+id="wire-desk-try"\s+class="large-text"\s+rows="2"\s+maxlength="500"#', $output );
 		$this->assertStringNotContainsString( 'wire_desk_settings[try]', $output );
 		$this->assertStringContainsString( 'data-wire-desk-try-submit', $output );
+	}
+
+	/**
+	 * Test that today's spend is shown against the budget.
+	 */
+	public function test_render_screen_shows_usage(): void {
+		update_option( Settings::OPTION_KEY, [ 'daily_budget' => 5 ] );
+		Usage::record_success( 0.0123 );
+
+		$output = $this->render_screen();
+
+		$this->assertStringContainsString( '$0.0123 of $5.00 spent, 1 post scored.', $output );
+		$this->assertStringNotContainsString( 'wire-desk-paused', $output );
+
+		update_option( Settings::OPTION_KEY, [ 'daily_budget' => 0 ] );
+
+		$this->assertStringContainsString( '$0.0123 spent, 1 post scored.', $this->render_screen() );
+	}
+
+	/**
+	 * Test that a pause is shown with a resume button.
+	 */
+	public function test_render_screen_shows_pause(): void {
+		for ( $i = 0; $i < Usage::FAILURE_LIMIT; $i++ ) {
+			Usage::record_failure( 'Server error' );
+		}
+
+		$output = $this->render_screen();
+
+		$this->assertStringContainsString( 'wire-desk-paused', $output );
+		$this->assertStringContainsString( 'Last error: Server error', $output );
+		$this->assertStringContainsString( 'action=wire_desk_resume', $output );
 	}
 
 	/**

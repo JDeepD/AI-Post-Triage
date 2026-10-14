@@ -14,6 +14,7 @@ use JDeepD\Wire_Desk\Core\Capabilities;
 use JDeepD\Wire_Desk\Core\Templates;
 use JDeepD\Wire_Desk\Decisions\Model_Catalogue;
 use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\Wire_Desk\Jobs\Usage;
 
 /**
  * Class - Admin_Screen
@@ -216,6 +217,12 @@ final class Admin_Screen implements Registrable {
 				'description' => __( 'How many posts are scored at the same time.', 'wire-desk' ),
 			],
 			[
+				'key'      => 'usage',
+				'title'    => __( 'Today', 'wire-desk' ),
+				'section'  => 'wire_desk_limits',
+				'template' => 'usage',
+			],
+			[
 				'key'         => 'delete_data_on_uninstall',
 				'option'      => Settings::DELETE_DATA_OPTION_KEY,
 				'title'       => __( 'Uninstall', 'wire-desk' ),
@@ -295,6 +302,16 @@ final class Admin_Screen implements Registrable {
 
 			case 'model':
 				$args['models'] = Model_Catalogue::get();
+				break;
+
+			case 'usage':
+				$usage = Usage::get();
+
+				$args['cost']       = $usage['cost'];
+				$args['calls']      = $usage['calls'];
+				$args['budget']     = $settings['daily_budget'];
+				$args['paused']     = Usage_Notice::paused_message();
+				$args['resume_url'] = Usage_Notice::resume_url();
 				break;
 		}
 

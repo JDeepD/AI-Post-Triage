@@ -29,11 +29,13 @@ final class Main {
 		Core\Assets::class,
 		Jobs\Post_Listener::class,
 		Jobs\Score_Job::class,
+		Jobs\Usage::class,
 		Modules\CLI::class,
 		Modules\Settings\Admin_Screen::class,
 		Modules\Settings\Settings::class,
 		Modules\Settings\Term_Search_Controller::class,
 		Modules\Settings\Try_Controller::class,
+		Modules\Settings\Usage_Notice::class,
 	];
 
 	/**

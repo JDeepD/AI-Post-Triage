@@ -18,6 +18,7 @@ use JDeepD\Wire_Desk\Decisions\Decision;
 use JDeepD\Wire_Desk\Decisions\Decision_Client;
 use JDeepD\Wire_Desk\Jobs\Queue;
 use JDeepD\Wire_Desk\Jobs\Score_Job;
+use JDeepD\Wire_Desk\Jobs\Usage;
 use JDeepD\Wire_Desk\Modules\Settings\Settings;
 use JDeepD\Wire_Desk\Scoring\Post_Scorer;
 use JDeepD\Wire_Desk\Tests\Fakes\Fake_Decision_Client;
@@ -271,6 +272,89 @@ class Score_JobTest extends TestCase {
 		$this->job( $client )->run( $this->post_id );
 
 		$this->assertCount( 1, $client->calls );
+	}
+
+	/**
+	 * Test that jobs wait while scoring is paused.
+	 */
+	public function test_waits_while_paused(): void {
+		$client = new Fake_Decision_Client( $this->decision() );
+
+		for ( $i = 0; $i < Usage::FAILURE_LIMIT; $i++ ) {
+			Usage::record_failure( 'Server error' );
+		}
+
+		$this->job( $client )->run( $this->post_id );
+
+		$this->assertSame( [], $client->calls );
+		$this->assertSame( 0, $this->repository->get( $this->post_id )?->attempts );
+
+		$jobs = $this->jobs();
+
+		$this->assertCount( 1, $jobs );
+		$this->assertGreaterThanOrEqual( Usage::paused_until(), $jobs[0] );
+		$this->assertLessThanOrEqual( Usage::paused_until() + MINUTE_IN_SECONDS, $jobs[0] );
+	}
+
+	/**
+	 * Test that jobs wait for tomorrow once today's budget is spent.
+	 */
+	public function test_waits_for_tomorrow_when_budget_spent(): void {
+		update_option( Settings::OPTION_KEY, [ 'daily_budget' => 0.01 ] + Settings::get() );
+		Usage::record_success( 0.01 );
+
+		$client = new Fake_Decision_Client( $this->decision() );
+
+		$this->job( $client )->run( $this->post_id );
+
+		$this->assertSame( [], $client->calls );
+		$this->assertSame( 0, $this->repository->get( $this->post_id )?->attempts );
+
+		$jobs = $this->jobs();
+
+		$this->assertCount( 1, $jobs );
+		$this->assertGreaterThanOrEqual( Usage::tomorrow(), $jobs[0] );
+		$this->assertLessThanOrEqual( Usage::tomorrow() + Score_Job::BUDGET_SPREAD, $jobs[0] );
+	}
+
+	/**
+	 * Test that a scored post counts toward today's spend.
+	 */
+	public function test_scored_post_counts_toward_spend(): void {
+		$this->job( new Fake_Decision_Client( $this->decision() ) )->run( $this->post_id );
+
+		$this->assertSame( 0.00002, Usage::get()['cost'] );
+		$this->assertSame( 1, Usage::get()['calls'] );
+	}
+
+	/**
+	 * Test that failed requests count toward the pause, and other errors don't.
+	 */
+	public function test_failures_count_toward_pause(): void {
+		$this->job( new Fake_Decision_Client( $this->error( Decision_Client::ERROR_AUTH ) ) )->run( $this->post_id );
+
+		$this->assertSame( 1, Usage::get()['failures'] );
+		$this->assertSame( 'Failed.', Usage::get()['last_error'] );
+
+		$this->job( new Fake_Decision_Client( new Decision( [], 'typesafe/jev-1.13', 0.0, '' ) ) )->run( $this->post_id );
+
+		$this->assertSame( 1, Usage::get()['failures'] );
+	}
+
+	/**
+	 * Test that failed requests across posts pause scoring.
+	 */
+	public function test_failures_across_posts_pause_scoring(): void {
+		$client = new Fake_Decision_Client( $this->error( Decision_Client::ERROR_SERVER ) );
+
+		for ( $i = 0; $i < Usage::FAILURE_LIMIT; $i++ ) {
+			$post_id = self::factory()->post->create();
+
+			$this->repository->add_queued( $post_id, '2026-10-14 00:00:00' );
+			$this->job( $client )->run( $post_id );
+		}
+
+		$this->assertGreaterThan( time(), Usage::paused_until() );
 	}
 
 	/**

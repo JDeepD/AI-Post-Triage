@@ -40,6 +40,24 @@ final class Score_Job implements Registrable {
 	public const BUSY_DELAY = 30;
 
 	/**
+	 * Most random extra delay after the daily budget resets, in seconds.
+	 */
+	public const BUDGET_SPREAD = 15 * MINUTE_IN_SECONDS;
+
+	/**
+	 * Error codes from the decision model's API.
+	 */
+	public const CLIENT_ERRORS = [
+		Decision_Client::ERROR_NO_KEY,
+		Decision_Client::ERROR_AUTH,
+		Decision_Client::ERROR_CREDITS,
+		Decision_Client::ERROR_RATE_LIMITED,
+		Decision_Client::ERROR_SERVER,
+		Decision_Client::ERROR_BAD_REQUEST,
+		Decision_Client::ERROR_INVALID_RESPONSE,
+	];
+
+	/**
 	 * Error codes worth retrying.
 	 */
 	public const RETRYABLE = [
@@ -82,7 +100,8 @@ final class Score_Job implements Registrable {
 	}
 
 	/**
-	 * Scores a queued post. Rate limits and server errors are retried with backoff.
+	 * Scores a queued post. Rate limits and server errors are retried with backoff. Waits while scoring
+	 * is paused or today's budget is spent.
 	 *
 	 * @param mixed $post_id Post ID.
 	 */
@@ -101,6 +120,18 @@ final class Score_Job implements Registrable {
 			return;
 		}
 
+		$paused_until = Usage::paused_until();
+
+		if ( $paused_until ) {
+			$this->retry( $post_id, $paused_until - time() + wp_rand( 0, MINUTE_IN_SECONDS ) );
+			return;
+		}
+
+		if ( Usage::budget_reached() ) {
+			$this->retry( $post_id, Usage::tomorrow() - time() + wp_rand( 0, self::BUDGET_SPREAD ) );
+			return;
+		}
+
 		$concurrency = Settings::get()['concurrency'];
 
 		if ( Queue::running( $concurrency + 1 ) > $concurrency ) {
@@ -112,6 +143,10 @@ final class Score_Job implements Registrable {
 
 		if ( ! is_wp_error( $result ) || 'wire_desk_no_post' === $result->get_error_code() ) {
 			return;
+		}
+
+		if ( in_array( $result->get_error_code(), self::CLIENT_ERRORS, true ) ) {
+			Usage::record_failure( $result->get_error_message() );
 		}
 
 		$attempts = $row->attempts + 1;
