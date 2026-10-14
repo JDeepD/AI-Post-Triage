@@ -274,18 +274,19 @@ class Post_ListenerTest extends TestCase {
 	 * Test that publishing updates the row's date.
 	 */
 	public function test_publish_updates_date(): void {
-		$post_id = $this->wire_post( [ 'post_date' => wp_date( 'Y-m-d H:i:s', time() - HOUR_IN_SECONDS ) ] );
-		$date    = wp_date( 'Y-m-d H:i:s' );
+		$draft   = wp_date( 'Y-m-d H:i:s', time() - HOUR_IN_SECONDS );
+		$post_id = $this->wire_post( [ 'post_date' => $draft ] );
 
 		wp_update_post(
 			[
-				'ID'            => $post_id,
-				'post_status'   => 'publish',
-				'post_date'     => $date,
-				'post_date_gmt' => get_gmt_from_date( $date ),
+				'ID'          => $post_id,
+				'post_status' => 'publish',
 			]
 		);
 
+		$date = get_post( $post_id )?->post_date;
+
+		$this->assertNotSame( $draft, $date );
 		$this->assertSame( $date, $this->repository->get( $post_id )?->post_date );
 	}
 

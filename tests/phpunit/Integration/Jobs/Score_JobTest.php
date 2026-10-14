@@ -105,7 +105,9 @@ class Score_JobTest extends TestCase {
 	 * Test that a rate limit is retried after the Retry-After delay.
 	 */
 	public function test_rate_limit_retries_after_delay(): void {
+		$before = time();
 		$this->job( new Fake_Decision_Client( $this->error( Decision_Client::ERROR_RATE_LIMITED, 120 ) ) )->run( $this->post_id );
+		$after = time();
 
 		$this->assertSame( 1, $this->repository->get( $this->post_id )?->attempts );
 		$this->assertSame( Wire_Post::STATE_FAILED, $this->repository->get( $this->post_id )?->state );
@@ -113,8 +115,8 @@ class Score_JobTest extends TestCase {
 		$jobs = $this->jobs();
 
 		$this->assertCount( 1, $jobs );
-		$this->assertGreaterThanOrEqual( time() + 119, $jobs[0] );
-		$this->assertLessThanOrEqual( time() + 131, $jobs[0] );
+		$this->assertGreaterThanOrEqual( $before + 120, $jobs[0] );
+		$this->assertLessThanOrEqual( $after + 130, $jobs[0] );
 	}
 
 	/**
@@ -124,13 +126,15 @@ class Score_JobTest extends TestCase {
 	 */
 	#[DataProvider( 'data_retryable' )]
 	public function test_retryable_error_retries_with_backoff( string $code ): void {
+		$before = time();
 		$this->job( new Fake_Decision_Client( $this->error( $code ) ) )->run( $this->post_id );
+		$after = time();
 
 		$jobs = $this->jobs();
 
 		$this->assertCount( 1, $jobs );
-		$this->assertGreaterThanOrEqual( time() + Score_Job::BASE_BACKOFF / 2 - 1, $jobs[0] );
-		$this->assertLessThanOrEqual( time() + Score_Job::BASE_BACKOFF + 1, $jobs[0] );
+		$this->assertGreaterThanOrEqual( $before + Score_Job::BASE_BACKOFF / 2, $jobs[0] );
+		$this->assertLessThanOrEqual( $after + Score_Job::BASE_BACKOFF, $jobs[0] );
 	}
 
 	/**
@@ -248,15 +252,17 @@ class Score_JobTest extends TestCase {
 
 		$this->start_job( self::factory()->post->create() );
 		$this->start_job( $this->post_id );
+		$before = time();
 		$this->job( $client )->run( $this->post_id );
+		$after = time();
 
 		$this->assertSame( [], $client->calls );
 
 		$jobs = $this->jobs();
 
 		$this->assertCount( 1, $jobs );
-		$this->assertGreaterThanOrEqual( time() + Score_Job::BUSY_DELAY - 1, $jobs[0] );
-		$this->assertLessThanOrEqual( time() + 2 * Score_Job::BUSY_DELAY + 1, $jobs[0] );
+		$this->assertGreaterThanOrEqual( $before + Score_Job::BUSY_DELAY, $jobs[0] );
+		$this->assertLessThanOrEqual( $after + 2 * Score_Job::BUSY_DELAY, $jobs[0] );
 	}
 
 	/**

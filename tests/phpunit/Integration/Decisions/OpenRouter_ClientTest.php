@@ -275,11 +275,15 @@ class OpenRouter_ClientTest extends TestCase {
 	/**
 	 * Test that a rate limit carries the Retry-After delay.
 	 *
-	 * @param string $header   Retry-After header.
-	 * @param ?int   $expected Expected delay in seconds.
+	 * @param string|int $header   Retry-After header, or a date this many seconds from now.
+	 * @param ?int       $expected Expected delay in seconds.
 	 */
 	#[DataProvider( 'data_retry_after' )]
-	public function test_decide_rate_limit_reads_retry_after( string $header, ?int $expected ): void {
+	public function test_decide_rate_limit_reads_retry_after( string|int $header, ?int $expected ): void {
+		if ( is_int( $header ) ) {
+			$header = gmdate( 'D, d M Y H:i:s', time() + $header ) . ' GMT';
+		}
+
 		$this->respond( 429, 'rate-limited', [ 'retry-after' => $header ] );
 
 		$result = ( new OpenRouter_Client() )->decide( [ 'headline' => 'x' ], self::QUESTIONS, 'typesafe/jev-1.13' );
@@ -299,13 +303,13 @@ class OpenRouter_ClientTest extends TestCase {
 	/**
 	 * Retry-After headers.
 	 *
-	 * @return array<string, array{string, ?int}>
+	 * @return array<string, array{string|int, ?int}>
 	 */
 	public static function data_retry_after(): array {
 		return [
 			'seconds'  => [ '30', 30 ],
-			'date'     => [ gmdate( 'D, d M Y H:i:s', time() + 120 ) . ' GMT', 120 ],
-			'past'     => [ gmdate( 'D, d M Y H:i:s', time() - 120 ) . ' GMT', 0 ],
+			'date'     => [ 120, 120 ],
+			'past'     => [ -120, 0 ],
 			'missing'  => [ '', null ],
 			'nonsense' => [ 'soon', null ],
 		];
