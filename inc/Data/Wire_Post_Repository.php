@@ -372,6 +372,58 @@ final class Wire_Post_Repository {
 	}
 
 	/**
+	 * Counts posts by state and band.
+	 *
+	 * @param string|null $since Only posts dated on or after this.
+	 * @return array<int, array{state: int, band: int, posts: int}>
+	 */
+	public function counts_by_state_and_band( ?string $since = null ): array {
+		global $wpdb;
+
+		$rows = $wpdb->get_results(
+			null === $since
+				? $wpdb->prepare( 'SELECT state, band, COUNT(*) AS posts FROM %i GROUP BY state, band', Schema::table_name() )
+				: $wpdb->prepare( 'SELECT state, band, COUNT(*) AS posts FROM %i WHERE post_date >= %s GROUP BY state, band', Schema::table_name(), $since ),
+			ARRAY_A
+		);
+
+		return array_map(
+			static fn ( $row ): array => [
+				'state' => (int) $row['state'],
+				'band'  => (int) $row['band'],
+				'posts' => (int) $row['posts'],
+			],
+			(array) $rows
+		);
+	}
+
+	/**
+	 * Counts scored posts and adds up their latest cost, by model.
+	 *
+	 * @param string|null $since Only posts dated on or after this.
+	 * @return array<int, array{model: string, posts: int, cost: float}>
+	 */
+	public function totals_by_model( ?string $since = null ): array {
+		global $wpdb;
+
+		$rows = $wpdb->get_results(
+			null === $since
+				? $wpdb->prepare( 'SELECT model, COUNT(*) AS posts, SUM(cost) AS cost FROM %i WHERE scored_at IS NOT NULL GROUP BY model ORDER BY posts DESC', Schema::table_name() )
+				: $wpdb->prepare( 'SELECT model, COUNT(*) AS posts, SUM(cost) AS cost FROM %i WHERE scored_at IS NOT NULL AND post_date >= %s GROUP BY model ORDER BY posts DESC', Schema::table_name(), $since ),
+			ARRAY_A
+		);
+
+		return array_map(
+			static fn ( $row ): array => [
+				'model' => (string) $row['model'],
+				'posts' => (int) $row['posts'],
+				'cost'  => (float) $row['cost'],
+			],
+			(array) $rows
+		);
+	}
+
+	/**
 	 * All states.
 	 *
 	 * @return int[]

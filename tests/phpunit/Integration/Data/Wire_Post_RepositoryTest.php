@@ -348,6 +348,54 @@ class Wire_Post_RepositoryTest extends TestCase {
 	}
 
 	/**
+	 * Test the counts by state and band, with and without a start date.
+	 */
+	public function test_counts_by_state_and_band(): void {
+		$this->add_rows();
+		$this->repository->save_score( 2, Wire_Post::BAND_HIGH, 90, 'typesafe/jev-1.13', md5( '2' ), 0.002, [] );
+		$this->repository->save_score( 4, Wire_Post::BAND_HIGH, 85, 'typesafe/jev-1.13', md5( '4' ), 0.003, [] );
+
+		$counts = $this->repository->counts_by_state_and_band();
+
+		usort( $counts, static fn ( array $a, array $b ): int => [ $a['state'], $a['band'] ] <=> [ $b['state'], $b['band'] ] );
+
+		$this->assertSame(
+			[
+				[
+					'state' => Wire_Post::STATE_QUEUED,
+					'band'  => Wire_Post::BAND_NONE,
+					'posts' => 3,
+				],
+				[
+					'state' => Wire_Post::STATE_SCORED,
+					'band'  => Wire_Post::BAND_HIGH,
+					'posts' => 2,
+				],
+			],
+			$counts
+		);
+
+		$this->assertSame( 3, array_sum( array_column( $this->repository->counts_by_state_and_band( '2026-10-12 00:00:00' ), 'posts' ) ) );
+	}
+
+	/**
+	 * Test the totals by model, with and without a start date.
+	 */
+	public function test_totals_by_model(): void {
+		$this->add_rows();
+		$this->repository->save_score( 2, Wire_Post::BAND_HIGH, 90, 'typesafe/jev-1.13', md5( '2' ), 0.002, [] );
+		$this->repository->save_score( 4, Wire_Post::BAND_LOW, 10, 'typesafe/jev-1.13', md5( '4' ), 0.003, [] );
+		$this->repository->save_score( 5, Wire_Post::BAND_LOW, 10, 'cloudflare/clef', md5( '5' ), 0.01, [] );
+
+		$totals = $this->repository->totals_by_model();
+
+		$this->assertSame( [ 'typesafe/jev-1.13', 'cloudflare/clef' ], array_column( $totals, 'model' ) );
+		$this->assertSame( 2, $totals[0]['posts'] );
+		$this->assertEqualsWithDelta( 0.005, $totals[0]['cost'], 0.000001 );
+		$this->assertSame( [ 'cloudflare/clef' ], array_column( $this->repository->totals_by_model( '2026-10-13 00:00:00' ), 'model' ) );
+	}
+
+	/**
 	 * Test that newest_ids() returns the newest IDs.
 	 */
 	public function test_newest_ids(): void {

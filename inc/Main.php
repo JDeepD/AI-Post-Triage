@@ -27,6 +27,7 @@ final class Main {
 		Core\Schema::class,
 		Core\Capabilities::class,
 		Core\Assets::class,
+		Jobs\Maintenance::class,
 		Jobs\Post_Listener::class,
 		Jobs\Rescore::class,
 		Jobs\Score_Job::class,

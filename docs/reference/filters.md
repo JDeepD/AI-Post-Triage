@@ -13,6 +13,7 @@
   - [`wire_desk/unsupported_models`](#wire_deskunsupported_models)
   - [`wire_desk/state`](#wire_deskstate)
   - [`wire_desk/is_wire_content`](#wire_deskis_wire_content)
+  - [`wire_desk/details_retention_days`](#wire_deskdetails_retention_days)
 
 ## `wire_desk/template_args`
 
@@ -128,3 +129,15 @@ apply_filters( 'wire_desk/is_wire_content', bool $is_wire, WP_Post $post );
 
 - `$is_wire (bool)`: Whether the post is wire content.
 - `$post (WP_Post)`: The post being saved.
+
+## `wire_desk/details_retention_days`
+
+Filters how many days the model's per-question answers are kept, counted from the post date. A daily job, and `wp wire-desk prune`, clear older answers; scores and bands are kept. Return 0 to keep every answer.
+
+```php
+apply_filters( 'wire_desk/details_retention_days', int $days );
+```
+
+### Parameters
+
+- `$days (int)`: Days. Default 90.

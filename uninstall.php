@@ -15,6 +15,9 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 // We use local constants so this plugin can be uninstalled even if the autoloader is corrupted or missing.
 const PLUGIN_PREFIX = 'wire_desk_';
 
+// The Action Scheduler group of the plugin's jobs, from Jobs\Queue.
+const JOB_GROUP = 'wire-desk';
+
 /**
  * Uninstalls the plugin. If multisite, uninstalls from all sites.
  */
@@ -46,6 +49,8 @@ function run_uninstaller(): void {
  * The (site-specific) uninstall function.
  */
 function uninstall(): void {
+	cancel_jobs();
+
 	if ( ! get_option( PLUGIN_PREFIX . 'delete_data_on_uninstall' ) ) {
 		return;
 	}
@@ -54,6 +59,15 @@ function uninstall(): void {
 	drop_tables();
 	delete_options();
 	delete_transients();
+}
+
+/**
+ * Cancels the plugin's waiting jobs, including the daily prune.
+ */
+function cancel_jobs(): void {
+	if ( function_exists( 'as_unschedule_all_actions' ) ) {
+		as_unschedule_all_actions( '', [], JOB_GROUP );
+	}
 }
 
 /**
@@ -82,6 +96,7 @@ function delete_options(): void {
 		PLUGIN_PREFIX . 'delete_data_on_uninstall', // Set by Modules\Settings\Settings.
 		PLUGIN_PREFIX . 'settings', // Set by Modules\Settings\Settings.
 		PLUGIN_PREFIX . 'usage', // Set by Jobs\Usage.
+		PLUGIN_PREFIX . 'backfill', // Set by Jobs\Backfill.
 	];
 
 	foreach ( $options as $option ) {

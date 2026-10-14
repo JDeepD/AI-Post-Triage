@@ -1,6 +1,6 @@
 <?php
 /**
- * Integration tests for the Healthcheck CLI command.
+ * Integration tests for the health-check CLI command.
  *
  * @package JDeepD\Wire_Desk\Tests\Integration\Modules\CLI
  */
@@ -9,7 +9,14 @@ declare( strict_types = 1 );
 
 namespace JDeepD\Wire_Desk\Tests\Integration\Modules\CLI;
 
+use ActionScheduler;
+use ActionScheduler_Store;
+use JDeepD\Wire_Desk\Jobs\Maintenance;
+use JDeepD\Wire_Desk\Jobs\Queue;
+use JDeepD\Wire_Desk\Jobs\Usage;
 use JDeepD\Wire_Desk\Modules\CLI\Healthcheck;
+use JDeepD\Wire_Desk\Modules\Settings\Settings;
+use JDeepD\Wire_Desk\Tests\Fakes\Fake_WP_CLI;
 use JDeepD\Wire_Desk\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
@@ -21,102 +28,203 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 #[CoversClass( Healthcheck::class )]
 class HealthcheckTest extends TestCase {
 	/**
-	 * Test that get_name() returns the expected command name.
+	 * Requests sent to OpenRouter.
+	 *
+	 * @var string[]
 	 */
-	public function test_healthcheck_get_name(): void {
-		$this->assertSame( 'health-check', Healthcheck::get_name() );
+	private array $requests = [];
+
+	/**
+	 * Clears the recorded requests and any failed Wire Desk jobs left in the shared tables.
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+
+		$this->requests = [];
+
+		foreach ( as_get_scheduled_actions(
+			[
+				'group'    => Queue::GROUP,
+				'status'   => ActionScheduler_Store::STATUS_FAILED,
+				'per_page' => -1,
+			],
+			'ids'
+		) as $id ) {
+			ActionScheduler::store()->delete_action( (string) $id );
+		}
 	}
 
 	/**
-	 * Test that get_description() returns a non-empty string.
+	 * Test the command name and description.
 	 */
-	public function test_healthcheck_get_description(): void {
+	public function test_name_and_description(): void {
+		$this->assertSame( 'health-check', Healthcheck::get_name() );
 		$this->assertNotEmpty( Healthcheck::get_description() );
 	}
 
 	/**
-	 * Test that run() executes without errors and logs the expected output.
+	 * Test the local checks on a working site without a key.
+	 */
+	public function test_checks_without_key(): void {
+		$checks = Healthcheck::checks( false );
+
+		$this->assertSame( [ 'plugin_active', 'constants', 'composer_autoload', 'table', 'api_key', 'action_scheduler', 'backlog', 'failed_jobs', 'prune_job', 'scoring' ], array_keys( $checks ) );
+		$this->assertSame( Healthcheck::PASS, $checks['table']['status'] );
+		$this->assertSame( Healthcheck::FAIL, $checks['api_key']['status'] );
+		$this->assertStringContainsString( 'WIRE_DESK_OPENROUTER_API_KEY', $checks['api_key']['message'] );
+		$this->assertSame( Healthcheck::PASS, $checks['action_scheduler']['status'] );
+		$this->assertSame( Healthcheck::PASS, $checks['backlog']['status'] );
+		$this->assertSame( Healthcheck::PASS, $checks['scoring']['status'] );
+		$this->assertSame( [], $this->requests );
+	}
+
+	/**
+	 * Test that the key and the daily prune pass once they are set up.
+	 */
+	public function test_checks_with_key_and_prune(): void {
+		add_filter( 'wire_desk/openrouter_api_key', static fn (): string => 'sk-test' );
+		( new Maintenance() )->schedule();
+
+		$checks = Healthcheck::checks( false );
+
+		$this->assertSame( Healthcheck::PASS, $checks['api_key']['status'] );
+		$this->assertSame( Healthcheck::PASS, $checks['prune_job']['status'] );
+	}
+
+	/**
+	 * Test that a pause and a spent budget are warnings.
+	 */
+	public function test_checks_warn_when_scoring_stops(): void {
+		for ( $i = 0; $i < Usage::FAILURE_LIMIT; $i++ ) {
+			Usage::record_failure( 'Server error' );
+		}
+
+		$this->assertSame( Healthcheck::WARN, Healthcheck::checks( false )['scoring']['status'] );
+
+		Usage::resume();
+		update_option( Settings::OPTION_KEY, [ 'daily_budget' => 1 ] + Settings::defaults() );
+		Usage::record_success( 2.0 );
+
+		$checks = Healthcheck::checks( false );
+
+		$this->assertSame( Healthcheck::WARN, $checks['scoring']['status'] );
+		$this->assertStringContainsString( 'budget', $checks['scoring']['message'] );
+	}
+
+	/**
+	 * Test that a failed job is a warning.
+	 */
+	public function test_checks_warn_about_failed_jobs(): void {
+		$this->assertSame( Healthcheck::PASS, Healthcheck::checks( false )['failed_jobs']['status'] );
+
+		$id = as_schedule_single_action( time() + HOUR_IN_SECONDS, Queue::HOOK, [ 42 ], Queue::GROUP );
+		ActionScheduler::store()->mark_failure( $id );
+
+		$checks = Healthcheck::checks( false );
+
+		$this->assertSame( Healthcheck::WARN, $checks['failed_jobs']['status'] );
+		$this->assertSame( '1 Wire Desk job failed. See Tools > Scheduled Actions.', $checks['failed_jobs']['message'] );
+	}
+
+	/**
+	 * Test that the remote checks list the models and look for the chosen one.
+	 */
+	public function test_remote_checks(): void {
+		$this->respond( (string) file_get_contents( dirname( __DIR__, 3 ) . '/Fixtures/models/decisions.json' ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local fixture.
+
+		$checks = Healthcheck::checks();
+
+		$this->assertSame( Healthcheck::PASS, $checks['endpoint']['status'] );
+		$this->assertSame( Healthcheck::PASS, $checks['model']['status'] );
+		$this->assertCount( 1, $this->requests );
+
+		update_option( Settings::OPTION_KEY, [ 'model' => 'acme/retired-1' ] + Settings::defaults() );
+
+		$this->assertSame( Healthcheck::WARN, Healthcheck::checks()['model']['status'] );
+	}
+
+	/**
+	 * Test that an unreachable OpenRouter fails.
+	 */
+	public function test_remote_checks_fail_when_unreachable(): void {
+		add_filter( 'pre_http_request', static fn () => new \WP_Error( 'http_request_failed', 'cURL error 28' ) );
+
+		$checks = Healthcheck::checks();
+
+		$this->assertSame( Healthcheck::FAIL, $checks['endpoint']['status'] );
+		$this->assertArrayNotHasKey( 'model', $checks );
+	}
+
+	/**
+	 * Test that a failed check is an error.
 	 */
 	#[RunInSeparateProcess]
 	#[PreserveGlobalState( false )]
-	public function test_healthcheck_run(): void {
-		$this->mock_wp_cli();
+	public function test_run_fails_without_key(): void {
+		Fake_WP_CLI::install();
 
-		Healthcheck::run();
-		$this->assertNotEmpty( Mock_WP_CLI::$logs );
-		$this->assertStringContainsString( 'Wire Desk Health Check', Mock_WP_CLI::$logs[0] );
+		Healthcheck::run( [], [ 'skip-remote' => true ] );
+
+		$this->assertSame( 'Wire Desk Health Check', Fake_WP_CLI::$logs[0] );
+		$this->assertContains( '  api_key: ✗ FAIL  No OpenRouter API key. Define WIRE_DESK_OPENROUTER_API_KEY or connect OpenRouter.', Fake_WP_CLI::$logs );
+		$this->assertSame( [ 'One or more health checks failed. Please investigate the issues above.' ], Fake_WP_CLI::$errors );
+		$this->assertSame( [], Fake_WP_CLI::$successes );
 	}
 
 	/**
-	 * Mocks the WP_CLI class for testing purposes.
+	 * Test that warnings still pass, and are counted.
 	 */
-	private function mock_wp_cli(): void {
-		Mock_WP_CLI::reset();
+	#[RunInSeparateProcess]
+	#[PreserveGlobalState( false )]
+	public function test_run_passes_with_warnings(): void {
+		Fake_WP_CLI::install();
+		add_filter( 'wire_desk/openrouter_api_key', static fn (): string => 'sk-test' );
 
-		if ( ! class_exists( 'WP_CLI' ) ) {
-			class_alias( Mock_WP_CLI::class, 'WP_CLI' );
-		}
-	}
-}
+		Healthcheck::run( [], [ 'skip-remote' => true ] );
 
-/**
- * Mock class for WP_CLI to capture registered commands during testing.
- */
-class Mock_WP_CLI {
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @var array<string,mixed>
-	 */
-	public static array $logs = [];
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @var array<string,mixed>
-	 */
-	public static array $errors = [];
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @var array<string,mixed>
-	 */
-	public static array $successes = [];
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public static function reset(): void {
-		self::$logs      = [];
-		self::$errors    = [];
-		self::$successes = [];
+		$this->assertSame( [], Fake_WP_CLI::$errors );
+		$this->assertSame( [ 'Health checks passed with 1 warning.' ], Fake_WP_CLI::$successes );
 	}
 
 	/**
-	 * {@inheritDoc}
-	 *
-	 * @param string $message The message to log.
+	 * Test a clean run.
 	 */
-	public static function log( string $message ): void {
-		self::$logs[] = $message;
+	#[RunInSeparateProcess]
+	#[PreserveGlobalState( false )]
+	public function test_run_passes(): void {
+		Fake_WP_CLI::install();
+		add_filter( 'wire_desk/openrouter_api_key', static fn (): string => 'sk-test' );
+		( new Maintenance() )->schedule();
+
+		Healthcheck::run( [], [ 'skip-remote' => true ] );
+
+		$this->assertSame( [ 'All health checks passed!' ], Fake_WP_CLI::$successes );
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Responds to requests with a body.
 	 *
-	 * @param string $message The error message.
+	 * @param string $body Response body.
 	 */
-	public static function error( string $message ): void {
-		self::$errors[] = $message;
-	}
+	private function respond( string $body ): void {
+		add_filter(
+			'pre_http_request',
+			function ( $preempt, array $args, string $url ) use ( $body ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundBeforeLastUsed, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter -- Required by the filter.
+				$this->requests[] = $url;
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @param string $message The success message.
-	 */
-	public static function success( string $message ): void {
-		self::$successes[] = $message;
+				return [
+					'headers'  => [],
+					'body'     => $body,
+					'response' => [
+						'code'    => 200,
+						'message' => 'OK',
+					],
+					'cookies'  => [],
+					'filename' => null,
+				];
+			},
+			10,
+			3
+		);
 	}
 }

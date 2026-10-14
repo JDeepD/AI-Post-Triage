@@ -10,6 +10,8 @@ declare( strict_types = 1 );
 namespace JDeepD\Wire_Desk\Tests\Integration;
 
 use JDeepD\Wire_Desk\Core\Schema;
+use JDeepD\Wire_Desk\Jobs\Maintenance;
+use JDeepD\Wire_Desk\Jobs\Queue;
 use JDeepD\Wire_Desk\Modules\Settings\Settings;
 use JDeepD\Wire_Desk\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversNothing;
@@ -75,6 +77,21 @@ class UninstallTest extends TestCase {
 		$this->assertFalse( get_option( Settings::DELETE_DATA_OPTION_KEY ) );
 		$this->assertFalse( get_option( Settings::OPTION_KEY ) );
 		$this->assertFalse( get_transient( Schema::FAILURE_TRANSIENT ) );
+	}
+
+	/**
+	 * Test that uninstalling cancels the plugin's waiting jobs, even when the data is kept.
+	 */
+	public function test_uninstall_cancels_jobs(): void {
+		delete_option( Settings::DELETE_DATA_OPTION_KEY );
+
+		Queue::schedule( 123 );
+		( new Maintenance() )->schedule();
+
+		$this->run_uninstall();
+
+		$this->assertFalse( Queue::is_scheduled( 123 ) );
+		$this->assertFalse( as_has_scheduled_action( Maintenance::HOOK, [], Queue::GROUP ) );
 	}
 
 	/**
