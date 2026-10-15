@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/JDeepD/Wire-Desk/compare/v0.1.0...v0.1.1) (2026-10-15)
+
+
+### Fixed
+
+* Plugin Check requirements for wordpress.org ([2ac8e44](https://github.com/JDeepD/Wire-Desk/commit/2ac8e44fd55c087e803db8c340b49880e77bd86b))
+
 ## [0.1.0](https://github.com/JDeepD/Wire-Desk/compare/v0.0.1...v0.1.0) (2026-10-14)
 
 
