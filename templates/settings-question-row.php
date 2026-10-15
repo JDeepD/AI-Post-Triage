@@ -7,6 +7,8 @@
 
 declare(strict_types = 1);
 
+defined( 'ABSPATH' ) || exit;
+
 /** @var array{name: string, index: string, question: array<string, mixed>, weights: array<string, int>} $args */
 
 $question = $args['question'];

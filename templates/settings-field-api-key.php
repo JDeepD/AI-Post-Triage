@@ -7,6 +7,8 @@
 
 declare(strict_types = 1);
 
+defined( 'ABSPATH' ) || exit;
+
 use JDeepD\Wire_Desk\Decisions\OpenRouter_Client;
 
 /** @var array{id: string, name: string, source: string, constant: string, saved: string, broken: bool} $args */

@@ -7,6 +7,8 @@
 
 declare(strict_types = 1);
 
+defined( 'ABSPATH' ) || exit;
+
 use JDeepD\Wire_Desk\Modules\Settings\Admin_Screen;
 use JDeepD\Wire_Desk\Modules\Settings\Settings;
 

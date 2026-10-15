@@ -7,6 +7,8 @@
 
 declare(strict_types = 1);
 
+defined( 'ABSPATH' ) || exit;
+
 /** @var array{id: string, cost: float, calls: int, budget: float, paused: string, resume_url: string} $args */
 ?>
 <p id="<?php echo esc_attr( $args['id'] ); ?>">

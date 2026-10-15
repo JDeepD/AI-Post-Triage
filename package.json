@@ -6,8 +6,8 @@
 		"npm": ">=11.14.1"
 	},
 	"files": [
-		"assets",
 		"build",
+		"composer.json",
 		"framework",
 		"inc",
 		"languages",

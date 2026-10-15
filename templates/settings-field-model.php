@@ -7,6 +7,8 @@
 
 declare(strict_types = 1);
 
+defined( 'ABSPATH' ) || exit;
+
 /** @var array{id: string, name: string, value: mixed, models: array<string, string>|\WP_Error} $args */
 
 $value = is_string( $args['value'] ) ? $args['value'] : '';

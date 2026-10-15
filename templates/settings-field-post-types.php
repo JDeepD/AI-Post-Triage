@@ -7,6 +7,8 @@
 
 declare(strict_types = 1);
 
+defined( 'ABSPATH' ) || exit;
+
 /** @var array{id: string, name: string, value: mixed, post_types: \WP_Post_Type[]} $args */
 
 $selected = is_array( $args['value'] ) ? $args['value'] : [];

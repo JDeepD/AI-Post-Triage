@@ -11,6 +11,8 @@ declare( strict_types = 1 );
 
 namespace JDeepD\Wire_Desk;
 
+defined( 'ABSPATH' ) || exit;
+
 // @phpstan-ignore function.impossibleType (This file is loaded before the Composer autoloader.)
 if ( ! class_exists( 'JDeepD\Wire_Desk\Framework\AutoloaderTrait' ) ) {
 	require_once WIRE_DESK_PATH . 'framework/AutoloaderTrait.php';

@@ -7,6 +7,8 @@
 
 declare(strict_types = 1);
 
+defined( 'ABSPATH' ) || exit;
+
 /** @var array{id: string, description: string} $args */
 ?>
 <div class="wire-desk-try" data-wire-desk-try>

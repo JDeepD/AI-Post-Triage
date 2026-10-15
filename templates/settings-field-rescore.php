@@ -7,6 +7,8 @@
 
 declare(strict_types = 1);
 
+defined( 'ABSPATH' ) || exit;
+
 /** @var array{id: string, description: string, max: int} $args */
 ?>
 <div class="wire-desk-rescore" data-wire-desk-rescore>

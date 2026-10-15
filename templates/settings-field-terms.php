@@ -7,6 +7,8 @@
 
 declare(strict_types = 1);
 
+defined( 'ABSPATH' ) || exit;
+
 /** @var array{id: string, name: string, taxonomies: \WP_Taxonomy[], post_types: array<string, string[]>, selected: array<string, \WP_Term[]>} $args */
 $wire_desk_labels = [];
 

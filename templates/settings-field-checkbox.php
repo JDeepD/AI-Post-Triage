@@ -7,6 +7,8 @@
 
 declare(strict_types = 1);
 
+defined( 'ABSPATH' ) || exit;
+
 /** @var array{id: string, name: string, value: mixed, label: string, description: string} $args */
 ?>
 <input type="hidden" name="<?php echo esc_attr( $args['name'] ); ?>" value="0" />

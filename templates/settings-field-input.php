@@ -7,6 +7,8 @@
 
 declare(strict_types = 1);
 
+defined( 'ABSPATH' ) || exit;
+
 /** @var array{id: string, name: string, value: mixed, modes: array<string, string>} $args */
 ?>
 <fieldset id="<?php echo esc_attr( $args['id'] ); ?>">

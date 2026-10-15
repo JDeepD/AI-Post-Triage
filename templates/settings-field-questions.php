@@ -7,6 +7,8 @@
 
 declare(strict_types = 1);
 
+defined( 'ABSPATH' ) || exit;
+
 use JDeepD\Wire_Desk\Core\Templates;
 
 /** @var array{id: string, name: string, value: mixed, weights: array<string, int>, max: int} $args */

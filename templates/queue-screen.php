@@ -7,6 +7,8 @@
 
 declare(strict_types = 1);
 
+defined( 'ABSPATH' ) || exit;
+
 use JDeepD\Wire_Desk\Modules\Queue\Queue_List_Table;
 use JDeepD\Wire_Desk\Modules\Queue\Queue_Screen;
 

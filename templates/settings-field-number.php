@@ -7,6 +7,8 @@
 
 declare(strict_types = 1);
 
+defined( 'ABSPATH' ) || exit;
+
 /** @var array{id: string, name: string, value: mixed, description: string, min: int|float|null, max: int|float|null, step: int|float|null} $args */
 ?>
 <input
