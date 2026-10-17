@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/JDeepD/Wire-Desk/compare/v0.1.1...v0.1.2) (2026-10-17)
+
+
+### Fixed
+
+* declare Tested up to only in the readme ([073ce8d](https://github.com/JDeepD/Wire-Desk/commit/073ce8df795460df4393197aa3fdff8ac60148b7))
+
 ## [0.1.1](https://github.com/JDeepD/Wire-Desk/compare/v0.1.0...v0.1.1) (2026-10-15)
 
 
