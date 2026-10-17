@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.3](https://github.com/JDeepD/Wire-Desk/compare/v0.1.2...v0.1.3) (2026-10-17)
+
+
+### Fixed
+
+* correct the readme stable tag ([c94e8c3](https://github.com/JDeepD/Wire-Desk/commit/c94e8c322f4070921b6ede18dbe8b5fea46c6a60))
+* correct the readme stable tag ([183aed1](https://github.com/JDeepD/Wire-Desk/commit/183aed19558e3b6a66463b5ae7290fe6587cdd15))
+
 ## [0.1.2](https://github.com/JDeepD/Wire-Desk/compare/v0.1.1...v0.1.2) (2026-10-17)
 
 
