@@ -30,8 +30,6 @@ Code contributions, bug reports, and feature requests are welcome! The following
   - [Performance Check](#performance-check)
   - [GitHub Workflows](#github-workflows)
 - [Internationalization](#internationalization)
-  - [Updating the POT file](#updating-the-pot-file)
-  - [Adding a translation](#adding-a-translation)
 - [Building the plugin for distribution](#building-the-plugin-for-distribution)
 - [Releasing](#releasing)
 
@@ -76,8 +74,6 @@ Code contributions, bug reports, and feature requests are welcome! The following
 │   │
 │   ├── Autoloader.php # PSR-4 autoloader.
 │   └── Main.php # Main plugin entrypoint.
-│
-├── languages/ # The POT file for translators.
 │
 ├── templates/ # Reusable PHP templates and partials.
 │
@@ -391,15 +387,6 @@ You can test the workflows locally using [act](https://github.com/nektos/act), w
 
 All strings use the `wire-desk` text domain, and the admin and editor scripts are set up with `wp_set_script_translations()`. Translations come from [translate.wordpress.org](https://translate.wordpress.org/), which WordPress downloads as language packs and loads on its own, so the plugin doesn't bundle any.
 
-### Updating the POT file
-
-`languages/wire-desk.pot` is committed so translators can work from it. Regenerate it after changing any strings, from a production build so the script strings point at the built files:
-
-```bash
-npm run build:prod
-npm run i18n:make-pot
-```
-
 translate.wordpress.org makes one JSON file per built script, named after an MD5 hash of the script path, such as `build/editor.js`. WordPress looks for that exact name, so don't rename a built script. Also avoid entry names ending in `min`: `wp i18n make-json` treats `admin.js` as a minified `a.js` and writes the wrong hash, which is why the admin bundle is called `admin-ui`.
 
 ## Building the plugin for distribution
@@ -415,9 +402,6 @@ npm run wp-env:cli -- install --optimize-autoloader --no-dev
 
 # Create a production-ready build:
 npm run build:prod
-
-# Generate translation files:
-npm run i18n:make-pot
 
 # Create the zip file for distribution:
 npm run plugin-zip

@@ -18,7 +18,6 @@
  * License:           GPL-3.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain:       wire-desk
- * Domain Path:       /languages
  * Requires PHP:      8.2
  * Requires at least: 7.1
  */
