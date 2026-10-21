@@ -6,7 +6,7 @@ License URI:       https://www.gnu.org/licenses/gpl-3.0.html
 Requires PHP:      8.2
 Requires at least: 7.1
 Tested up to:      7.1
-Stable tag:        0.1.3
+Stable tag:        0.1.4
 
 Flags high-priority wire-ingested posts with a decision model and gives editors a review queue to decide what gets published.
 

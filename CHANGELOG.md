@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.1.4](https://github.com/JDeepD/Wire-Desk/compare/v0.1.3...v0.1.4) (2026-10-21)
+
+
+### Fixed
+
+* address the wordpress.org review ([171fc6d](https://github.com/JDeepD/Wire-Desk/commit/171fc6df421b8df23e2ea2cc41d5cc8b013b2b1b))
+
+
+### Changed
+
+* **deps-dev:** bump launch-editor from 2.14.1 to 2.14.2 ([aee468c](https://github.com/JDeepD/Wire-Desk/commit/aee468c8ec7702d27bebf9abd2170826e475fd51))
+* **deps-dev:** bump launch-editor from 2.14.1 to 2.14.2 ([5786ef9](https://github.com/JDeepD/Wire-Desk/commit/5786ef9dc609921683351566b097e112f483a1ed))
+* **deps-dev:** bump markdown-it from 14.3.2 to 14.3.3 ([d4ec2ba](https://github.com/JDeepD/Wire-Desk/commit/d4ec2ba85aefb56128441a422c15195bf9f38ea1))
+* **deps-dev:** bump markdown-it from 14.3.2 to 14.3.3 ([5b84654](https://github.com/JDeepD/Wire-Desk/commit/5b8465427317f8710be76d04b61838dca73dabe3))
+
 ## [0.1.3](https://github.com/JDeepD/Wire-Desk/compare/v0.1.2...v0.1.3) (2026-10-17)
 
 
