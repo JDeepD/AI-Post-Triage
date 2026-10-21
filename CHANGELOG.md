@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/JDeepD/Wire-Desk/compare/v0.1.5...v0.1.6) (2026-10-21)
+
+
+### Fixed
+
+* build the plugin zip without generating a POT file. ([6002f6a](https://github.com/JDeepD/Wire-Desk/commit/6002f6af71bc0fe331b1538a82419c6d952b9511))
+
 ## [0.1.5](https://github.com/JDeepD/Wire-Desk/compare/v0.1.4...v0.1.5) (2026-10-21)
 
 
