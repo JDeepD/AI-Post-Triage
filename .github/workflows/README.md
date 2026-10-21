@@ -7,7 +7,7 @@ uses: rtCamp/plugin-skeleton-d/.github/workflows/reusable-build<-public>.yml@<co
 ```
 
 - The `*-public.yml` variants run on GitHub-hosted runners, for public repositories. For a private repository on self-hosted runners, drop the `-public` suffix: both variants of a pair accept the same inputs, so only the `uses:` line changes.
-- The plugin slug (`wire-desk`) is passed as `plugin-slug` to the build, PHPUnit and Playground workflows. The repository name must match it, since wp-env and the `package.json` scripts name the plugin directory after the checkout.
+- The plugin slug (`wire-desk`) is passed as `plugin-slug` to the PHPUnit and Playground workflows. The repository name must match it, since wp-env and the `package.json` scripts name the plugin directory after the checkout.
 - Secrets are not inherited, so they are passed explicitly with `secrets:`. See [Secrets](#secrets).
 
 ### Versioning
@@ -27,7 +27,8 @@ Main CI pipeline used to validate code. Based on file changes it calls the follo
 | [`reusable-phpstan.yml`](https://github.com/rtCamp/plugin-skeleton-d/blob/v0.2.0/.github/workflows/reusable-phpstan.yml) <br /> [`reusable-phpstan-public.yml`](https://github.com/rtCamp/plugin-skeleton-d/blob/v0.2.0/.github/workflows/reusable-phpstan-public.yml)                 | PHPStan static analysis                     |
 | [`reusable-phpunit.yml`](https://github.com/rtCamp/plugin-skeleton-d/blob/v0.2.0/.github/workflows/reusable-phpunit.yml) <br /> [`reusable-phpunit-public.yml`](https://github.com/rtCamp/plugin-skeleton-d/blob/v0.2.0/.github/workflows/reusable-phpunit-public.yml)                 | PHPUnit tests                               |
 | [`reusable-lint-css-js.yml`](https://github.com/rtCamp/plugin-skeleton-d/blob/v0.2.0/.github/workflows/reusable-lint-css-js.yml) <br /> [`reusable-lint-css-js-public.yml`](https://github.com/rtCamp/plugin-skeleton-d/blob/v0.2.0/.github/workflows/reusable-lint-css-js-public.yml) | ESLint, Stylelint, Prettier, tsc linting    |
-| [`reusable-build.yml`](https://github.com/rtCamp/plugin-skeleton-d/blob/v0.2.0/.github/workflows/reusable-build.yml) <br /> [`reusable-build-public.yml`](https://github.com/rtCamp/plugin-skeleton-d/blob/v0.2.0/.github/workflows/reusable-build-public.yml)                         | Creates a build zip (used by playground)    |
+
+It builds the plugin zip with this repository's own [`build.yml`](build.yml), which is used by the PHPUnit jobs and Playground previews.
 
 Reusable workflows have a `*-public.yml` variant which is used for public GitHub runners and should be used for public repositories. The non-public `*.yml` are meant for private repositories using private runners.
 
@@ -61,7 +62,7 @@ Triggers on PRs. Validates [Conventional Commit](https://www.conventionalcommits
 
 Triggers on push to `main`. Uses [release-please](https://github.com/googleapis/release-please) to automate releases based on conventional commits.
 
-When a release is created, it builds the plugin at the release tag via `reusable-build-public.yml` (switch to `reusable-build.yml` for private runners) and uploads the zip artifact to the GitHub release.
+When a release is created, it builds the plugin at the release tag via [`build.yml`](build.yml) and uploads the zip artifact to the GitHub release.
 
 ## Configuration
 

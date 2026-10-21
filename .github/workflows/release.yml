@@ -60,10 +60,9 @@ jobs:
       contents: read
     needs: release-please
     if: ${{ needs.release-please.outputs.release_created == 'true' }}
-    uses: rtCamp/plugin-skeleton-d/.github/workflows/reusable-build-public.yml@72dd3643b710bd84eed7c6143312c9434a95d352 # v0.2.0
+    uses: ./.github/workflows/build.yml
     with:
       php-version: '8.2'
-      plugin-slug: wire-desk
       artifact-name: wire-desk
       ref: ${{ needs.release-please.outputs.tag_name }}
 
