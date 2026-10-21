@@ -12,6 +12,7 @@ namespace JDeepD\Wire_Desk\Modules\Settings;
 use JDeepD\Wire_Desk\Core\Capabilities;
 use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
 use JDeepD\Wire_Desk\Jobs\Usage;
+use JDeepD\Wire_Desk\Modules\Queue\Queue_Screen;
 
 /**
  * Class - Usage_Notice
@@ -31,10 +32,10 @@ final class Usage_Notice implements Registrable {
 	}
 
 	/**
-	 * Shows a notice while scoring is paused or today's budget is spent.
+	 * Shows a notice on Wire Desk's screens while scoring is paused or today's budget is spent.
 	 */
 	public function render(): void {
-		if ( ! current_user_can( Capabilities::MANAGE ) ) {
+		if ( ! current_user_can( Capabilities::MANAGE ) || ! self::is_wire_desk_screen() ) {
 			return;
 		}
 
@@ -71,6 +72,19 @@ final class Usage_Notice implements Registrable {
 		if ( wp_safe_redirect( wp_get_referer() ?: admin_url( 'admin.php?page=' . Admin_Screen::SCREEN_ID ) ) ) {
 			exit;
 		}
+	}
+
+	/**
+	 * Whether the current screen is the review queue or the settings screen.
+	 */
+	public static function is_wire_desk_screen(): bool {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+
+		if ( ! $screen ) {
+			return false;
+		}
+
+		return str_ends_with( $screen->id, '_page_' . Queue_Screen::SCREEN_ID ) || str_ends_with( $screen->id, '_page_' . Admin_Screen::SCREEN_ID );
 	}
 
 	/**

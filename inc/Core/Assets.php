@@ -67,7 +67,7 @@ final class Assets implements Registrable {
 		$this->register_script( self::ADMIN_HANDLE, 'admin-ui' );
 		$this->register_style( self::ADMIN_HANDLE, 'admin-ui', [ 'common' ] );
 
-		wp_set_script_translations( self::ADMIN_HANDLE, I18n::DOMAIN, I18n::languages_path() );
+		wp_set_script_translations( self::ADMIN_HANDLE, 'wire-desk' );
 	}
 
 	/**
@@ -77,7 +77,7 @@ final class Assets implements Registrable {
 		$this->register_script( self::EDITOR_HANDLE, 'editor' );
 		$this->register_style( self::EDITOR_HANDLE, 'editor', [ 'wp-components' ] );
 
-		wp_set_script_translations( self::EDITOR_HANDLE, I18n::DOMAIN, I18n::languages_path() );
+		wp_set_script_translations( self::EDITOR_HANDLE, 'wire-desk' );
 	}
 
 	/**

@@ -84,6 +84,20 @@ final class Queue_List_Table extends WP_List_Table {
 	private bool $has_older = false;
 
 	/**
+	 * First row of this page, including any the user can't edit.
+	 *
+	 * @var \JDeepD\Wire_Desk\Data\Wire_Post|null
+	 */
+	private ?Wire_Post $first = null;
+
+	/**
+	 * Last row of this page, including any the user can't edit.
+	 *
+	 * @var \JDeepD\Wire_Desk\Data\Wire_Post|null
+	 */
+	private ?Wire_Post $last = null;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param array<string, mixed>                             $query      Query arguments: view, band, before and after.
@@ -166,16 +180,20 @@ final class Queue_List_Table extends WP_List_Table {
 			$items = $this->repository->page( $filters, null, $per_page );
 		}
 
-		$this->items = $items;
+		$this->items = [];
 
 		if ( ! $items ) {
 			return;
 		}
 
-		$this->has_newer = (bool) $this->repository->page( $filters, $this->cursor( $items[0] ), 1, true );
-		$this->has_older = (bool) $this->repository->page( $filters, $this->cursor( $items[ count( $items ) - 1 ] ), 1 );
+		$this->first     = $items[0];
+		$this->last      = $items[ count( $items ) - 1 ];
+		$this->has_newer = (bool) $this->repository->page( $filters, $this->cursor( $this->first ), 1, true );
+		$this->has_older = (bool) $this->repository->page( $filters, $this->cursor( $this->last ), 1 );
 
 		_prime_post_caches( array_map( static fn ( Wire_Post $item ): int => $item->post_id, $items ), false, false );
+
+		$this->items = Post_Actions::editable( $items );
 	}
 
 	/**
@@ -451,7 +469,7 @@ final class Queue_List_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Newer and older links, paged from the first and last rows shown.
+	 * Newer and older links, paged from the first and last rows of the page.
 	 *
 	 * @param string $which Top or bottom.
 	 */
@@ -460,8 +478,8 @@ final class Queue_List_Table extends WP_List_Table {
 			return;
 		}
 
-		$first = reset( $this->items );
-		$last  = end( $this->items );
+		$first = $this->first;
+		$last  = $this->last;
 
 		$links = [
 			$this->has_newer

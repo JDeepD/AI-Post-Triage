@@ -87,6 +87,25 @@ class Usage_NoticeTest extends TestCase {
 	}
 
 	/**
+	 * Test that the notice shows on the settings screen too.
+	 */
+	public function test_render_on_settings_screen(): void {
+		$this->pause( 'Server error' );
+
+		$this->assertStringContainsString( 'notice-error', $this->render( 'wire-desk_page_wire-desk-settings' ) );
+	}
+
+	/**
+	 * Test that the notice isn't shown on other admin screens.
+	 */
+	public function test_render_hidden_on_other_screens(): void {
+		$this->pause( 'Server error' );
+
+		$this->assertSame( '', $this->render( 'dashboard' ) );
+		$this->assertSame( '', $this->render( 'edit-post' ) );
+	}
+
+	/**
 	 * Test that resuming clears the pause and redirects back.
 	 */
 	public function test_handle_resume(): void {
@@ -144,7 +163,7 @@ class Usage_NoticeTest extends TestCase {
 	 * Clears the request.
 	 */
 	protected function tearDown(): void {
-		unset( $_REQUEST['_wpnonce'] );
+		unset( $_REQUEST['_wpnonce'], $GLOBALS['current_screen'] );
 
 		parent::tearDown();
 	}
@@ -161,9 +180,13 @@ class Usage_NoticeTest extends TestCase {
 	}
 
 	/**
-	 * Renders the notice.
+	 * Renders the notice on a screen.
+	 *
+	 * @param string $screen Screen ID.
 	 */
-	private function render(): string {
+	private function render( string $screen = 'toplevel_page_wire-desk' ): string {
+		set_current_screen( $screen );
+
 		ob_start();
 		( new Usage_Notice() )->render();
 		return (string) ob_get_clean();

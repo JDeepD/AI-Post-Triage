@@ -13,7 +13,7 @@ use JDeepD\Wire_Desk\Core\Templates;
 
 /** @var array{id: string, name: string, value: mixed, weights: array<string, int>, max: int} $args */
 
-$questions = is_array( $args['value'] ) ? array_values( $args['value'] ) : [];
+$wire_desk_questions = is_array( $args['value'] ) ? array_values( $args['value'] ) : [];
 ?>
 <div id="<?php echo esc_attr( $args['id'] ); ?>" class="wire-desk-questions" data-wire-desk-questions-field>
 	<input type="hidden" name="<?php echo esc_attr( $args['name'] ); ?>[_]" value="" />
@@ -28,15 +28,15 @@ $questions = is_array( $args['value'] ) ? array_values( $args['value'] ) : [];
 			</tr>
 		</thead>
 		<tbody data-wire-desk-questions>
-			<?php foreach ( $questions as $index => $question ) : ?>
+			<?php foreach ( $wire_desk_questions as $wire_desk_index => $wire_desk_question ) : ?>
 				<?php
 				Templates::get_template_part(
 					'settings-question-row',
 					null,
 					[
 						'name'     => $args['name'],
-						'index'    => (string) $index,
-						'question' => $question,
+						'index'    => (string) $wire_desk_index,
+						'question' => $wire_desk_question,
 						'weights'  => $args['weights'],
 					],
 					true

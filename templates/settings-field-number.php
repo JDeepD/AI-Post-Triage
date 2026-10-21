@@ -17,9 +17,9 @@ defined( 'ABSPATH' ) || exit;
 	id="<?php echo esc_attr( $args['id'] ); ?>"
 	name="<?php echo esc_attr( $args['name'] ); ?>"
 	value="<?php echo esc_attr( is_scalar( $args['value'] ) ? (string) $args['value'] : '' ); ?>"
-	<?php foreach ( [ 'min', 'max', 'step' ] as $attribute ) : ?>
-		<?php if ( null !== $args[ $attribute ] ) : ?>
-			<?php echo esc_attr( $attribute ); ?>="<?php echo esc_attr( (string) $args[ $attribute ] ); ?>"
+	<?php foreach ( [ 'min', 'max', 'step' ] as $wire_desk_attribute ) : ?>
+		<?php if ( null !== $args[ $wire_desk_attribute ] ) : ?>
+			<?php echo esc_attr( $wire_desk_attribute ); ?>="<?php echo esc_attr( (string) $args[ $wire_desk_attribute ] ); ?>"
 		<?php endif; ?>
 	<?php endforeach; ?>
 />

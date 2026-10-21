@@ -71,4 +71,36 @@ class AssetsTest extends TestCase {
 		$this->assertContains( 'wp-plugins', wp_scripts()->registered[ Assets::EDITOR_HANDLE ]->deps );
 		$this->assertContains( 'wp-components', wp_styles()->registered[ Assets::EDITOR_HANDLE ]->deps );
 	}
+
+	/**
+	 * Test that both scripts load their translations, from the language packs.
+	 */
+	public function test_scripts_load_translations(): void {
+		$assets = new Assets();
+		$assets->register_admin_assets();
+		$assets->register_editor_assets();
+
+		foreach ( [ Assets::ADMIN_HANDLE, Assets::EDITOR_HANDLE ] as $handle ) {
+			$script = wp_scripts()->registered[ $handle ] ?? null;
+
+			$this->assertNotNull( $script );
+			$this->assertSame( 'wire-desk', $script->textdomain );
+			$this->assertSame( '', (string) $script->translations_path );
+			$this->assertContains( 'wp-i18n', $script->deps );
+		}
+	}
+
+	/**
+	 * Test that the script files are named so their translation files can be found.
+	 */
+	public function test_script_names_survive_make_json(): void {
+		( new Assets() )->register_admin_assets();
+		( new Assets() )->register_editor_assets();
+
+		foreach ( [ Assets::ADMIN_HANDLE, Assets::EDITOR_HANDLE ] as $handle ) {
+			$path = (string) wp_parse_url( (string) wp_scripts()->registered[ $handle ]->src, PHP_URL_PATH );
+
+			$this->assertDoesNotMatchRegularExpression( '/.min\.js$/', $path, 'wp i18n make-json renames files ending in "<any character>min.js", so their translations would not load.' );
+		}
+	}
 }

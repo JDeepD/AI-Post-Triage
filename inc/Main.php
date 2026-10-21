@@ -26,7 +26,6 @@ final class Main {
 	private const REGISTRABLE_CLASSES = [
 		Core\Schema::class,
 		Core\Capabilities::class,
-		Core\I18n::class,
 		Core\Assets::class,
 		Jobs\Maintenance::class,
 		Jobs\Post_Listener::class,

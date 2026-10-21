@@ -98,6 +98,16 @@ final class Post_Actions {
 	}
 
 	/**
+	 * The wire posts the current user can edit.
+	 *
+	 * @param \JDeepD\Wire_Desk\Data\Wire_Post[] $items Rows.
+	 * @return \JDeepD\Wire_Desk\Data\Wire_Post[]
+	 */
+	public static function editable( array $items ): array {
+		return array_values( array_filter( $items, static fn ( Wire_Post $item ): bool => current_user_can( 'edit_post', $item->post_id ) ) );
+	}
+
+	/**
 	 * Messages for the errors actions return, keyed by error code.
 	 *
 	 * @return array<string, string>

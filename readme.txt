@@ -74,7 +74,7 @@ Users who can edit others' posts, which by default means Editors and Administrat
 
 = Is Wire Desk translated? =
 
-Wire Desk includes Spanish and French translations, and its strings are in `languages/wire-desk.pot` for other languages. Translations from translate.wordpress.org are used automatically and take precedence.
+Translations come from [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/wire-desk/), where anyone can help translate Wire Desk. WordPress downloads them automatically.
 
 == Screenshots ==
 

@@ -127,7 +127,7 @@ final class Posts_Controller extends Abstract_REST_Controller {
 	}
 
 	/**
-	 * Only reviewers can list wire posts and act on them.
+	 * Only reviewers can list wire posts and act on them. The list leaves out posts the user can't edit.
 	 *
 	 * @param \WP_REST_Request<array<string, mixed>> $request Request.
 	 * @return true|\WP_Error
@@ -199,7 +199,7 @@ final class Posts_Controller extends Abstract_REST_Controller {
 		_prime_post_caches( array_map( static fn ( Wire_Post $item ): int => $item->post_id, $items ), false, false );
 
 		$data = [];
-		foreach ( $items as $item ) {
+		foreach ( Post_Actions::editable( $items ) as $item ) {
 			$data[] = $this->prepare_response_for_collection( $this->prepare_item_for_response( $item, $request ) );
 		}
 

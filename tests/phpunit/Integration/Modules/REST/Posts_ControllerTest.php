@@ -318,6 +318,32 @@ class Posts_ControllerTest extends TestCase {
 	}
 
 	/**
+	 * Test that the list leaves out posts the reviewer can't edit, and still pages past them.
+	 */
+	public function test_list_leaves_out_posts_reviewer_cannot_edit(): void {
+		$older   = $this->wire_post( '2024-01-01 00:00:00' );
+		$private = $this->wire_post( '2024-01-02 00:00:00' );
+		$newer   = $this->wire_post( '2024-01-03 00:00:00' );
+
+		wp_update_post(
+			[
+				'ID'          => $private,
+				'post_status' => 'private',
+				'post_author' => self::factory()->user->create( [ 'role' => 'editor' ] ),
+			]
+		);
+
+		wp_set_current_user( self::factory()->user->create( [ 'role' => self::REVIEWER ] ) );
+
+		$this->assertSame( [ $newer, $older ], array_column( $this->get()->get_data(), 'id' ) );
+
+		$first = $this->get( [ 'per_page' => 2 ] );
+
+		$this->assertSame( [ $newer ], array_column( $first->get_data(), 'id' ) );
+		$this->assertSame( [ $older ], array_column( $this->follow( (string) $this->link( $first, 'next' ) )->get_data(), 'id' ) );
+	}
+
+	/**
 	 * Test that an action runs and returns the updated post.
 	 */
 	public function test_action_returns_updated_post(): void {

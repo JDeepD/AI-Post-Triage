@@ -235,12 +235,45 @@ class Queue_List_TableTest extends TestCase {
 	}
 
 	/**
-	 * Test that a row whose post is gone still renders.
+	 * Test that a row whose post is gone isn't listed.
 	 */
-	public function test_renders_row_without_post(): void {
+	public function test_hides_row_without_post(): void {
 		$this->insert_rows( 1, Wire_Post::STATE_SCORED, Wire_Post::BAND_LOW );
 
-		$this->assertStringContainsString( '<strong>(deleted)</strong>', $this->render( $this->table() ) );
+		$this->assertSame( [], $this->ids( $this->table() ) );
+	}
+
+	/**
+	 * Test that posts the reviewer can't edit aren't listed, and paging still moves past them.
+	 */
+	public function test_hides_posts_reviewer_cannot_edit(): void {
+		[ $one, $two, $three ] = $this->wire_posts( 3 );
+
+		wp_update_post(
+			[
+				'ID'          => $two,
+				'post_status' => 'private',
+				'post_author' => self::factory()->user->create( [ 'role' => 'editor' ] ),
+			]
+		);
+
+		add_role(
+			'wire_desk_reviewer',
+			'Reviewer',
+			[
+				'read'              => true,
+				'edit_posts'        => true,
+				'edit_others_posts' => true,
+			]
+		);
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'wire_desk_reviewer' ] ) );
+		update_user_option( get_current_user_id(), Queue_Screen::PER_PAGE_OPTION, 2 );
+
+		$this->assertSame( [ $three ], $this->ids( $this->table() ) );
+		$this->assertSame( [ $one ], $this->ids( $this->table( [ 'before' => $two ] ) ) );
+		$this->assertStringContainsString( 'before=' . $two, $this->render( $this->table() ) );
+
+		remove_role( 'wire_desk_reviewer' );
 	}
 
 	/**
