@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/JDeepD/Wire-Desk/compare/v0.1.4...v0.1.5) (2026-10-21)
+
+
+### Fixed
+
+* remove the POT file ([9b10f93](https://github.com/JDeepD/Wire-Desk/commit/9b10f937d31fa596d2d172ec9fc3e55c30abc1dc))
+
 ## [0.1.4](https://github.com/JDeepD/Wire-Desk/compare/v0.1.3...v0.1.4) (2026-10-21)
 
 
