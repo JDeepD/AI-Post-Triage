@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/JDeepD/AI-Post-Triage/compare/v0.2.0...v0.2.1) (2026-10-22)
+
+
+### Fixed
+
+* use fixed SQL for the queue queries ([88ec6be](https://github.com/JDeepD/AI-Post-Triage/commit/88ec6beb70a3d704dfa8af3e4a4131cc3df03a3a))
+
 ## [0.2.0](https://github.com/JDeepD/Wire-Desk/compare/v0.1.6...v0.2.0) (2026-10-22)
 
 

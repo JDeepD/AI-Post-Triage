@@ -11,7 +11,7 @@
  * Plugin URI:        https://github.com/JDeepD/ai-post-triage
  * Description:       Flags high-priority wire-ingested posts with a decision model and gives editors a review queue to decide what gets published.
  * x-release-please-start-version
- * Version:           0.2.0
+ * Version:           0.2.1
  * x-release-please-end
  * Author:            Jaydeep Das
  * Author URI:        https://github.com/JDeepD
@@ -41,7 +41,7 @@ function constants(): void {
 	/**
 	 * Version of the plugin.
 	 */
-	define( 'AI_POST_TRIAGE_VERSION', '0.2.0' ); // x-release-please-version.
+	define( 'AI_POST_TRIAGE_VERSION', '0.2.1' ); // x-release-please-version.
 
 	/**
 	 * Root path to the plugin directory.
