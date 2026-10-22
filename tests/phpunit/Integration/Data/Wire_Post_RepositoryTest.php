@@ -285,6 +285,27 @@ class Wire_Post_RepositoryTest extends TestCase {
 	}
 
 	/**
+	 * Test that page() and count() filter by band alone, including posts that aren't scored, and page filtered rows from a cursor.
+	 */
+	public function test_page_and_count_filter_by_band_and_cursor(): void {
+		$this->add_rows();
+		$this->repository->save_score( 2, Wire_Post::BAND_HIGH, 90, 'typesafe/jev-1.13', md5( '2' ), 0.0, [] );
+		$this->repository->save_score( 4, Wire_Post::BAND_HIGH, 80, 'typesafe/jev-1.13', md5( '4' ), 0.0, [] );
+		$this->repository->save_score( 5, Wire_Post::BAND_LOW, 10, 'typesafe/jev-1.13', md5( '5' ), 0.0, [] );
+
+		$this->assertSame( [ 4, 2 ], $this->ids( $this->repository->page( [ 'band' => Wire_Post::BAND_HIGH ] ) ) );
+		$this->assertSame( [ 3, 1 ], $this->ids( $this->repository->page( [ 'band' => Wire_Post::BAND_NONE ] ) ) );
+		$this->assertSame( 2, $this->repository->count( [ 'band' => Wire_Post::BAND_NONE ] ) );
+		$this->assertSame( 1, $this->repository->count( [ 'band' => Wire_Post::BAND_HIGH ], 1 ) );
+
+		$scored = [ 'state' => Wire_Post::STATE_SCORED ];
+		$rows   = $this->repository->page( $scored );
+
+		$this->assertSame( [ 4, 2 ], $this->ids( $this->repository->page( $scored, $this->cursor( $rows[0] ) ) ) );
+		$this->assertSame( [ 5, 4 ], $this->ids( $this->repository->page( $scored, $this->cursor( $rows[2] ), 20, true ) ) );
+	}
+
+	/**
 	 * Test that page() limits the page size.
 	 */
 	public function test_page_limits_page_size(): void {

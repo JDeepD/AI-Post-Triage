@@ -312,27 +312,28 @@ final class Wire_Post_Repository {
 	public function page( array $filters = [], ?array $cursor = null, int $limit = 20, bool $newer = false ): array {
 		global $wpdb;
 
-		[ $where, $args ] = $this->where( $filters );
-
-		$operator = $newer ? '>' : '<';
-		$order_by = $newer ? ' ORDER BY post_date ASC, post_id ASC' : ' ORDER BY post_date DESC, post_id DESC';
-
-		if ( null !== $cursor ) {
-			$where[] = "( post_date {$operator} %s OR ( post_date = %s AND post_id {$operator} %d ) )";
-			array_push( $args, $cursor['post_date'], $cursor['post_date'], $cursor['post_id'] );
-		}
-
-		$query = $wpdb->prepare(
-			'SELECT post_id FROM %i' . $this->where_sql( $where ) . $order_by . ' LIMIT %d',
+		$args = [
 			Schema::table_name(),
-			...[ ...$args, max( 1, min( self::MAX_PAGE_SIZE, $limit ) ) ]
-		);
+			...self::filter_args( $filters ),
+			null === $cursor ? 0 : 1,
+			$cursor['post_date'] ?? '',
+			$cursor['post_date'] ?? '',
+			$cursor['post_id'] ?? 0,
+			max( 1, min( self::MAX_PAGE_SIZE, $limit ) ),
+		];
 
-		$key      = 'page:' . md5( $query ) . ':' . wp_cache_get_last_changed( self::CACHE_GROUP );
+		$key      = 'page:' . md5( (string) wp_json_encode( [ $newer, $args ] ) ) . ':' . wp_cache_get_last_changed( self::CACHE_GROUP );
 		$post_ids = wp_cache_get( $key, self::CACHE_GROUP );
 
 		if ( ! is_array( $post_ids ) ) {
-			$post_ids = array_map( 'intval', $wpdb->get_col( $query ) );
+			$post_ids = array_map(
+				'intval',
+				$wpdb->get_col(
+					$newer
+						? $wpdb->prepare( 'SELECT post_id FROM %i WHERE ( %d = -1 OR state = %d ) AND ( %d = -1 OR band = %d ) AND ( %d = 0 OR post_date > %s OR ( post_date = %s AND post_id > %d ) ) ORDER BY post_date ASC, post_id ASC LIMIT %d', ...$args )
+						: $wpdb->prepare( 'SELECT post_id FROM %i WHERE ( %d = -1 OR state = %d ) AND ( %d = -1 OR band = %d ) AND ( %d = 0 OR post_date < %s OR ( post_date = %s AND post_id < %d ) ) ORDER BY post_date DESC, post_id DESC LIMIT %d', ...$args )
+				)
+			);
 			wp_cache_set( $key, $post_ids, self::CACHE_GROUP );
 		}
 
@@ -352,16 +353,16 @@ final class Wire_Post_Repository {
 	public function count( array $filters = [], int $max = 0 ): int {
 		global $wpdb;
 
-		[ $where, $args ] = $this->where( $filters );
-
-		$query = $max > 0
-			? $wpdb->prepare( 'SELECT COUNT(*) FROM ( SELECT 1 FROM %i' . $this->where_sql( $where ) . ' LIMIT %d ) AS capped', Schema::table_name(), ...[ ...$args, $max ] )
-			: $wpdb->prepare( 'SELECT COUNT(*) FROM %i' . $this->where_sql( $where ), Schema::table_name(), ...$args );
-		$key   = 'count:' . md5( $query ) . ':' . wp_cache_get_last_changed( self::CACHE_GROUP );
+		$args  = [ Schema::table_name(), ...self::filter_args( $filters ) ];
+		$key   = 'count:' . md5( (string) wp_json_encode( [ $max, $args ] ) ) . ':' . wp_cache_get_last_changed( self::CACHE_GROUP );
 		$count = wp_cache_get( $key, self::CACHE_GROUP );
 
 		if ( ! is_int( $count ) ) {
-			$count = (int) $wpdb->get_var( $query );
+			$count = (int) $wpdb->get_var(
+				$max > 0
+					? $wpdb->prepare( 'SELECT COUNT(*) FROM ( SELECT 1 FROM %i WHERE ( %d = -1 OR state = %d ) AND ( %d = -1 OR band = %d ) LIMIT %d ) AS capped', ...[ ...$args, $max ] )
+					: $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE ( %d = -1 OR state = %d ) AND ( %d = -1 OR band = %d )', ...$args )
+			);
 			wp_cache_set( $key, $count, self::CACHE_GROUP );
 		}
 
@@ -493,32 +494,16 @@ final class Wire_Post_Repository {
 	}
 
 	/**
-	 * Builds WHERE conditions from filters.
+	 * Arguments for the state and band conditions, with -1 for a filter that isn't set.
 	 *
 	 * @param array{state?: int, band?: int} $filters Filters.
-	 * @return array{0: string[], 1: array<int, int|string>} Conditions and their arguments.
+	 * @return int[]
 	 */
-	private function where( array $filters ): array {
-		$where = [];
-		$args  = [];
+	private static function filter_args( array $filters ): array {
+		$state = isset( $filters['state'] ) ? (int) $filters['state'] : -1;
+		$band  = isset( $filters['band'] ) ? (int) $filters['band'] : -1;
 
-		foreach ( [ 'state', 'band' ] as $column ) {
-			if ( isset( $filters[ $column ] ) ) {
-				$where[] = "{$column} = %d";
-				$args[]  = (int) $filters[ $column ];
-			}
-		}
-
-		return [ $where, $args ];
-	}
-
-	/**
-	 * Joins WHERE conditions.
-	 *
-	 * @param string[] $where Conditions.
-	 */
-	private function where_sql( array $where ): string {
-		return $where ? ' WHERE ' . implode( ' AND ', $where ) : '';
+		return [ $state, $state, $band, $band ];
 	}
 
 	/**
