@@ -2,21 +2,21 @@
 /**
  * REST endpoint for trying a headline on the settings screen.
  *
- * @package JDeepD\Wire_Desk\Modules\Settings
+ * @package JDeepD\AI_Post_Triage\Modules\Settings
  */
 
 declare(strict_types = 1);
 
-namespace JDeepD\Wire_Desk\Modules\Settings;
+namespace JDeepD\AI_Post_Triage\Modules\Settings;
 
-use JDeepD\Wire_Desk\Core\Capabilities;
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Decisions\Decision_Client;
-use JDeepD\Wire_Desk\Decisions\OpenRouter_Client;
-use JDeepD\Wire_Desk\Framework\Contracts\Abstracts\Abstract_REST_Controller;
-use JDeepD\Wire_Desk\Scoring\Rubric;
-use JDeepD\Wire_Desk\Scoring\Scorer;
-use JDeepD\Wire_Desk\Scoring\State_Builder;
+use JDeepD\AI_Post_Triage\Core\Capabilities;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Decisions\Decision_Client;
+use JDeepD\AI_Post_Triage\Decisions\OpenRouter_Client;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Abstracts\Abstract_REST_Controller;
+use JDeepD\AI_Post_Triage\Scoring\Rubric;
+use JDeepD\AI_Post_Triage\Scoring\Scorer;
+use JDeepD\AI_Post_Triage\Scoring\State_Builder;
 use WP_REST_Response;
 use WP_REST_Server;
 
@@ -39,14 +39,14 @@ final class Try_Controller extends Abstract_REST_Controller {
 	/**
 	 * Client that answers the questions.
 	 *
-	 * @var ?\JDeepD\Wire_Desk\Decisions\Decision_Client
+	 * @var ?\JDeepD\AI_Post_Triage\Decisions\Decision_Client
 	 */
 	private ?Decision_Client $client;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param \JDeepD\Wire_Desk\Decisions\Decision_Client|null $client Client that answers the questions.
+	 * @param \JDeepD\AI_Post_Triage\Decisions\Decision_Client|null $client Client that answers the questions.
 	 */
 	public function __construct( ?Decision_Client $client = null ) {
 		$this->client = $client;
@@ -92,7 +92,7 @@ final class Try_Controller extends Abstract_REST_Controller {
 			return true;
 		}
 
-		return new \WP_Error( 'rest_forbidden', __( 'Sorry, you are not allowed to try headlines.', 'wire-desk' ), [ 'status' => rest_authorization_required_code() ] );
+		return new \WP_Error( 'rest_forbidden', __( 'Sorry, you are not allowed to try headlines.', 'ai-post-triage' ), [ 'status' => rest_authorization_required_code() ] );
 	}
 
 	/**
@@ -106,7 +106,7 @@ final class Try_Controller extends Abstract_REST_Controller {
 		$model    = is_string( $request['model'] ) && '' !== $request['model'] ? $request['model'] : $settings['model'];
 
 		if ( '' === $headline ) {
-			return new \WP_Error( 'rest_invalid_param', __( 'Enter a headline.', 'wire-desk' ), [ 'status' => 400 ] );
+			return new \WP_Error( 'rest_invalid_param', __( 'Enter a headline.', 'ai-post-triage' ), [ 'status' => 400 ] );
 		}
 
 		$decision = ( $this->client ?? new OpenRouter_Client() )->decide( State_Builder::for_headline( $headline ), $settings['questions'], $model );

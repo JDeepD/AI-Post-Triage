@@ -4,7 +4,7 @@
 
 @use "../shared/bands";
 
-.wire-desk-panel-summary {
+.ai-post-triage-panel-summary {
 	align-items: center;
 	display: flex;
 	flex-wrap: wrap;
@@ -12,54 +12,54 @@
 	margin: 0 0 12px;
 }
 
-.wire-desk-panel-summary .wire-desk-score {
+.ai-post-triage-panel-summary .ai-post-triage-score {
 	margin-left: 0;
 }
 
-.wire-desk-panel-state {
+.ai-post-triage-panel-state {
 	color: #757575;
 }
 
-.wire-desk-panel-error {
+.ai-post-triage-panel-error {
 	color: #cc1818;
 }
 
-.wire-desk-panel-answers {
+.ai-post-triage-panel-answers {
 	margin: 0 0 12px;
 }
 
-.wire-desk-panel-answers li {
+.ai-post-triage-panel-answers li {
 	display: flex;
 	gap: 8px;
 	margin: 0 0 8px;
 }
 
-.wire-desk-panel-mark {
+.ai-post-triage-panel-mark {
 	flex: none;
 	font-weight: 600;
 	width: 1em;
 }
 
-.wire-desk-panel-answers .is-met .wire-desk-panel-mark {
+.ai-post-triage-panel-answers .is-met .ai-post-triage-panel-mark {
 	color: #008a20;
 }
 
-.wire-desk-panel-answers .is-missed .wire-desk-panel-mark {
+.ai-post-triage-panel-answers .is-missed .ai-post-triage-panel-mark {
 	color: #cc1818;
 }
 
-.wire-desk-panel-question {
+.ai-post-triage-panel-question {
 	display: flex;
 	flex-direction: column;
 	gap: 2px;
 }
 
-.wire-desk-panel-meta {
+.ai-post-triage-panel-meta {
 	color: #757575;
 	font-size: 12px;
 }
 
-.wire-desk-panel-actions {
+.ai-post-triage-panel-actions {
 	align-items: center;
 	display: flex;
 	flex-wrap: wrap;

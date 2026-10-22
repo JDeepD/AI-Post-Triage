@@ -42,13 +42,13 @@ const MIN_SEARCH_LENGTH = 2;
  */
 const initQuestions = ( field: HTMLElement ): void => {
 	const rows = field.querySelector< HTMLElement >(
-		'[data-wire-desk-questions]'
+		'[data-ai-post-triage-questions]'
 	);
 	const template = field.querySelector< HTMLTemplateElement >(
-		'[data-wire-desk-question-template]'
+		'[data-ai-post-triage-question-template]'
 	);
 	const add = field.querySelector< HTMLButtonElement >(
-		'[data-wire-desk-add-question]'
+		'[data-ai-post-triage-add-question]'
 	);
 
 	if ( ! rows || ! template || ! add ) {
@@ -75,7 +75,7 @@ const initQuestions = ( field: HTMLElement ): void => {
 
 	rows.addEventListener( 'click', ( event ) => {
 		const remove = ( event.target as HTMLElement ).closest(
-			'[data-wire-desk-remove-question]'
+			'[data-ai-post-triage-remove-question]'
 		);
 
 		if ( remove ) {
@@ -96,16 +96,16 @@ const initQuestions = ( field: HTMLElement ): void => {
 const initTermSearch = ( field: HTMLElement ): void => {
 	const baseName = field.dataset[ 'inputName' ] ?? '';
 	const taxonomies = field.querySelector< HTMLSelectElement >(
-		'[data-wire-desk-term-taxonomy]'
+		'[data-ai-post-triage-term-taxonomy]'
 	);
 	const search = field.querySelector< HTMLInputElement >(
-		'[data-wire-desk-term-search]'
+		'[data-ai-post-triage-term-search]'
 	);
 	const results = field.querySelector< HTMLElement >(
-		'[data-wire-desk-term-results]'
+		'[data-ai-post-triage-term-results]'
 	);
 	const selected = field.querySelector< HTMLElement >(
-		'[data-wire-desk-selected-terms]'
+		'[data-ai-post-triage-selected-terms]'
 	);
 
 	if ( ! baseName || ! taxonomies || ! search || ! results || ! selected ) {
@@ -117,7 +117,7 @@ const initTermSearch = ( field: HTMLElement ): void => {
 
 	const message = ( text: string ): HTMLLIElement => {
 		const item = document.createElement( 'li' );
-		item.className = 'wire-desk-terms-message';
+		item.className = 'ai-post-triage-terms-message';
 		item.textContent = text;
 		return item;
 	};
@@ -144,7 +144,7 @@ const initTermSearch = ( field: HTMLElement ): void => {
 			checkbox.value = String( term.id );
 			checkbox.checked = true;
 
-			meta.className = 'wire-desk-terms-meta';
+			meta.className = 'ai-post-triage-terms-meta';
 			meta.textContent =
 				taxonomies.selectedOptions[ 0 ]?.dataset[ 'label' ] ?? taxonomy;
 
@@ -161,7 +161,7 @@ const initTermSearch = ( field: HTMLElement ): void => {
 	const render = ( terms: Term[], taxonomy: string ): void => {
 		if ( ! terms.length ) {
 			results.replaceChildren(
-				message( __( 'No terms found.', 'wire-desk' ) )
+				message( __( 'No terms found.', 'ai-post-triage' ) )
 			);
 			return;
 		}
@@ -207,7 +207,7 @@ const initTermSearch = ( field: HTMLElement ): void => {
 
 			try {
 				const terms = await apiFetch< Term[] >( {
-					path: addQueryArgs( '/wire-desk/v1/terms', {
+					path: addQueryArgs( '/ai-post-triage/v1/terms', {
 						taxonomy,
 						search: value,
 					} ),
@@ -220,7 +220,10 @@ const initTermSearch = ( field: HTMLElement ): void => {
 				if ( current === request ) {
 					results.replaceChildren(
 						message(
-							__( 'The search failed. Try again.', 'wire-desk' )
+							__(
+								'The search failed. Try again.',
+								'ai-post-triage'
+							)
 						)
 					);
 				}
@@ -239,16 +242,16 @@ const initTermSearch = ( field: HTMLElement ): void => {
  */
 const initTry = ( box: HTMLElement ): void => {
 	const headline = box.querySelector< HTMLTextAreaElement >(
-		'[data-wire-desk-try-headline]'
+		'[data-ai-post-triage-try-headline]'
 	);
 	const submit = box.querySelector< HTMLButtonElement >(
-		'[data-wire-desk-try-submit]'
+		'[data-ai-post-triage-try-submit]'
 	);
 	const spinner = box.querySelector< HTMLElement >(
-		'[data-wire-desk-try-spinner]'
+		'[data-ai-post-triage-try-spinner]'
 	);
 	const result = box.querySelector< HTMLElement >(
-		'[data-wire-desk-try-result]'
+		'[data-ai-post-triage-try-result]'
 	);
 
 	if ( ! headline || ! submit || ! spinner || ! result ) {
@@ -257,7 +260,7 @@ const initTry = ( box: HTMLElement ): void => {
 
 	const notice = ( text: string ): HTMLParagraphElement => {
 		const paragraph = document.createElement( 'p' );
-		paragraph.className = 'wire-desk-try-error';
+		paragraph.className = 'ai-post-triage-try-error';
 		paragraph.textContent = text;
 		return paragraph;
 	};
@@ -275,10 +278,10 @@ const initTry = ( box: HTMLElement ): void => {
 
 		table.className = 'widefat striped';
 		head.append(
-			cell( 'th', __( 'Question', 'wire-desk' ) ),
-			cell( 'th', __( 'Answer', 'wire-desk' ) ),
-			cell( 'th', __( 'Expected', 'wire-desk' ) ),
-			cell( 'th', __( 'Met', 'wire-desk' ) )
+			cell( 'th', __( 'Question', 'ai-post-triage' ) ),
+			cell( 'th', __( 'Answer', 'ai-post-triage' ) ),
+			cell( 'th', __( 'Expected', 'ai-post-triage' ) ),
+			cell( 'th', __( 'Met', 'ai-post-triage' ) )
 		);
 		table.createTHead().append( head );
 
@@ -295,24 +298,24 @@ const initTry = ( box: HTMLElement ): void => {
 					'td',
 					sprintf(
 						/* translators: 1: Yes or No, 2: confidence percentage. */
-						__( '%1$s (%2$d%%)', 'wire-desk' ),
+						__( '%1$s (%2$d%%)', 'ai-post-triage' ),
 						yes
-							? __( 'Yes', 'wire-desk' )
-							: __( 'No', 'wire-desk' ),
+							? __( 'Yes', 'ai-post-triage' )
+							: __( 'No', 'ai-post-triage' ),
 						confidence
 					)
 				),
 				cell(
 					'td',
 					'yes' === answer.expected
-						? __( 'Yes', 'wire-desk' )
-						: __( 'No', 'wire-desk' )
+						? __( 'Yes', 'ai-post-triage' )
+						: __( 'No', 'ai-post-triage' )
 				),
 				cell(
 					'td',
 					answer.met
-						? __( 'Yes', 'wire-desk' )
-						: __( 'No', 'wire-desk' )
+						? __( 'Yes', 'ai-post-triage' )
+						: __( 'No', 'ai-post-triage' )
 				)
 			);
 			body.append( row );
@@ -325,18 +328,18 @@ const initTry = ( box: HTMLElement ): void => {
 
 		strong.textContent = sprintf(
 			/* translators: 1: score from 0 to 100, 2: band name. */
-			__( 'Score %1$d: %2$s', 'wire-desk' ),
+			__( 'Score %1$d: %2$s', 'ai-post-triage' ),
 			data.score,
 			data.band_label
 		);
-		summary.className = 'wire-desk-try-summary';
+		summary.className = 'ai-post-triage-try-summary';
 		summary.append( strong );
 
 		const model = document.createElement( 'p' );
 		model.className = 'description';
 		model.textContent = sprintf(
 			/* translators: %s: model ID. */
-			__( 'Answered by %s.', 'wire-desk' ),
+			__( 'Answered by %s.', 'ai-post-triage' ),
 			data.model
 		);
 
@@ -348,7 +351,7 @@ const initTry = ( box: HTMLElement ): void => {
 
 		if ( ! text ) {
 			result.replaceChildren(
-				notice( __( 'Enter a headline.', 'wire-desk' ) )
+				notice( __( 'Enter a headline.', 'ai-post-triage' ) )
 			);
 			headline.focus();
 			return;
@@ -356,7 +359,7 @@ const initTry = ( box: HTMLElement ): void => {
 
 		const model =
 			document.querySelector< HTMLSelectElement | HTMLInputElement >(
-				'#wire-desk-model'
+				'#ai-post-triage-model'
 			)?.value ?? '';
 
 		submit.disabled = true;
@@ -365,7 +368,7 @@ const initTry = ( box: HTMLElement ): void => {
 		try {
 			render(
 				await apiFetch< TryResult >( {
-					path: '/wire-desk/v1/try',
+					path: '/ai-post-triage/v1/try',
 					method: 'POST',
 					data: model
 						? { headline: text, model }
@@ -376,7 +379,7 @@ const initTry = ( box: HTMLElement ): void => {
 			result.replaceChildren(
 				notice(
 					( error as { message?: string } ).message ||
-						__( 'The request failed. Try again.', 'wire-desk' )
+						__( 'The request failed. Try again.', 'ai-post-triage' )
 				)
 			);
 		} finally {
@@ -393,16 +396,16 @@ const initTry = ( box: HTMLElement ): void => {
  */
 const initRescore = ( box: HTMLElement ): void => {
 	const limit = box.querySelector< HTMLInputElement >(
-		'[data-wire-desk-rescore-limit]'
+		'[data-ai-post-triage-rescore-limit]'
 	);
 	const submit = box.querySelector< HTMLButtonElement >(
-		'[data-wire-desk-rescore-submit]'
+		'[data-ai-post-triage-rescore-submit]'
 	);
 	const spinner = box.querySelector< HTMLElement >(
-		'[data-wire-desk-rescore-spinner]'
+		'[data-ai-post-triage-rescore-spinner]'
 	);
 	const result = box.querySelector< HTMLElement >(
-		'[data-wire-desk-rescore-result]'
+		'[data-ai-post-triage-rescore-result]'
 	);
 
 	if ( ! limit || ! submit || ! spinner || ! result ) {
@@ -423,11 +426,11 @@ const initRescore = ( box: HTMLElement ): void => {
 
 		submit.disabled = true;
 		spinner.classList.add( 'is-active' );
-		result.classList.remove( 'wire-desk-try-error' );
+		result.classList.remove( 'ai-post-triage-try-error' );
 
 		try {
 			const { queued } = await apiFetch< { queued: number } >( {
-				path: '/wire-desk/v1/rescore',
+				path: '/ai-post-triage/v1/rescore',
 				method: 'POST',
 				data: { limit: Number( limit.value ) },
 			} );
@@ -438,15 +441,15 @@ const initRescore = ( box: HTMLElement ): void => {
 					'Queued %d post. It is scored in the background.',
 					'Queued %d posts. They are scored in the background.',
 					queued,
-					'wire-desk'
+					'ai-post-triage'
 				),
 				queued
 			);
 		} catch ( error ) {
-			result.classList.add( 'wire-desk-try-error' );
+			result.classList.add( 'ai-post-triage-try-error' );
 			result.textContent =
 				( error as { message?: string } ).message ||
-				__( 'The request failed. Try again.', 'wire-desk' );
+				__( 'The request failed. Try again.', 'ai-post-triage' );
 		} finally {
 			submit.disabled = false;
 			spinner.classList.remove( 'is-active' );
@@ -456,18 +459,20 @@ const initRescore = ( box: HTMLElement ): void => {
 
 domReady( () => {
 	document
-		.querySelectorAll< HTMLElement >( '[data-wire-desk-questions-field]' )
+		.querySelectorAll< HTMLElement >(
+			'[data-ai-post-triage-questions-field]'
+		)
 		.forEach( initQuestions );
 
 	document
-		.querySelectorAll< HTMLElement >( '[data-wire-desk-terms]' )
+		.querySelectorAll< HTMLElement >( '[data-ai-post-triage-terms]' )
 		.forEach( initTermSearch );
 
 	document
-		.querySelectorAll< HTMLElement >( '[data-wire-desk-try]' )
+		.querySelectorAll< HTMLElement >( '[data-ai-post-triage-try]' )
 		.forEach( initTry );
 
 	document
-		.querySelectorAll< HTMLElement >( '[data-wire-desk-rescore]' )
+		.querySelectorAll< HTMLElement >( '[data-ai-post-triage-rescore]' )
 		.forEach( initRescore );
 } );

@@ -2,16 +2,16 @@
 /**
  * Integration tests for Wire_Post_Repository.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Data
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Data
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Data;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Data;
 
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -23,7 +23,7 @@ class Wire_Post_RepositoryTest extends TestCase {
 	/**
 	 * Repository under test.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
@@ -500,7 +500,7 @@ class Wire_Post_RepositoryTest extends TestCase {
 	/**
 	 * Post IDs of rows.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post[] $posts Rows.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post[] $posts Rows.
 	 * @return int[]
 	 */
 	private function ids( array $posts ): array {
@@ -510,7 +510,7 @@ class Wire_Post_RepositoryTest extends TestCase {
 	/**
 	 * Cursor for a row.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post $post Row.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post $post Row.
 	 * @return array{post_date: string, post_id: int}
 	 */
 	private function cursor( Wire_Post $post ): array {

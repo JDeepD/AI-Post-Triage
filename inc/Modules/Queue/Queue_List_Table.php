@@ -2,16 +2,16 @@
 /**
  * Lists wire posts on the review queue screen.
  *
- * @package JDeepD\Wire_Desk\Modules\Queue
+ * @package JDeepD\AI_Post_Triage\Modules\Queue
  */
 
 declare(strict_types = 1);
 
-namespace JDeepD\Wire_Desk\Modules\Queue;
+namespace JDeepD\AI_Post_Triage\Modules\Queue;
 
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Editorial\Post_Actions;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Editorial\Post_Actions;
 use WP_List_Table;
 use WP_Post;
 
@@ -37,7 +37,7 @@ final class Queue_List_Table extends WP_List_Table {
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
@@ -86,22 +86,22 @@ final class Queue_List_Table extends WP_List_Table {
 	/**
 	 * First row of this page, including any the user can't edit.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post|null
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post|null
 	 */
 	private ?Wire_Post $first = null;
 
 	/**
 	 * Last row of this page, including any the user can't edit.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post|null
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post|null
 	 */
 	private ?Wire_Post $last = null;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param array<string, mixed>                             $query      Query arguments: view, band, before and after.
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post_Repository|null $repository Wire post table.
+	 * @param array<string, mixed>                                  $query      Query arguments: view, band, before and after.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository|null $repository Wire post table.
 	 */
 	public function __construct( array $query = [], ?Wire_Post_Repository $repository = null ) {
 		parent::__construct(
@@ -148,12 +148,12 @@ final class Queue_List_Table extends WP_List_Table {
 	 */
 	public static function view_labels(): array {
 		return [
-			'needs-review' => __( 'Needs review', 'wire-desk' ),
-			'waiting'      => __( 'Waiting', 'wire-desk' ),
-			'failed'       => __( 'Failed', 'wire-desk' ),
-			'published'    => __( 'Published', 'wire-desk' ),
-			'dismissed'    => __( 'Dismissed', 'wire-desk' ),
-			'all'          => __( 'All', 'wire-desk' ),
+			'needs-review' => __( 'Needs review', 'ai-post-triage' ),
+			'waiting'      => __( 'Waiting', 'ai-post-triage' ),
+			'failed'       => __( 'Failed', 'ai-post-triage' ),
+			'published'    => __( 'Published', 'ai-post-triage' ),
+			'dismissed'    => __( 'Dismissed', 'ai-post-triage' ),
+			'all'          => __( 'All', 'ai-post-triage' ),
 		];
 	}
 
@@ -204,11 +204,11 @@ final class Queue_List_Table extends WP_List_Table {
 	public function get_columns(): array {
 		return [
 			'cb'    => '<input type="checkbox" />',
-			'title' => __( 'Title', 'wire-desk' ),
-			'band'  => __( 'Priority', 'wire-desk' ),
-			'state' => __( 'Status', 'wire-desk' ),
-			'model' => __( 'Model', 'wire-desk' ),
-			'date'  => __( 'Date', 'wire-desk' ),
+			'title' => __( 'Title', 'ai-post-triage' ),
+			'band'  => __( 'Priority', 'ai-post-triage' ),
+			'state' => __( 'Status', 'ai-post-triage' ),
+			'model' => __( 'Model', 'ai-post-triage' ),
+			'date'  => __( 'Date', 'ai-post-triage' ),
 		];
 	}
 
@@ -216,36 +216,36 @@ final class Queue_List_Table extends WP_List_Table {
 	 * {@inheritDoc}
 	 */
 	public function no_items(): void {
-		esc_html_e( 'No wire posts found.', 'wire-desk' );
+		esc_html_e( 'No wire posts found.', 'ai-post-triage' );
 	}
 
 	/**
 	 * The checkbox column.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post $item Row.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post $item Row.
 	 */
 	public function column_cb( $item ): string {
 		$post  = get_post( $item->post_id );
-		$title = $post instanceof WP_Post ? _draft_or_post_title( $post ) : esc_html__( '(deleted)', 'wire-desk' );
+		$title = $post instanceof WP_Post ? _draft_or_post_title( $post ) : esc_html__( '(deleted)', 'ai-post-triage' );
 
 		return sprintf(
 			'<input id="cb-select-%1$d" type="checkbox" name="post[]" value="%1$d" /><label for="cb-select-%1$d"><span class="screen-reader-text">%2$s</span></label>',
 			$item->post_id,
 			/* translators: %s: post title. */
-			sprintf( __( 'Select %s', 'wire-desk' ), $title )
+			sprintf( __( 'Select %s', 'ai-post-triage' ), $title )
 		);
 	}
 
 	/**
 	 * The title column.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post $item Row.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post $item Row.
 	 */
 	public function column_title( Wire_Post $item ): string {
 		$post = get_post( $item->post_id );
 
 		if ( ! $post instanceof WP_Post ) {
-			return '<strong>' . esc_html__( '(deleted)', 'wire-desk' ) . '</strong>';
+			return '<strong>' . esc_html__( '(deleted)', 'ai-post-triage' ) . '</strong>';
 		}
 
 		$title = _draft_or_post_title( $post );
@@ -260,15 +260,15 @@ final class Queue_List_Table extends WP_List_Table {
 	/**
 	 * The priority column.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post $item Row.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post $item Row.
 	 */
 	public function column_band( Wire_Post $item ): string {
 		$labels = Wire_Post::band_labels();
 		$slug   = (string) array_search( $item->band, Wire_Post::band_slugs(), true );
-		$html   = '<span class="wire-desk-band wire-desk-band-' . esc_attr( $slug ) . '">' . esc_html( $labels[ $item->band ] ?? $labels[ Wire_Post::BAND_NONE ] ) . '</span>';
+		$html   = '<span class="ai-post-triage-band ai-post-triage-band-' . esc_attr( $slug ) . '">' . esc_html( $labels[ $item->band ] ?? $labels[ Wire_Post::BAND_NONE ] ) . '</span>';
 
 		if ( null !== $item->scored_at ) {
-			$html .= ' <span class="wire-desk-score">' . esc_html( number_format_i18n( $item->score ) ) . '</span>';
+			$html .= ' <span class="ai-post-triage-score">' . esc_html( number_format_i18n( $item->score ) ) . '</span>';
 		}
 
 		return $html;
@@ -277,13 +277,13 @@ final class Queue_List_Table extends WP_List_Table {
 	/**
 	 * The status column.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post $item Row.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post $item Row.
 	 */
 	public function column_state( Wire_Post $item ): string {
 		$html = esc_html( Wire_Post::state_labels()[ $item->state ] ?? '' );
 
 		if ( '' !== $item->error && in_array( $item->state, [ Wire_Post::STATE_FAILED, Wire_Post::STATE_QUEUED ], true ) ) {
-			$html .= '<br /><span class="wire-desk-error">' . esc_html( $item->error ) . '</span>';
+			$html .= '<br /><span class="ai-post-triage-error">' . esc_html( $item->error ) . '</span>';
 		}
 
 		return $html;
@@ -292,36 +292,36 @@ final class Queue_List_Table extends WP_List_Table {
 	/**
 	 * The model column.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post $item Row.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post $item Row.
 	 */
 	public function column_model( Wire_Post $item ): string {
 		if ( '' === $item->model ) {
-			return '<span aria-hidden="true">&#8212;</span><span class="screen-reader-text">' . esc_html__( 'Not scored', 'wire-desk' ) . '</span>';
+			return '<span aria-hidden="true">&#8212;</span><span class="screen-reader-text">' . esc_html__( 'Not scored', 'ai-post-triage' ) . '</span>';
 		}
 
-		return esc_html( $item->model ) . '<br /><span class="wire-desk-muted">$' . esc_html( number_format_i18n( $item->cost, 4 ) ) . '</span>';
+		return esc_html( $item->model ) . '<br /><span class="ai-post-triage-muted">$' . esc_html( number_format_i18n( $item->cost, 4 ) ) . '</span>';
 	}
 
 	/**
 	 * The date column.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post $item Row.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post $item Row.
 	 */
 	public function column_date( Wire_Post $item ): string {
 		$html = esc_html(
 			sprintf(
 				/* translators: 1: post date, 2: post time. */
-				__( '%1$s at %2$s', 'wire-desk' ),
+				__( '%1$s at %2$s', 'ai-post-triage' ),
 				mysql2date( (string) get_option( 'date_format' ), $item->post_date ),
 				mysql2date( (string) get_option( 'time_format' ), $item->post_date )
 			)
 		);
 
 		if ( null !== $item->scored_at ) {
-			$html .= '<br /><span class="wire-desk-muted">' . esc_html(
+			$html .= '<br /><span class="ai-post-triage-muted">' . esc_html(
 				sprintf(
 					/* translators: %s: time since the post was scored, such as 5 mins. */
-					__( 'Scored %s ago', 'wire-desk' ),
+					__( 'Scored %s ago', 'ai-post-triage' ),
 					human_time_diff( (int) strtotime( $item->scored_at . ' UTC' ) )
 				)
 			) . '</span>';
@@ -370,9 +370,9 @@ final class Queue_List_Table extends WP_List_Table {
 	/**
 	 * Edit and action links under the title.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post $item        Row.
-	 * @param string                           $column_name Column.
-	 * @param string                           $primary     Primary column.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post $item        Row.
+	 * @param string                                $column_name Column.
+	 * @param string                                $primary     Primary column.
 	 */
 	protected function handle_row_actions( $item, $column_name, $primary ): string {
 		if ( $primary !== $column_name || ! $item instanceof Wire_Post ) {
@@ -389,8 +389,8 @@ final class Queue_List_Table extends WP_List_Table {
 				'<a href="%1$s" aria-label="%2$s">%3$s</a>',
 				esc_url( $edit ),
 				/* translators: %s: post title. */
-				esc_attr( sprintf( __( 'Edit &#8220;%s&#8221;', 'wire-desk' ), $title ) ),
-				esc_html__( 'Edit', 'wire-desk' )
+				esc_attr( sprintf( __( 'Edit &#8220;%s&#8221;', 'ai-post-triage' ), $title ) ),
+				esc_html__( 'Edit', 'ai-post-triage' )
 			);
 		}
 
@@ -412,7 +412,7 @@ final class Queue_List_Table extends WP_List_Table {
 					)
 				),
 				/* translators: 1: action, such as Dismiss, 2: post title. */
-				esc_attr( sprintf( __( '%1$s &#8220;%2$s&#8221;', 'wire-desk' ), $labels[ $action ], $title ) ),
+				esc_attr( sprintf( __( '%1$s &#8220;%2$s&#8221;', 'ai-post-triage' ), $labels[ $action ], $title ) ),
 				esc_html( $labels[ $action ] )
 			);
 		}
@@ -456,14 +456,14 @@ final class Queue_List_Table extends WP_List_Table {
 		}
 		?>
 		<div class="alignleft actions">
-			<label for="wire-desk-band-filter" class="screen-reader-text"><?php esc_html_e( 'Filter by priority', 'wire-desk' ); ?></label>
-			<select name="band" id="wire-desk-band-filter">
-				<option value=""><?php esc_html_e( 'All priorities', 'wire-desk' ); ?></option>
+			<label for="ai-post-triage-band-filter" class="screen-reader-text"><?php esc_html_e( 'Filter by priority', 'ai-post-triage' ); ?></label>
+			<select name="band" id="ai-post-triage-band-filter">
+				<option value=""><?php esc_html_e( 'All priorities', 'ai-post-triage' ); ?></option>
 				<?php foreach ( Wire_Post::band_slugs() as $slug => $band ) : ?>
 					<option value="<?php echo esc_attr( $slug ); ?>" <?php selected( $this->band, $slug ); ?>><?php echo esc_html( Wire_Post::band_labels()[ $band ] ); ?></option>
 				<?php endforeach; ?>
 			</select>
-			<?php submit_button( __( 'Filter', 'wire-desk' ), '', 'filter_action', false, [ 'id' => 'wire-desk-filter-submit' ] ); ?>
+			<?php submit_button( __( 'Filter', 'ai-post-triage' ), '', 'filter_action', false, [ 'id' => 'ai-post-triage-filter-submit' ] ); ?>
 		</div>
 		<?php
 	}
@@ -483,13 +483,13 @@ final class Queue_List_Table extends WP_List_Table {
 
 		$links = [
 			$this->has_newer
-				? $this->page_link( $this->url(), 'first-page', __( 'Newest posts', 'wire-desk' ), '&laquo;' )
+				? $this->page_link( $this->url(), 'first-page', __( 'Newest posts', 'ai-post-triage' ), '&laquo;' )
 				: '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&laquo;</span>',
 			$this->has_newer && $first instanceof Wire_Post
-				? $this->page_link( $this->url( [ 'after' => $first->post_id ] ), 'prev-page', __( 'Newer posts', 'wire-desk' ), '&lsaquo;' )
+				? $this->page_link( $this->url( [ 'after' => $first->post_id ] ), 'prev-page', __( 'Newer posts', 'ai-post-triage' ), '&lsaquo;' )
 				: '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo;</span>',
 			$this->has_older && $last instanceof Wire_Post
-				? $this->page_link( $this->url( [ 'before' => $last->post_id ] ), 'next-page', __( 'Older posts', 'wire-desk' ), '&rsaquo;' )
+				? $this->page_link( $this->url( [ 'before' => $last->post_id ] ), 'next-page', __( 'Older posts', 'ai-post-triage' ), '&rsaquo;' )
 				: '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&rsaquo;</span>',
 		];
 
@@ -576,7 +576,7 @@ final class Queue_List_Table extends WP_List_Table {
 	/**
 	 * The paging cursor for a row.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post|null $item Row.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post|null $item Row.
 	 * @return array{post_date: string, post_id: int}|null
 	 */
 	private function cursor( ?Wire_Post $item ): ?array {

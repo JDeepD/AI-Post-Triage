@@ -2,17 +2,17 @@
 /**
  * Keeps the wire post table in step with saved, published and deleted posts.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Jobs;
+namespace JDeepD\AI_Post_Triage\Jobs;
 
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
 use WP_Post;
 
 /**
@@ -27,14 +27,14 @@ final class Post_Listener implements Registrable {
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post_Repository|null $repository Wire post table.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository|null $repository Wire post table.
 	 */
 	public function __construct( ?Wire_Post_Repository $repository = null ) {
 		$this->repository = $repository ?? new Wire_Post_Repository();
@@ -138,8 +138,8 @@ final class Post_Listener implements Registrable {
 	/**
 	 * Marks a row published when its post is published, and back when it is unpublished.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post $row  The post's row.
-	 * @param \WP_Post                         $post Post.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post $row  The post's row.
+	 * @param \WP_Post                              $post Post.
 	 */
 	private function sync_state( Wire_Post $row, WP_Post $post ): void {
 		$published = 'publish' === $post->post_status;

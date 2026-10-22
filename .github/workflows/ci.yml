@@ -141,7 +141,7 @@ jobs:
             coverage: true
     with:
       php-version: ${{ matrix.php }}
-      plugin-slug: wire-desk
+      plugin-slug: ai-post-triage
       wp-version: ${{ matrix.wp }}
       coverage: ${{ matrix.coverage == true }}
     secrets:
@@ -154,6 +154,6 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       php-version: '8.2'
-      artifact-name: wire-desk-pr${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+      artifact-name: ai-post-triage-pr${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
       # Published by wp-playground-pr-preview.yml once CI succeeds.
       playground-preview: true

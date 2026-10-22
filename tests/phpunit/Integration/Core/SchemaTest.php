@@ -2,15 +2,15 @@
 /**
  * Integration tests for Schema.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Core
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Core
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Core;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Core;
 
-use JDeepD\Wire_Desk\Core\Schema;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Core\Schema;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -61,7 +61,7 @@ class SchemaTest extends TestCase {
 	public function test_table_name_uses_site_prefix(): void {
 		global $wpdb;
 
-		$this->assertSame( $wpdb->prefix . 'wire_desk_post', Schema::table_name() );
+		$this->assertSame( $wpdb->prefix . 'ai_post_triage_post', Schema::table_name() );
 	}
 
 	/**
@@ -199,7 +199,7 @@ class SchemaTest extends TestCase {
 
 		// phpcs:disable WordPress.DB.RestrictedClasses.mysql__mysqli
 		$other = new \mysqli( (string) $host, DB_USER, DB_PASSWORD, DB_NAME, $port ? (int) $port : 3306, $socket ? (string) $socket : null );
-		$other->query( "SELECT GET_LOCK( 'wire_desk_schema_{$wpdb->prefix}', 0 )" );
+		$other->query( "SELECT GET_LOCK( 'ai_post_triage_schema_{$wpdb->prefix}', 0 )" );
 		// phpcs:enable
 
 		$installed = Schema::install();

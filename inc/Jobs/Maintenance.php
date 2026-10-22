@@ -2,16 +2,16 @@
 /**
  * Clears old answers and finished jobs once a day.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Jobs;
+namespace JDeepD\AI_Post_Triage\Jobs;
 
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
-use JDeepD\Wire_Desk\Scoring\Result;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Scoring\Result;
 
 /**
  * Class - Maintenance
@@ -20,12 +20,12 @@ final class Maintenance implements Registrable {
 	/**
 	 * Daily action.
 	 */
-	public const HOOK = 'wire_desk/prune';
+	public const HOOK = 'ai_post_triage/prune';
 
 	/**
 	 * Option holding the post date before which answers are already cleared.
 	 */
-	public const PRUNED_OPTION = 'wire_desk_pruned_before';
+	public const PRUNED_OPTION = 'ai_post_triage_pruned_before';
 
 	/**
 	 * Days the per-question answers are kept by default.
@@ -45,14 +45,14 @@ final class Maintenance implements Registrable {
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post_Repository|null $repository Wire post table.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository|null $repository Wire post table.
 	 */
 	public function __construct( ?Wire_Post_Repository $repository = null ) {
 		$this->repository = $repository ?? new Wire_Post_Repository();
@@ -64,7 +64,7 @@ final class Maintenance implements Registrable {
 	public function register_hooks(): void {
 		add_action( 'admin_init', [ $this, 'schedule' ] );
 		add_action( self::HOOK, [ $this, 'run' ] );
-		add_action( 'wire_desk/scored', [ $this, 'on_scored' ] );
+		add_action( 'ai_post_triage/scored', [ $this, 'on_scored' ] );
 	}
 
 	/**
@@ -115,7 +115,7 @@ final class Maintenance implements Registrable {
 		 *
 		 * @param int $days Days, counted from the post date.
 		 */
-		$days = apply_filters( 'wire_desk/details_retention_days', self::DEFAULT_RETENTION_DAYS );
+		$days = apply_filters( 'ai_post_triage/details_retention_days', self::DEFAULT_RETENTION_DAYS );
 
 		return is_numeric( $days ) ? max( 0, (int) $days ) : self::DEFAULT_RETENTION_DAYS;
 	}
@@ -173,7 +173,7 @@ final class Maintenance implements Registrable {
 	}
 
 	/**
-	 * Deletes finished Wire Desk jobs past their retention.
+	 * Deletes finished AI Post Triage jobs past their retention.
 	 *
 	 * @param int $batches Most queries, or 0 for no limit.
 	 * @return int Jobs deleted.

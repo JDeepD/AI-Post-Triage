@@ -2,14 +2,14 @@
 /**
  * Creates and upgrades the plugin's database table.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Core;
+namespace JDeepD\AI_Post_Triage\Core;
 
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
 
 /**
  * Class - Schema
@@ -23,17 +23,17 @@ final class Schema implements Registrable {
 	/**
 	 * Option holding the installed schema version.
 	 */
-	public const VERSION_OPTION = 'wire_desk_db_version';
+	public const VERSION_OPTION = 'ai_post_triage_db_version';
 
 	/**
 	 * Table name, without the site prefix.
 	 */
-	public const TABLE = 'wire_desk_post';
+	public const TABLE = 'ai_post_triage_post';
 
 	/**
 	 * Transient set after a failed install.
 	 */
-	public const FAILURE_TRANSIENT = 'wire_desk_db_install_failed';
+	public const FAILURE_TRANSIENT = 'ai_post_triage_db_install_failed';
 
 	/**
 	 * Seconds to wait before retrying a failed install.
@@ -82,7 +82,7 @@ final class Schema implements Registrable {
 	public static function install(): bool {
 		global $wpdb;
 
-		$lock = 'wire_desk_schema_' . $wpdb->prefix;
+		$lock = 'ai_post_triage_schema_' . $wpdb->prefix;
 
 		if ( ! self::acquire_lock( $lock ) ) {
 			return false;

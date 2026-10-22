@@ -63,7 +63,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       php-version: '8.2'
-      artifact-name: wire-desk
+      artifact-name: ai-post-triage
       ref: ${{ needs.release-please.outputs.tag_name }}
 
   upload:
@@ -77,7 +77,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          name: wire-desk
+          name: ai-post-triage
           path: .
 
       - name: Upload release asset
@@ -85,4 +85,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           TAG_NAME: ${{ needs.release-please.outputs.tag_name }}
-        run: gh release upload "$TAG_NAME" wire-desk.zip --clobber
+        run: gh release upload "$TAG_NAME" ai-post-triage.zip --clobber

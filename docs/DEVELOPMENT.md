@@ -1,4 +1,4 @@
-# Development Guidelines - Wire Desk
+# Development Guidelines - AI Post Triage
 
 Code contributions, bug reports, and feature requests are welcome! The following sections provide guidelines for contributing to this project, as well as information about development processes and testing.
 
@@ -95,7 +95,7 @@ Code contributions, bug reports, and feature requests are welcome! The following
 │       ├── bootstrap.php     # PHPUnit bootstrapper.
 │       └── TestCase.php      # Base test case class.
 │
-├── wire-desk.php # Root plugin entrypoint.
+├── ai-post-triage.php # Root plugin entrypoint.
 ├── uninstall.php # Plugin uninstall script.
 │
 ├── readme.txt   # WordPress plugin readme.
@@ -150,7 +150,7 @@ You can use Docker and the `wp-env` tool to set up a local development environme
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/justlevine/wire-desk.git
+   git clone https://github.com/justlevine/ai-post-triage.git
    ```
 
 2. Change into the project folder and install the NPM dependencies.
@@ -201,8 +201,8 @@ You should now have a fully functional local development environment with the pl
 
 - `npm run wp-env start`: Start the local development environment.
 - `npm run wp-env stop`: Stop the local development environment.
-- `npm run wp-env run cli -- --env-cwd=wp-content/plugins/wire-desk {YOUR_CMD_HERE}`: Run WP-CLI commands in the local environment.
-- `npm run wp-env:test run cli -- --env-cwd=wp-content/plugins/wire-desk {YOUR_CMD_HERE}`: Run Composer/PHP tooling in the tests container.
+- `npm run wp-env run cli -- --env-cwd=wp-content/plugins/ai-post-triage {YOUR_CMD_HERE}`: Run WP-CLI commands in the local environment.
+- `npm run wp-env:test run cli -- --env-cwd=wp-content/plugins/ai-post-triage {YOUR_CMD_HERE}`: Run Composer/PHP tooling in the tests container.
 - `npm run wp-env clean all`: Resets the wp-env database.
 
 For more information on using `wp-env`, see the [wp-env documentation](https://developer.wordpress.org/block-editor/packages/packages-env/).
@@ -365,7 +365,7 @@ You should see the html coverage report in the `tests/_output/html` directory an
 
 ### Performance Check
 
-`tests/performance/check.php` checks that Wire Desk holds up at about a million wire posts. It is a dev-only WP-CLI script, not part of the plugin zip, and runs in the test environment:
+`tests/performance/check.php` checks that AI Post Triage holds up at about a million wire posts. It is a dev-only WP-CLI script, not part of the plugin zip, and runs in the test environment:
 
 ```bash
 npm run perf -- seed           # Fill the wdperf_ tables with 1,000,000 posts (about 20 seconds). Add a number for a different size.
@@ -373,7 +373,7 @@ npm run perf -- check          # Explain and time the queries that have to scale
 npm run perf -- drop           # Drop the wdperf_ tables.
 ```
 
-Only Wire Desk's table, the posts table and the postmeta table are redirected to the `wdperf_` tables. Options, users and Action Scheduler stay on the site's own tables, so PHPUnit is not affected.
+Only AI Post Triage's table, the posts table and the postmeta table are redirected to the `wdperf_` tables. Options, users and Action Scheduler stay on the site's own tables, so PHPUnit is not affected.
 
 `check` runs each query with a cold and a warm object cache and explains it. It fails when a query reads a whole table, has no index, or sorts without one, or misses its time target. Targets include the queue page (under 250 ms cold and 100 ms warm), every query behind it (under 50 ms cold), the daily prune (under 100 ms) and the save hook (1 ms or less per save). The `stats` queries and the first prune over all history are expected to read a lot, so they are timed but not failed.
 
@@ -385,7 +385,7 @@ You can test the workflows locally using [act](https://github.com/nektos/act), w
 
 ## Internationalization
 
-All strings use the `wire-desk` text domain, and the admin and editor scripts are set up with `wp_set_script_translations()`. Translations come from [translate.wordpress.org](https://translate.wordpress.org/), which WordPress downloads as language packs and loads on its own, so the plugin doesn't bundle any.
+All strings use the `ai-post-triage` text domain, and the admin and editor scripts are set up with `wp_set_script_translations()`. Translations come from [translate.wordpress.org](https://translate.wordpress.org/), which WordPress downloads as language packs and loads on its own, so the plugin doesn't bundle any.
 
 translate.wordpress.org makes one JSON file per built script, named after an MD5 hash of the script path, such as `build/editor.js`. WordPress looks for that exact name, so don't rename a built script. Also avoid entry names ending in `min`: `wp i18n make-json` treats `admin.js` as a minified `a.js` and writes the wrong hash, which is why the admin bundle is called `admin-ui`.
 

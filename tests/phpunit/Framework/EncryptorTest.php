@@ -2,22 +2,22 @@
 /**
  * Integration tests for Encryptor class.
  *
- * @package JDeepD\Wire_Desk\Tests
+ * @package JDeepD\AI_Post_Triage\Tests
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Framework;
+namespace JDeepD\AI_Post_Triage\Tests\Framework;
 
-use JDeepD\Wire_Desk\Framework\Encryptor;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Framework\Encryptor;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Class - EncryptorTest
  */
-#[CoversClass( \JDeepD\Wire_Desk\Framework\Encryptor::class )]
+#[CoversClass( \JDeepD\AI_Post_Triage\Framework\Encryptor::class )]
 class EncryptorTest extends TestCase {
 	/**
 	 * Test that encrypting and then decrypting returns the original value.
@@ -94,8 +94,8 @@ class EncryptorTest extends TestCase {
 	 * Test that custom key is used for encryption and decryption.
 	 */
 	public function test_encrypt_and_decrypt_with_custom_key(): void {
-		if ( ! defined( 'WIRE_DESK_ENCRYPTION_KEY' ) ) {
-			define( 'WIRE_DESK_ENCRYPTION_KEY', 'custom-key-123' );
+		if ( ! defined( 'AI_POST_TRIAGE_ENCRYPTION_KEY' ) ) {
+			define( 'AI_POST_TRIAGE_ENCRYPTION_KEY', 'custom-key-123' );
 		}
 
 		$raw       = 'custom key test';

@@ -17,4 +17,4 @@ jobs:
       contents: write
       pull-requests: write
     with:
-      plugin-slug: wire-desk
+      plugin-slug: ai-post-triage

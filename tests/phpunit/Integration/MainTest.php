@@ -2,22 +2,22 @@
 /**
  * Integration tests for Main.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration
+ * @package JDeepD\AI_Post_Triage\Tests\Integration
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration;
+namespace JDeepD\AI_Post_Triage\Tests\Integration;
 
-use JDeepD\Wire_Desk\Core\Schema;
-use JDeepD\Wire_Desk\Main;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Core\Schema;
+use JDeepD\AI_Post_Triage\Main;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * Class - MainTest
  */
-#[CoversClass( \JDeepD\Wire_Desk\Main::class )]
+#[CoversClass( \JDeepD\AI_Post_Triage\Main::class )]
 class MainTest extends TestCase {
 	/**
 	 * Reset the Main singleton instance.
@@ -35,7 +35,7 @@ class MainTest extends TestCase {
 		remove_all_actions( 'init' );
 		remove_all_actions( 'admin_enqueue_scripts' );
 		remove_all_filters( 'script_loader_tag' );
-		delete_option( 'wire_desk_version' );
+		delete_option( 'ai_post_triage_version' );
 
 		parent::tearDown();
 	}
@@ -58,7 +58,7 @@ class MainTest extends TestCase {
 
 		Main::activate();
 
-		$this->assertEquals( WIRE_DESK_VERSION, get_option( 'wire_desk_version' ) );
+		$this->assertEquals( AI_POST_TRIAGE_VERSION, get_option( 'ai_post_triage_version' ) );
 	}
 
 	/**
@@ -94,7 +94,7 @@ class MainTest extends TestCase {
 
 		Main::get_instance();
 
-		$this->assertNotFalse( has_action( 'activate_' . plugin_basename( WIRE_DESK_FILE ) ) );
-		$this->assertNotFalse( has_action( 'deactivate_' . plugin_basename( WIRE_DESK_FILE ) ) );
+		$this->assertNotFalse( has_action( 'activate_' . plugin_basename( AI_POST_TRIAGE_FILE ) ) );
+		$this->assertNotFalse( has_action( 'deactivate_' . plugin_basename( AI_POST_TRIAGE_FILE ) ) );
 	}
 }

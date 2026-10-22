@@ -2,15 +2,15 @@
 /**
  * Integration tests for Singleton trait.
  *
- * @package JDeepD\Wire_Desk\Tests\Framework\Traits
+ * @package JDeepD\AI_Post_Triage\Tests\Framework\Traits
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Framework\Traits;
+namespace JDeepD\AI_Post_Triage\Tests\Framework\Traits;
 
-use JDeepD\Wire_Desk\Framework\Contracts\Traits\Singleton;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Traits\Singleton;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -30,7 +30,7 @@ final class SingletonTraitTestDouble {
 /**
  * Class - SingletonTraitTest
  */
-#[CoversClass( \JDeepD\Wire_Desk\Framework\Contracts\Traits\Singleton::class )]
+#[CoversClass( \JDeepD\AI_Post_Triage\Framework\Contracts\Traits\Singleton::class )]
 class SingletonTraitTest extends TestCase {
 	/**
 	 * Tests that get_instance() returns the same instance each time.

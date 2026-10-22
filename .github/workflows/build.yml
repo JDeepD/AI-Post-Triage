@@ -68,7 +68,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ${{ inputs.artifact-name }}
-          path: wire-desk.zip
+          path: ai-post-triage.zip
           if-no-files-found: error
 
       # Matches the bundle layout of WordPress/action-wp-playground-pr-preview's preview-build.yml (v4),
@@ -77,7 +77,7 @@ jobs:
         if: inputs.playground-preview && github.event_name == 'pull_request'
         run: |
           mkdir -p wp-playground-preview-bundle/zips
-          cp wire-desk.zip wp-playground-preview-bundle/zips/wire-desk.zip
+          cp ai-post-triage.zip wp-playground-preview-bundle/zips/ai-post-triage.zip
 
       - name: Upload Playground preview bundle
         if: inputs.playground-preview && github.event_name == 'pull_request'

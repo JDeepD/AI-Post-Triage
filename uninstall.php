@@ -2,21 +2,21 @@
 /**
  * This will be executed when the plugin is uninstalled.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk;
+namespace JDeepD\AI_Post_Triage;
 
 // Only uninstall if called by WordPress.
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 // We use local constants so this plugin can be uninstalled even if the autoloader is corrupted or missing.
-const PLUGIN_PREFIX = 'wire_desk_';
+const PLUGIN_PREFIX = 'ai_post_triage_';
 
 // The Action Scheduler group of the plugin's jobs, from Jobs\Queue.
-const JOB_GROUP = 'wire-desk';
+const JOB_GROUP = 'ai-post-triage';
 
 /**
  * Uninstalls the plugin. If multisite, uninstalls from all sites.

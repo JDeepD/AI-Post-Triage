@@ -2,18 +2,18 @@
 /**
  * Integration tests for the Backfill CLI command.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Modules\CLI
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Modules\CLI
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Modules\CLI;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Modules\CLI;
 
-use JDeepD\Wire_Desk\Jobs\Backfill as Backfill_Job;
-use JDeepD\Wire_Desk\Modules\CLI\Backfill;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Tests\Fakes\Fake_WP_CLI;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Jobs\Backfill as Backfill_Job;
+use JDeepD\AI_Post_Triage\Modules\CLI\Backfill;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Tests\Fakes\Fake_WP_CLI;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -45,7 +45,7 @@ class BackfillTest extends TestCase {
 		$this->assertSame( [], Fake_WP_CLI::$errors );
 		$this->assertCount( 2, Fake_WP_CLI::$logs );
 		$this->assertStringStartsWith( 'Read 2 posts, added 2.', Fake_WP_CLI::$logs[0] );
-		$this->assertSame( [ 'Read 3 posts and added 3 to Wire Desk. The backfill is complete.' ], Fake_WP_CLI::$successes );
+		$this->assertSame( [ 'Read 3 posts and added 3 to AI Post Triage. The backfill is complete.' ], Fake_WP_CLI::$successes );
 	}
 
 	/**
@@ -65,12 +65,12 @@ class BackfillTest extends TestCase {
 			]
 		);
 
-		$this->assertSame( [ 'Read 2 posts and added 2 to Wire Desk. Run the command again to carry on.' ], Fake_WP_CLI::$successes );
+		$this->assertSame( [ 'Read 2 posts and added 2 to AI Post Triage. Run the command again to carry on.' ], Fake_WP_CLI::$successes );
 
 		Fake_WP_CLI::install();
 		Backfill::run( [], [ 'batch' => '10' ] );
 
-		$this->assertSame( [ 'Read 3 posts and added 3 to Wire Desk. The backfill is complete.' ], Fake_WP_CLI::$successes );
+		$this->assertSame( [ 'Read 3 posts and added 3 to AI Post Triage. The backfill is complete.' ], Fake_WP_CLI::$successes );
 
 		Fake_WP_CLI::install();
 		Backfill::run( [], [] );
@@ -80,7 +80,7 @@ class BackfillTest extends TestCase {
 		Fake_WP_CLI::install();
 		Backfill::run( [], [ 'restart' => true ] );
 
-		$this->assertSame( [ 'Read 5 posts and added 0 to Wire Desk. The backfill is complete.' ], Fake_WP_CLI::$successes );
+		$this->assertSame( [ 'Read 5 posts and added 0 to AI Post Triage. The backfill is complete.' ], Fake_WP_CLI::$successes );
 	}
 
 	/**
@@ -94,7 +94,7 @@ class BackfillTest extends TestCase {
 
 		Backfill::run( [], [] );
 
-		$this->assertSame( [ 'Read 1 post and added 1 to Wire Desk. Automatic scoring is off, so they wait until you re-score them. The backfill is complete.' ], Fake_WP_CLI::$successes );
+		$this->assertSame( [ 'Read 1 post and added 1 to AI Post Triage. Automatic scoring is off, so they wait until you re-score them. The backfill is complete.' ], Fake_WP_CLI::$successes );
 	}
 
 	/**
@@ -115,7 +115,7 @@ class BackfillTest extends TestCase {
 				'--batch must be between 1 and 2000.',
 				'--batch must be between 1 and 2000.',
 				'--limit must be a positive number.',
-				'No wire post types or terms are set. Choose them on the Wire Desk settings screen first.',
+				'No wire post types or terms are set. Choose them on the AI Post Triage settings screen first.',
 			],
 			Fake_WP_CLI::$errors
 		);

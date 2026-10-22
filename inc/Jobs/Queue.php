@@ -2,12 +2,12 @@
 /**
  * Schedules scoring jobs with Action Scheduler.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Jobs;
+namespace JDeepD\AI_Post_Triage\Jobs;
 
 use ActionScheduler;
 use ActionScheduler_Store;
@@ -19,12 +19,12 @@ final class Queue {
 	/**
 	 * Action that scores a post.
 	 */
-	public const HOOK = 'wire_desk/score';
+	public const HOOK = 'ai_post_triage/score';
 
 	/**
 	 * Action Scheduler group.
 	 */
-	public const GROUP = 'wire-desk';
+	public const GROUP = 'ai-post-triage';
 
 	/**
 	 * Seconds to wait after a save before scoring.
@@ -126,7 +126,7 @@ final class Queue {
 	}
 
 	/**
-	 * Deletes finished and canceled Wire Desk jobs older than RETENTION, with their logs.
+	 * Deletes finished and canceled AI Post Triage jobs older than RETENTION, with their logs.
 	 *
 	 * @param int $limit Most jobs to delete.
 	 * @return int Jobs deleted.

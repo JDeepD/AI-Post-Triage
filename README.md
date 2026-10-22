@@ -1,4 +1,4 @@
-# Wire Desk
+# AI Post Triage
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](LICENSE.md)
 [![PHP](https://img.shields.io/badge/PHP-8.2%2B-blue?logo=php)](composer.json)
@@ -6,10 +6,10 @@
 
 ---
 
-Wire Desk helps high-volume newsrooms triage wire-ingested posts. It asks a decision model a set of configurable yes/no questions about each incoming post, scores it, and gives editors a review queue to decide what gets published.
+AI Post Triage helps high-volume newsrooms triage wire-ingested posts. It asks a decision model a set of configurable yes/no questions about each incoming post, scores it, and gives editors a review queue to decide what gets published.
 
 > [!IMPORTANT]
-> Wire Desk sends the parts of each post you choose (the headline by default) to a third-party decision model through OpenRouter, using your own API key. You are responsible for making sure your wire agency agreements and data policies allow this. Wire Desk only suggests priorities; editors always decide what gets published.
+> AI Post Triage sends the parts of each post you choose (the headline by default) to a third-party decision model through OpenRouter, using your own API key. You are responsible for making sure your wire agency agreements and data policies allow this. AI Post Triage only suggests priorities; editors always decide what gets published.
 
 ## Screenshots
 
@@ -19,15 +19,15 @@ Wire posts waiting for an editor, newest first, with a filter for each priority.
 
 ![The review queue, listing wire posts with their priority, score, status, model and date](.wordpress-org/screenshot-1.png)
 
-### Wire Desk panel in the editor
+### AI Post Triage panel in the editor
 
 The score behind a post: each question, whether the model's answer met it, and how sure it was. Re-score from the sidebar after editing.
 
-![The Wire Desk panel in the block editor sidebar, showing a High score of 95 and the answer to each question](.wordpress-org/screenshot-2.png)
+![The AI Post Triage panel in the block editor sidebar, showing a High score of 95 and the answer to each question](.wordpress-org/screenshot-2.png)
 
 ### Adding existing posts
 
-Posts saved before you set Wire Desk up can be added from the post list, one at a time or with the bulk action.
+Posts saved before you set AI Post Triage up can be added from the post list, one at a time or with the bulk action.
 
 ![The Posts screen with "Add to review queue" and "In review queue" row actions and a confirmation notice](.wordpress-org/screenshot-3.png)
 

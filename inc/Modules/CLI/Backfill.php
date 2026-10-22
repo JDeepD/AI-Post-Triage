@@ -1,23 +1,23 @@
 <?php
 /**
- * Backfill CLI command for Wire Desk.
+ * Backfill CLI command for AI Post Triage.
  *
- * @package JDeepD\Wire_Desk\Modules\CLI
+ * @package JDeepD\AI_Post_Triage\Modules\CLI
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Modules\CLI;
+namespace JDeepD\AI_Post_Triage\Modules\CLI;
 
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\CLI_Command;
-use JDeepD\Wire_Desk\Jobs\Backfill as Backfill_Job;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\CLI_Command;
+use JDeepD\AI_Post_Triage\Jobs\Backfill as Backfill_Job;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
 use WP_CLI;
 
 /**
  * Class - Backfill
  *
- * Implements the `wire-desk backfill` WP-CLI command.
+ * Implements the `ai-post-triage backfill` WP-CLI command.
  */
 final class Backfill implements CLI_Command {
 	/**
@@ -33,14 +33,14 @@ final class Backfill implements CLI_Command {
 	 * Get the command description.
 	 */
 	public static function get_description(): string {
-		return 'Add existing wire posts to Wire Desk, newest first.';
+		return 'Add existing wire posts to AI Post Triage, newest first.';
 	}
 
 	/**
-	 * Adds existing wire posts to Wire Desk, newest first, and stops at the scoring window.
+	 * Adds existing wire posts to AI Post Triage, newest first, and stops at the scoring window.
 	 *
 	 * Reads posts of the wire post types and of the wire terms' taxonomies. Posts already in
-	 * Wire Desk are skipped. Progress is saved after each batch, so a stopped backfill carries
+	 * AI Post Triage are skipped. Progress is saved after each batch, so a stopped backfill carries
 	 * on where it left off. Added posts are scored in the background when automatic scoring is on.
 	 *
 	 * ## OPTIONS
@@ -59,9 +59,9 @@ final class Backfill implements CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp wire-desk backfill
-	 *     wp wire-desk backfill --batch=1000 --limit=50000
-	 *     wp wire-desk backfill --restart
+	 *     wp ai-post-triage backfill
+	 *     wp ai-post-triage backfill --batch=1000 --limit=50000
+	 *     wp ai-post-triage backfill --restart
 	 *
 	 * @param array<int, mixed>    $args       Positional arguments.
 	 * @param array<string, mixed> $assoc_args Associative arguments.
@@ -85,7 +85,7 @@ final class Backfill implements CLI_Command {
 		}
 
 		if ( ! Backfill_Job::post_types() ) {
-			WP_CLI::error( 'No wire post types or terms are set. Choose them on the Wire Desk settings screen first.' );
+			WP_CLI::error( 'No wire post types or terms are set. Choose them on the AI Post Triage settings screen first.' );
 			return;
 		}
 
@@ -113,7 +113,7 @@ final class Backfill implements CLI_Command {
 			}
 		} while ( ! $progress['done'] && ( 0 === $limit || $scanned < $limit ) );
 
-		$summary = sprintf( 'Read %d %s and added %d to Wire Desk.', $scanned, 1 === $scanned ? 'post' : 'posts', $added );
+		$summary = sprintf( 'Read %d %s and added %d to AI Post Triage.', $scanned, 1 === $scanned ? 'post' : 'posts', $added );
 
 		if ( $added && ! Settings::get()['auto_score'] ) {
 			$summary .= ' Automatic scoring is off, so they wait until you re-score them.';

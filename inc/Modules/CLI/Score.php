@@ -1,23 +1,23 @@
 <?php
 /**
- * Score CLI command for Wire Desk.
+ * Score CLI command for AI Post Triage.
  *
- * @package JDeepD\Wire_Desk\Modules\CLI
+ * @package JDeepD\AI_Post_Triage\Modules\CLI
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Modules\CLI;
+namespace JDeepD\AI_Post_Triage\Modules\CLI;
 
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\CLI_Command;
-use JDeepD\Wire_Desk\Scoring\Post_Scorer;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\CLI_Command;
+use JDeepD\AI_Post_Triage\Scoring\Post_Scorer;
 use WP_CLI;
 
 /**
  * Class - Score
  *
- * Implements the `wire-desk score` WP-CLI command.
+ * Implements the `ai-post-triage score` WP-CLI command.
  */
 final class Score implements CLI_Command {
 	/**
@@ -49,8 +49,8 @@ final class Score implements CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp wire-desk score 123
-	 *     wp wire-desk score 123 456 --force
+	 *     wp ai-post-triage score 123
+	 *     wp ai-post-triage score 123 456 --force
 	 *
 	 * @param array<int, mixed>    $args       Positional arguments.
 	 * @param array<string, mixed> $assoc_args Associative arguments.

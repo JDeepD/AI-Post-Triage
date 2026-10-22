@@ -2,17 +2,17 @@
 /**
  * Integration tests for Rescore_Controller.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Modules\Settings
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Modules\Settings
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Settings;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Modules\Settings;
 
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Jobs\Rescore;
-use JDeepD\Wire_Desk\Modules\Settings\Rescore_Controller;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Jobs\Rescore;
+use JDeepD\AI_Post_Triage\Modules\Settings\Rescore_Controller;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use WP_REST_Request;
@@ -26,7 +26,7 @@ class Rescore_ControllerTest extends TestCase {
 	/**
 	 * Route under test.
 	 */
-	private const ROUTE = '/wire-desk/v1/rescore';
+	private const ROUTE = '/ai-post-triage/v1/rescore';
 
 	/**
 	 * Signs in an administrator and adds posts to the table.

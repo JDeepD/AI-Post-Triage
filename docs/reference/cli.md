@@ -3,35 +3,35 @@
 ## TOC
 
 - [TOC](#toc)
-- [wp wire-desk health-check](#wp-wire-desk-health-check)
-- [wp wire-desk score](#wp-wire-desk-score)
-- [wp wire-desk rescore](#wp-wire-desk-rescore)
-- [wp wire-desk backfill](#wp-wire-desk-backfill)
-- [wp wire-desk stats](#wp-wire-desk-stats)
-- [wp wire-desk prune](#wp-wire-desk-prune)
+- [wp ai-post-triage health-check](#wp-ai-post-triage-health-check)
+- [wp ai-post-triage score](#wp-ai-post-triage-score)
+- [wp ai-post-triage rescore](#wp-ai-post-triage-rescore)
+- [wp ai-post-triage backfill](#wp-ai-post-triage-backfill)
+- [wp ai-post-triage stats](#wp-ai-post-triage-stats)
+- [wp ai-post-triage prune](#wp-ai-post-triage-prune)
 
-## `wp wire-desk health-check`
+## `wp ai-post-triage health-check`
 
 Checks the plugin's table, the OpenRouter API key, whether OpenRouter can be reached and lists the chosen model, and the scoring jobs: Action Scheduler, the backlog of posts waiting to be scored, failed jobs, the daily prune, and whether scoring is paused or today's budget is spent. Failures exit with an error; warnings are listed and counted.
 
 ### Usage
 
 ```bash
-wp wire-desk health-check [--skip-remote]
+wp ai-post-triage health-check [--skip-remote]
 ```
 
 ### Options
 
 - `[--skip-remote]`: Don't contact OpenRouter.
 
-## `wp wire-desk score`
+## `wp ai-post-triage score`
 
-Scores posts with the decision model and saves the result to the Wire Desk table. Posts unchanged since they were last scored aren't sent to the model again; their saved answers are scored against the current rubric at no cost.
+Scores posts with the decision model and saves the result to the AI Post Triage table. Posts unchanged since they were last scored aren't sent to the model again; their saved answers are scored against the current rubric at no cost.
 
 ### Usage
 
 ```bash
-wp wire-desk score <id>... [--force]
+wp ai-post-triage score <id>... [--force]
 ```
 
 ### Options
@@ -42,18 +42,18 @@ wp wire-desk score <id>... [--force]
 ### Examples
 
 ```bash
-wp wire-desk score 123
-wp wire-desk score 123 456 --force
+wp ai-post-triage score 123
+wp ai-post-triage score 123 456 --force
 ```
 
-## `wp wire-desk rescore`
+## `wp ai-post-triage rescore`
 
-Queues the newest wire posts in the Wire Desk table to be scored again in the background, in batches of 25. Posts unchanged since they were last scored aren't sent to the model again, so they cost nothing. The same is on the settings screen, up to 1,000 posts.
+Queues the newest wire posts in the AI Post Triage table to be scored again in the background, in batches of 25. Posts unchanged since they were last scored aren't sent to the model again, so they cost nothing. The same is on the settings screen, up to 1,000 posts.
 
 ### Usage
 
 ```bash
-wp wire-desk rescore [--limit=<number>]
+wp ai-post-triage rescore [--limit=<number>]
 ```
 
 ### Options
@@ -63,18 +63,18 @@ wp wire-desk rescore [--limit=<number>]
 ### Examples
 
 ```bash
-wp wire-desk rescore
-wp wire-desk rescore --limit=500
+wp ai-post-triage rescore
+wp ai-post-triage rescore --limit=500
 ```
 
-## `wp wire-desk backfill`
+## `wp ai-post-triage backfill`
 
-Adds existing wire posts to Wire Desk, newest first. It reads posts of the wire post types and of the wire terms' taxonomies, by ID from the newest down, and stops once a whole batch is older than the scoring window. Posts already in Wire Desk are skipped. Progress is saved after each batch, so a stopped backfill carries on where it left off. Added posts are scored in the background when automatic scoring is on.
+Adds existing wire posts to AI Post Triage, newest first. It reads posts of the wire post types and of the wire terms' taxonomies, by ID from the newest down, and stops once a whole batch is older than the scoring window. Posts already in AI Post Triage are skipped. Progress is saved after each batch, so a stopped backfill carries on where it left off. Added posts are scored in the background when automatic scoring is on.
 
 ### Usage
 
 ```bash
-wp wire-desk backfill [--batch=<number>] [--limit=<number>] [--restart]
+wp ai-post-triage backfill [--batch=<number>] [--limit=<number>] [--restart]
 ```
 
 ### Options
@@ -86,19 +86,19 @@ wp wire-desk backfill [--batch=<number>] [--limit=<number>] [--restart]
 ### Examples
 
 ```bash
-wp wire-desk backfill
-wp wire-desk backfill --batch=1000 --limit=50000
-wp wire-desk backfill --restart
+wp ai-post-triage backfill
+wp ai-post-triage backfill --batch=1000 --limit=50000
+wp ai-post-triage backfill --restart
 ```
 
-## `wp wire-desk stats`
+## `wp ai-post-triage stats`
 
 Shows wire post counts by status and priority band, the number of scored posts and the cost of their latest scores by model, and today's spend.
 
 ### Usage
 
 ```bash
-wp wire-desk stats [--days=<number>] [--format=<format>]
+wp ai-post-triage stats [--days=<number>] [--format=<format>]
 ```
 
 ### Options
@@ -109,27 +109,27 @@ wp wire-desk stats [--days=<number>] [--format=<format>]
 ### Examples
 
 ```bash
-wp wire-desk stats
-wp wire-desk stats --days=7 --format=json
+wp ai-post-triage stats
+wp ai-post-triage stats --days=7 --format=json
 ```
 
-## `wp wire-desk prune`
+## `wp ai-post-triage prune`
 
-Clears the model's per-question answers from posts older than the retention, and deletes finished Wire Desk jobs. Wire Desk does this once a day on its own; scores and bands are kept.
+Clears the model's per-question answers from posts older than the retention, and deletes finished AI Post Triage jobs. AI Post Triage does this once a day on its own; scores and bands are kept.
 
 ### Usage
 
 ```bash
-wp wire-desk prune [--days=<number>]
+wp ai-post-triage prune [--days=<number>]
 ```
 
 ### Options
 
-- `[--days=<number>]`: Clear answers of posts older than this many days. Defaults to the [`wire_desk/details_retention_days`](filters.md#wire_deskdetails_retention_days) filter, 90 days.
+- `[--days=<number>]`: Clear answers of posts older than this many days. Defaults to the [`ai_post_triage/details_retention_days`](filters.md#ai_post_triagedetails_retention_days) filter, 90 days.
 
 ### Examples
 
 ```bash
-wp wire-desk prune
-wp wire-desk prune --days=30
+wp ai-post-triage prune
+wp ai-post-triage prune --days=30
 ```

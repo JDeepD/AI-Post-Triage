@@ -2,17 +2,17 @@
 /**
  * Integration tests for Api_Key.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Modules\Settings
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Modules\Settings
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Settings;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Modules\Settings;
 
-use JDeepD\Wire_Desk\Framework\Encryptor;
-use JDeepD\Wire_Desk\Modules\Settings\Api_Key;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Framework\Encryptor;
+use JDeepD\AI_Post_Triage\Modules\Settings\Api_Key;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -124,7 +124,7 @@ class Api_KeyTest extends TestCase {
 	/**
 	 * Test that a value that can't be decrypted is saved but unreadable.
 	 *
-	 * @expectedIncorrectUsage JDeepD\Wire_Desk\Framework\Encryptor::decrypt
+	 * @expectedIncorrectUsage JDeepD\AI_Post_Triage\Framework\Encryptor::decrypt
 	 */
 	public function test_unreadable_key(): void {
 		update_option( Api_Key::OPTION, 'not base64 at all!' );

@@ -1,6 +1,6 @@
 # REST API
 
-All routes are under `/wp-json/wire-desk/v1/`. Reading and acting on wire posts needs the `wire_desk_review` capability (granted from `edit_others_posts` by default), and each post also needs `edit_post`.
+All routes are under `/wp-json/ai-post-triage/v1/`. Reading and acting on wire posts needs the `ai_post_triage_review` capability (granted from `edit_others_posts` by default), and each post also needs `edit_post`.
 
 ## TOC
 
@@ -28,12 +28,12 @@ Pages are linked from the first and last posts returned, not by page number. The
 ### Example
 
 ```bash
-curl -u editor:application-password 'https://example.com/wp-json/wire-desk/v1/posts?state=scored&band=high&per_page=10'
+curl -u editor:application-password 'https://example.com/wp-json/ai-post-triage/v1/posts?state=scored&band=high&per_page=10'
 ```
 
 ## `GET /posts/{id}`
 
-Gets one wire post. Returns 404 when the post isn't in Wire Desk or no longer exists.
+Gets one wire post. Returns 404 when the post isn't in AI Post Triage or no longer exists.
 
 ## `POST /posts/{id}/{action}`
 
@@ -44,7 +44,7 @@ Runs an action and returns the updated wire post. `{action}` is one of:
 - `restore`: puts a dismissed post back in the queue.
 - `rescore`: schedules the post to be scored again. An unchanged post isn't sent to the model.
 
-Errors keep their status: 403 (`wire_desk_forbidden`), 404 (`wire_desk_not_found`), 409 (`wire_desk_published`, `wire_desk_not_dismissed`) and 500 (`wire_desk_db_error`).
+Errors keep their status: 403 (`ai_post_triage_forbidden`), 404 (`ai_post_triage_not_found`), 409 (`ai_post_triage_published`, `ai_post_triage_not_dismissed`) and 500 (`ai_post_triage_db_error`).
 
 ## Wire post fields
 

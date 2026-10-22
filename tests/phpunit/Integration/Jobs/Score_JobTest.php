@@ -2,27 +2,27 @@
 /**
  * Integration tests for Score_Job and Queue.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Jobs
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Jobs
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Jobs;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Jobs;
 
 use ActionScheduler;
 use ActionScheduler_Action;
 use ActionScheduler_Store;
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Decisions\Decision;
-use JDeepD\Wire_Desk\Decisions\Decision_Client;
-use JDeepD\Wire_Desk\Jobs\Queue;
-use JDeepD\Wire_Desk\Jobs\Score_Job;
-use JDeepD\Wire_Desk\Jobs\Usage;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Scoring\Post_Scorer;
-use JDeepD\Wire_Desk\Tests\Fakes\Fake_Decision_Client;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Decisions\Decision;
+use JDeepD\AI_Post_Triage\Decisions\Decision_Client;
+use JDeepD\AI_Post_Triage\Jobs\Queue;
+use JDeepD\AI_Post_Triage\Jobs\Score_Job;
+use JDeepD\AI_Post_Triage\Jobs\Usage;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Scoring\Post_Scorer;
+use JDeepD\AI_Post_Triage\Tests\Fakes\Fake_Decision_Client;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -35,7 +35,7 @@ class Score_JobTest extends TestCase {
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
@@ -455,7 +455,7 @@ class Score_JobTest extends TestCase {
 	/**
 	 * A job using the given client.
 	 *
-	 * @param \JDeepD\Wire_Desk\Tests\Fakes\Fake_Decision_Client $client Client.
+	 * @param \JDeepD\AI_Post_Triage\Tests\Fakes\Fake_Decision_Client $client Client.
 	 */
 	private function job( Fake_Decision_Client $client ): Score_Job {
 		return new Score_Job( new Post_Scorer( $client, $this->repository ), $this->repository );

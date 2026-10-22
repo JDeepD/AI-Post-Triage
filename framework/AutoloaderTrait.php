@@ -4,12 +4,12 @@
  *
  * Wraps the Composer autoloader to provide graceful failure if it is missing.
  *
- * @package JDeepD\Wire_Desk;
+ * @package JDeepD\AI_Post_Triage;
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Framework;
+namespace JDeepD\AI_Post_Triage\Framework;
 
 /**
  * Class - AutoloaderTrait

@@ -2,12 +2,12 @@
 /**
  * Trait for WordPress asset loading.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Framework;
+namespace JDeepD\AI_Post_Triage\Framework;
 
 /**
  * Trait - AssetLoaderTrait
@@ -46,7 +46,7 @@ trait AssetLoaderTrait {
 		if ( ! file_exists( $manifest_path ) ) {
 			_doing_it_wrong(
 				self::class,
-				esc_html__( 'Block manifest file is missing. Blocks will not be registered.', 'wire-desk' ),
+				esc_html__( 'Block manifest file is missing. Blocks will not be registered.', 'ai-post-triage' ),
 				'0.0.1'
 			);
 			return;
@@ -138,7 +138,7 @@ trait AssetLoaderTrait {
 				self::class,
 				sprintf(
 					/* translators: %s: The asset filename. */
-					esc_html__( 'Asset file for "%s" is missing. The script will not be registered.', 'wire-desk' ),
+					esc_html__( 'Asset file for "%s" is missing. The script will not be registered.', 'ai-post-triage' ),
 					esc_html( $filename )
 				),
 				'0.0.1'
@@ -154,7 +154,7 @@ trait AssetLoaderTrait {
 				self::class,
 				sprintf(
 					/* translators: %s: The asset filename. */
-					esc_html__( 'Asset file for "%s" is invalid. The script will not be registered.', 'wire-desk' ),
+					esc_html__( 'Asset file for "%s" is invalid. The script will not be registered.', 'ai-post-triage' ),
 					esc_html( $filename )
 				),
 				'0.0.1'

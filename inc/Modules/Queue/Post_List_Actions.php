@@ -2,20 +2,20 @@
 /**
  * Adds "Add to review queue" to the post lists of the wire post types.
  *
- * @package JDeepD\Wire_Desk\Modules\Queue
+ * @package JDeepD\AI_Post_Triage\Modules\Queue
  */
 
 declare(strict_types = 1);
 
-namespace JDeepD\Wire_Desk\Modules\Queue;
+namespace JDeepD\AI_Post_Triage\Modules\Queue;
 
-use JDeepD\Wire_Desk\Core\Capabilities;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Decisions\OpenRouter_Client;
-use JDeepD\Wire_Desk\Editorial\Post_Actions;
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
-use JDeepD\Wire_Desk\Modules\Settings\Admin_Screen;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Core\Capabilities;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Decisions\OpenRouter_Client;
+use JDeepD\AI_Post_Triage\Editorial\Post_Actions;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Modules\Settings\Admin_Screen;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
 use WP_Post;
 use WP_Query;
 
@@ -26,24 +26,24 @@ final class Post_List_Actions implements Registrable {
 	/**
 	 * Row and bulk action name.
 	 */
-	public const ACTION = 'wire_desk_add';
+	public const ACTION = 'ai_post_triage_add';
 
 	/**
 	 * Query arguments that report the result.
 	 */
-	public const RESULT_ARGS = [ 'wire_desk_added', 'wire_desk_add_failed' ];
+	public const RESULT_ARGS = [ 'ai_post_triage_added', 'ai_post_triage_add_failed' ];
 
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
 	/**
 	 * Wire post actions.
 	 *
-	 * @var \JDeepD\Wire_Desk\Editorial\Post_Actions
+	 * @var \JDeepD\AI_Post_Triage\Editorial\Post_Actions
 	 */
 	private Post_Actions $actions;
 
@@ -57,8 +57,8 @@ final class Post_List_Actions implements Registrable {
 	/**
 	 * Constructor.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post_Repository|null $repository Wire post table.
-	 * @param \JDeepD\Wire_Desk\Editorial\Post_Actions|null    $actions    Wire post actions.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository|null $repository Wire post table.
+	 * @param \JDeepD\AI_Post_Triage\Editorial\Post_Actions|null    $actions    Wire post actions.
 	 */
 	public function __construct( ?Wire_Post_Repository $repository = null, ?Post_Actions $actions = null ) {
 		$this->repository = $repository ?? new Wire_Post_Repository();
@@ -102,7 +102,7 @@ final class Post_List_Actions implements Registrable {
 	}
 
 	/**
-	 * Adds "Add to review queue" under posts that aren't in Wire Desk yet, and a link to the queue under those that are.
+	 * Adds "Add to review queue" under posts that aren't in AI Post Triage yet, and a link to the queue under those that are.
 	 *
 	 * @param mixed $actions Row actions.
 	 * @param mixed $post    Post.
@@ -123,7 +123,7 @@ final class Post_List_Actions implements Registrable {
 			$actions[ self::ACTION ] = sprintf(
 				'<a href="%1$s">%2$s</a>',
 				esc_url( admin_url( 'admin.php?page=' . Queue_Screen::SCREEN_ID . '&view=all' ) ),
-				esc_html__( 'In review queue', 'wire-desk' )
+				esc_html__( 'In review queue', 'ai-post-triage' )
 			);
 
 			return $actions;
@@ -144,8 +144,8 @@ final class Post_List_Actions implements Registrable {
 			'<a href="%1$s" aria-label="%2$s">%3$s</a>',
 			esc_url( $url ),
 			/* translators: %s: post title. */
-			esc_attr( sprintf( __( 'Add &#8220;%s&#8221; to the review queue', 'wire-desk' ), wp_strip_all_tags( _draft_or_post_title( $post ) ) ) ),
-			esc_html__( 'Add to review queue', 'wire-desk' )
+			esc_attr( sprintf( __( 'Add &#8220;%s&#8221; to the review queue', 'ai-post-triage' ), wp_strip_all_tags( _draft_or_post_title( $post ) ) ) ),
+			esc_html__( 'Add to review queue', 'ai-post-triage' )
 		);
 
 		return $actions;
@@ -160,13 +160,13 @@ final class Post_List_Actions implements Registrable {
 	public function bulk_actions( $actions ): array {
 		$actions = is_array( $actions ) ? $actions : [];
 
-		$actions[ self::ACTION ] = __( 'Add to review queue', 'wire-desk' );
+		$actions[ self::ACTION ] = __( 'Add to review queue', 'ai-post-triage' );
 
 		return $actions;
 	}
 
 	/**
-	 * Adds the chosen posts to Wire Desk. Core checks the bulk nonce before this runs.
+	 * Adds the chosen posts to AI Post Triage. Core checks the bulk nonce before this runs.
 	 *
 	 * @param mixed $redirect Where to go next.
 	 * @param mixed $action   Bulk action.
@@ -204,27 +204,27 @@ final class Post_List_Actions implements Registrable {
 	 * @param int $post_id Post ID.
 	 */
 	public static function nonce_action( int $post_id ): string {
-		return 'wire-desk-add-post_' . $post_id;
+		return 'ai-post-triage-add-post_' . $post_id;
 	}
 
 	/**
 	 * Shows how many posts were added.
 	 */
 	public function notice(): void {
-		$added  = isset( $_GET['wire_desk_added'] ) ? absint( $_GET['wire_desk_added'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only reports a result.
-		$failed = isset( $_GET['wire_desk_add_failed'] ) ? absint( $_GET['wire_desk_add_failed'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only reports a result.
+		$added  = isset( $_GET['ai_post_triage_added'] ) ? absint( $_GET['ai_post_triage_added'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only reports a result.
+		$failed = isset( $_GET['ai_post_triage_add_failed'] ) ? absint( $_GET['ai_post_triage_add_failed'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only reports a result.
 
 		if ( $added ) {
 			$message = esc_html(
 				sprintf(
 					/* translators: %s: number of posts. */
-					_n( '%s post added to the review queue. It is scored in the background.', '%s posts added to the review queue. They are scored in the background.', $added, 'wire-desk' ),
+					_n( '%s post added to the review queue. It is scored in the background.', '%s posts added to the review queue. They are scored in the background.', $added, 'ai-post-triage' ),
 					number_format_i18n( $added )
 				)
-			) . ' <a href="' . esc_url( admin_url( 'admin.php?page=' . Queue_Screen::SCREEN_ID . '&view=waiting' ) ) . '">' . esc_html__( 'View the review queue', 'wire-desk' ) . '</a>';
+			) . ' <a href="' . esc_url( admin_url( 'admin.php?page=' . Queue_Screen::SCREEN_ID . '&view=waiting' ) ) . '">' . esc_html__( 'View the review queue', 'ai-post-triage' ) . '</a>';
 
 			if ( '' === OpenRouter_Client::api_key() ) {
-				$message .= '<br />' . esc_html__( 'No OpenRouter API key is set, so scoring will fail.', 'wire-desk' ) . ' <a href="' . esc_url( admin_url( 'admin.php?page=' . Admin_Screen::SCREEN_ID ) ) . '">' . esc_html__( 'Add a key', 'wire-desk' ) . '</a>';
+				$message .= '<br />' . esc_html__( 'No OpenRouter API key is set, so scoring will fail.', 'ai-post-triage' ) . ' <a href="' . esc_url( admin_url( 'admin.php?page=' . Admin_Screen::SCREEN_ID ) ) . '">' . esc_html__( 'Add a key', 'ai-post-triage' ) . '</a>';
 			}
 
 			wp_admin_notice(
@@ -241,7 +241,7 @@ final class Post_List_Actions implements Registrable {
 				esc_html(
 					sprintf(
 						/* translators: %s: number of posts. */
-						_n( '%s post could not be added to the review queue.', '%s posts could not be added to the review queue.', $failed, 'wire-desk' ),
+						_n( '%s post could not be added to the review queue.', '%s posts could not be added to the review queue.', $failed, 'ai-post-triage' ),
 						number_format_i18n( $failed )
 					)
 				),
@@ -284,8 +284,8 @@ final class Post_List_Actions implements Registrable {
 		return add_query_arg(
 			array_filter(
 				[
-					'wire_desk_added'      => $added,
-					'wire_desk_add_failed' => $failed,
+					'ai_post_triage_added'      => $added,
+					'ai_post_triage_add_failed' => $failed,
 				]
 			),
 			remove_query_arg( self::RESULT_ARGS, $back )

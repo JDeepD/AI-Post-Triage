@@ -2,12 +2,12 @@
 /**
  * A stand-in for WP_CLI that records what commands print.
  *
- * @package JDeepD\Wire_Desk\Tests\Fakes
+ * @package JDeepD\AI_Post_Triage\Tests\Fakes
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Fakes;
+namespace JDeepD\AI_Post_Triage\Tests\Fakes;
 
 /**
  * Class - Fake_WP_CLI

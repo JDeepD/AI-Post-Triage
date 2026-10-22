@@ -2,15 +2,15 @@
 /**
  * Integration tests for the CLI module.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Modules
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Modules
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Modules;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Modules;
 
-use JDeepD\Wire_Desk\Modules\CLI;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Modules\CLI;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -42,7 +42,7 @@ class CLITest extends TestCase {
 		$cli = new CLI();
 		$cli->register_hooks();
 
-		$this->assertSame( [ 'wire-desk backfill', 'wire-desk health-check', 'wire-desk prune', 'wire-desk rescore', 'wire-desk score', 'wire-desk stats' ], array_keys( CLI_Mock_WP_CLI::$commands ) );
+		$this->assertSame( [ 'ai-post-triage backfill', 'ai-post-triage health-check', 'ai-post-triage prune', 'ai-post-triage rescore', 'ai-post-triage score', 'ai-post-triage stats' ], array_keys( CLI_Mock_WP_CLI::$commands ) );
 	}
 
 	/**

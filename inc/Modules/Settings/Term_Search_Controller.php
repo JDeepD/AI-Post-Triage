@@ -2,15 +2,15 @@
 /**
  * REST endpoint for finding terms on the settings screen.
  *
- * @package JDeepD\Wire_Desk\Modules\Settings
+ * @package JDeepD\AI_Post_Triage\Modules\Settings
  */
 
 declare(strict_types = 1);
 
-namespace JDeepD\Wire_Desk\Modules\Settings;
+namespace JDeepD\AI_Post_Triage\Modules\Settings;
 
-use JDeepD\Wire_Desk\Core\Capabilities;
-use JDeepD\Wire_Desk\Framework\Contracts\Abstracts\Abstract_REST_Controller;
+use JDeepD\AI_Post_Triage\Core\Capabilities;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Abstracts\Abstract_REST_Controller;
 use WP_REST_Response;
 use WP_REST_Server;
 use WP_Term;
@@ -78,7 +78,7 @@ final class Term_Search_Controller extends Abstract_REST_Controller {
 			return true;
 		}
 
-		return new \WP_Error( 'rest_forbidden', __( 'Sorry, you are not allowed to search terms.', 'wire-desk' ), [ 'status' => rest_authorization_required_code() ] );
+		return new \WP_Error( 'rest_forbidden', __( 'Sorry, you are not allowed to search terms.', 'ai-post-triage' ), [ 'status' => rest_authorization_required_code() ] );
 	}
 
 	/**

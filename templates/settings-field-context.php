@@ -2,14 +2,14 @@
 /**
  * Newsroom context settings field.
  *
- * @package wire-desk
+ * @package ai-post-triage
  */
 
 declare(strict_types = 1);
 
 defined( 'ABSPATH' ) || exit;
 
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
 
 /** @var array{id: string, name: string, value: mixed, description: string} $args */
 ?>

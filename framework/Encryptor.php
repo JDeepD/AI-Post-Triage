@@ -4,12 +4,12 @@
  *
  * Useful for encrypting sensitive data before storing it in the database, with a fallback to return raw values if OpenSSL is unavailable.
  *
- * @package JDeepD\Wire_Desk\Framework
+ * @package JDeepD\AI_Post_Triage\Framework
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Framework;
+namespace JDeepD\AI_Post_Triage\Framework;
 
 /**
  * Class - Encryptor
@@ -110,11 +110,11 @@ final class Encryptor {
 	/**
 	 * Gets the encryption key.
 	 *
-	 * Uses WIRE_DESK_ENCRYPTION_KEY if defined, otherwise falls back to LOGGED_IN_KEY.
+	 * Uses AI_POST_TRIAGE_ENCRYPTION_KEY if defined, otherwise falls back to LOGGED_IN_KEY.
 	 */
 	private static function get_key(): string {
-		if ( defined( 'WIRE_DESK_ENCRYPTION_KEY' ) && '' !== WIRE_DESK_ENCRYPTION_KEY ) {
-			return WIRE_DESK_ENCRYPTION_KEY;
+		if ( defined( 'AI_POST_TRIAGE_ENCRYPTION_KEY' ) && '' !== AI_POST_TRIAGE_ENCRYPTION_KEY ) {
+			return AI_POST_TRIAGE_ENCRYPTION_KEY;
 		}
 
 		if ( defined( 'LOGGED_IN_KEY' ) && '' !== LOGGED_IN_KEY ) {

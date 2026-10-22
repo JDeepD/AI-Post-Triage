@@ -2,21 +2,21 @@
 /**
  * Integration tests for Autoloader.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration
+ * @package JDeepD\AI_Post_Triage\Tests\Integration
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration;
+namespace JDeepD\AI_Post_Triage\Tests\Integration;
 
-use JDeepD\Wire_Desk\Autoloader;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Autoloader;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * Class - AutoloaderTest
  */
-#[CoversClass( \JDeepD\Wire_Desk\Autoloader::class )]
+#[CoversClass( \JDeepD\AI_Post_Triage\Autoloader::class )]
 class AutoloaderTest extends TestCase {
 	/**
 	 * {@inheritDoc}
@@ -29,10 +29,10 @@ class AutoloaderTest extends TestCase {
 	}
 
 	/**
-	 * Tests that autoload returns true when WIRE_DESK_AUTOLOAD is false.
+	 * Tests that autoload returns true when AI_POST_TRIAGE_AUTOLOAD is false.
 	 */
 	public function test_autoload_returns_true_when_autoload_disabled(): void {
-		define( 'WIRE_DESK_AUTOLOAD', false );
+		define( 'AI_POST_TRIAGE_AUTOLOAD', false );
 		$this->assertTrue( Autoloader::autoload() );
 	}
 
@@ -52,7 +52,7 @@ class AutoloaderTest extends TestCase {
 	 */
 	public function test_autoload_uses_correct_path(): void {
 		// Verify the autoloader path is constructed correctly.
-		$expected_path = WIRE_DESK_PATH . 'vendor/autoload.php';
+		$expected_path = AI_POST_TRIAGE_PATH . 'vendor/autoload.php';
 		$this->assertStringEndsWith( 'vendor/autoload.php', $expected_path );
 		$this->assertTrue( Autoloader::autoload() );
 	}
@@ -63,7 +63,7 @@ class AutoloaderTest extends TestCase {
 	public function test_get_autoloader_error_message_contains_plugin_name(): void {
 		$method = new \ReflectionMethod( Autoloader::class, 'get_autoloader_error_message' );
 		$result = $method->invoke( null );
-		$this->assertStringContainsString( 'Wire Desk', $result );
+		$this->assertStringContainsString( 'AI Post Triage', $result );
 		$this->assertStringContainsString( 'Composer autoloader', $result );
 	}
 }

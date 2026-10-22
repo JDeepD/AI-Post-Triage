@@ -21,9 +21,9 @@ parameters:
 		min: 80200
 		max: 80500
 	bootstrapFiles:
-		- wire-desk.php
+		- ai-post-triage.php
 	paths:
-		- wire-desk.php
+		- ai-post-triage.php
 		- uninstall.php
 		- framework/
 		- inc/

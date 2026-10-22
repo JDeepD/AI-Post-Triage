@@ -2,17 +2,17 @@
 /**
  * The actions editors take on wire posts.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Editorial;
+namespace JDeepD\AI_Post_Triage\Editorial;
 
-use JDeepD\Wire_Desk\Core\Capabilities;
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Jobs\Queue;
+use JDeepD\AI_Post_Triage\Core\Capabilities;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Jobs\Queue;
 use WP_Post;
 
 /**
@@ -28,7 +28,7 @@ final class Post_Actions {
 	public const RESCORE = 'rescore';
 
 	/**
-	 * Adding a post to Wire Desk, reported to wire_desk/post_action.
+	 * Adding a post to AI Post Triage, reported to ai_post_triage/post_action.
 	 */
 	public const ADD = 'add';
 
@@ -40,14 +40,14 @@ final class Post_Actions {
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post_Repository|null $repository Wire post table.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository|null $repository Wire post table.
 	 */
 	public function __construct( ?Wire_Post_Repository $repository = null ) {
 		$this->repository = $repository ?? new Wire_Post_Repository();
@@ -60,17 +60,17 @@ final class Post_Actions {
 	 */
 	public static function labels(): array {
 		return [
-			self::PUBLISH => __( 'Publish', 'wire-desk' ),
-			self::DISMISS => __( 'Dismiss', 'wire-desk' ),
-			self::RESTORE => __( 'Restore', 'wire-desk' ),
-			self::RESCORE => __( 'Re-score', 'wire-desk' ),
+			self::PUBLISH => __( 'Publish', 'ai-post-triage' ),
+			self::DISMISS => __( 'Dismiss', 'ai-post-triage' ),
+			self::RESTORE => __( 'Restore', 'ai-post-triage' ),
+			self::RESCORE => __( 'Re-score', 'ai-post-triage' ),
 		];
 	}
 
 	/**
 	 * The actions the current user can take on a wire post.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post $item Row.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post $item Row.
 	 * @return string[]
 	 */
 	public static function available( Wire_Post $item ): array {
@@ -100,8 +100,8 @@ final class Post_Actions {
 	/**
 	 * The wire posts the current user can edit.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post[] $items Rows.
-	 * @return \JDeepD\Wire_Desk\Data\Wire_Post[]
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post[] $items Rows.
+	 * @return \JDeepD\AI_Post_Triage\Data\Wire_Post[]
 	 */
 	public static function editable( array $items ): array {
 		return array_values( array_filter( $items, static fn ( Wire_Post $item ): bool => current_user_can( 'edit_post', $item->post_id ) ) );
@@ -114,13 +114,13 @@ final class Post_Actions {
 	 */
 	public static function error_messages(): array {
 		return [
-			'wire_desk_unknown_action' => __( 'Unknown action.', 'wire-desk' ),
-			'wire_desk_forbidden'      => __( 'Sorry, you are not allowed to do that.', 'wire-desk' ),
-			'wire_desk_not_found'      => __( 'The wire post does not exist.', 'wire-desk' ),
-			'wire_desk_published'      => __( 'Published posts can\'t be dismissed.', 'wire-desk' ),
-			'wire_desk_not_dismissed'  => __( 'Only dismissed posts can be restored.', 'wire-desk' ),
-			'wire_desk_db_error'       => __( 'The wire post could not be updated.', 'wire-desk' ),
-			'wire_desk_cannot_add'     => __( 'This post can\'t be added to the review queue.', 'wire-desk' ),
+			'ai_post_triage_unknown_action' => __( 'Unknown action.', 'ai-post-triage' ),
+			'ai_post_triage_forbidden'      => __( 'Sorry, you are not allowed to do that.', 'ai-post-triage' ),
+			'ai_post_triage_not_found'      => __( 'The wire post does not exist.', 'ai-post-triage' ),
+			'ai_post_triage_published'      => __( 'Published posts can\'t be dismissed.', 'ai-post-triage' ),
+			'ai_post_triage_not_dismissed'  => __( 'Only dismissed posts can be restored.', 'ai-post-triage' ),
+			'ai_post_triage_db_error'       => __( 'The wire post could not be updated.', 'ai-post-triage' ),
+			'ai_post_triage_cannot_add'     => __( 'This post can\'t be added to the review queue.', 'ai-post-triage' ),
 		];
 	}
 
@@ -137,7 +137,7 @@ final class Post_Actions {
 			self::DISMISS => $this->dismiss( $post_id ),
 			self::RESTORE => $this->restore( $post_id ),
 			self::RESCORE => $this->rescore( $post_id ),
-			default       => self::error( 'wire_desk_unknown_action', 400 ),
+			default       => self::error( 'ai_post_triage_unknown_action', 400 ),
 		};
 
 		if ( true === $result ) {
@@ -148,16 +148,16 @@ final class Post_Actions {
 			 * @param int    $post_id Post ID.
 			 * @param int    $user_id User who took the action.
 			 */
-			do_action( 'wire_desk/post_action', $action, $post_id, get_current_user_id() );
+			do_action( 'ai_post_triage/post_action', $action, $post_id, get_current_user_id() );
 		}
 
 		return $result;
 	}
 
 	/**
-	 * Adds a post to Wire Desk and schedules it to be scored, whatever its post type or age.
+	 * Adds a post to AI Post Triage and schedules it to be scored, whatever its post type or age.
 	 *
-	 * A post already in Wire Desk is scheduled again, like a re-score.
+	 * A post already in AI Post Triage is scheduled again, like a re-score.
 	 *
 	 * @param int $post_id Post ID.
 	 * @return true|\WP_Error
@@ -170,7 +170,7 @@ final class Post_Actions {
 		$post = get_post( $post_id );
 
 		if ( ! $post instanceof WP_Post ) {
-			return self::error( 'wire_desk_not_found', 404 );
+			return self::error( 'ai_post_triage_not_found', 404 );
 		}
 
 		if ( ! current_user_can( 'edit_post', $post->ID ) ) {
@@ -178,7 +178,7 @@ final class Post_Actions {
 		}
 
 		if ( in_array( $post->post_status, self::UNADDABLE_STATUSES, true ) || wp_is_post_revision( $post ) ) {
-			return self::error( 'wire_desk_cannot_add', 400 );
+			return self::error( 'ai_post_triage_cannot_add', 400 );
 		}
 
 		if ( null === $this->repository->get( $post->ID ) ) {
@@ -196,7 +196,7 @@ final class Post_Actions {
 		}
 
 		/** This action is documented in inc/Editorial/Post_Actions.php */
-		do_action( 'wire_desk/post_action', self::ADD, $post->ID, get_current_user_id() );
+		do_action( 'ai_post_triage/post_action', self::ADD, $post->ID, get_current_user_id() );
 
 		return true;
 	}
@@ -257,7 +257,7 @@ final class Post_Actions {
 		[ , $row ] = $found;
 
 		if ( Wire_Post::STATE_PUBLISHED === $row->state ) {
-			return self::error( 'wire_desk_published', 409 );
+			return self::error( 'ai_post_triage_published', 409 );
 		}
 
 		Queue::unschedule( $post_id );
@@ -281,7 +281,7 @@ final class Post_Actions {
 		[ , $row ] = $found;
 
 		if ( Wire_Post::STATE_DISMISSED !== $row->state ) {
-			return self::error( 'wire_desk_not_dismissed', 409 );
+			return self::error( 'ai_post_triage_not_dismissed', 409 );
 		}
 
 		if ( null !== $row->scored_at ) {
@@ -319,7 +319,7 @@ final class Post_Actions {
 	 * Finds a wire post the current user can review.
 	 *
 	 * @param int $post_id Post ID.
-	 * @return array{0: \WP_Post, 1: \JDeepD\Wire_Desk\Data\Wire_Post}|\WP_Error
+	 * @return array{0: \WP_Post, 1: \JDeepD\AI_Post_Triage\Data\Wire_Post}|\WP_Error
 	 */
 	private function find( int $post_id ): array|\WP_Error {
 		if ( ! current_user_can( Capabilities::REVIEW ) ) {
@@ -330,7 +330,7 @@ final class Post_Actions {
 		$row  = $this->repository->get( $post_id );
 
 		if ( ! $post instanceof WP_Post || null === $row ) {
-			return self::error( 'wire_desk_not_found', 404 );
+			return self::error( 'ai_post_triage_not_found', 404 );
 		}
 
 		if ( ! current_user_can( 'edit_post', $post->ID ) ) {
@@ -344,14 +344,14 @@ final class Post_Actions {
 	 * The error for a failed database write.
 	 */
 	private static function db_error(): \WP_Error {
-		return self::error( 'wire_desk_db_error', 500 );
+		return self::error( 'ai_post_triage_db_error', 500 );
 	}
 
 	/**
 	 * The error for a user who isn't allowed to act.
 	 */
 	private static function forbidden(): \WP_Error {
-		return self::error( 'wire_desk_forbidden', 403 );
+		return self::error( 'ai_post_triage_forbidden', 403 );
 	}
 
 	/**

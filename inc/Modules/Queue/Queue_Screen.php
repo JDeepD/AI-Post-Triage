@@ -2,29 +2,29 @@
 /**
  * Registers the review queue screen.
  *
- * @package JDeepD\Wire_Desk\Modules\Queue
+ * @package JDeepD\AI_Post_Triage\Modules\Queue
  */
 
 declare(strict_types = 1);
 
-namespace JDeepD\Wire_Desk\Modules\Queue;
+namespace JDeepD\AI_Post_Triage\Modules\Queue;
 
-use JDeepD\Wire_Desk\Core\Assets;
-use JDeepD\Wire_Desk\Core\Capabilities;
-use JDeepD\Wire_Desk\Core\Templates;
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Editorial\Post_Actions;
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Core\Assets;
+use JDeepD\AI_Post_Triage\Core\Capabilities;
+use JDeepD\AI_Post_Triage\Core\Templates;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Editorial\Post_Actions;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
 
 /**
  * Class - Queue_Screen
  */
 final class Queue_Screen implements Registrable {
 	/**
-	 * The page slug, also the slug of the Wire Desk menu.
+	 * The page slug, also the slug of the AI Post Triage menu.
 	 */
-	public const SCREEN_ID = 'wire-desk';
+	public const SCREEN_ID = 'ai-post-triage';
 
 	/**
 	 * The screen's hook suffix.
@@ -34,7 +34,7 @@ final class Queue_Screen implements Registrable {
 	/**
 	 * User option holding rows per page.
 	 */
-	public const PER_PAGE_OPTION = 'wire_desk_queue_per_page';
+	public const PER_PAGE_OPTION = 'ai_post_triage_queue_per_page';
 
 	/**
 	 * Highest count shown on the menu badge.
@@ -44,34 +44,34 @@ final class Queue_Screen implements Registrable {
 	/**
 	 * Query arguments that report an action's result.
 	 */
-	public const RESULT_ARGS = [ 'wire_desk_action', 'wire_desk_done', 'wire_desk_failed', 'wire_desk_error' ];
+	public const RESULT_ARGS = [ 'ai_post_triage_action', 'ai_post_triage_done', 'ai_post_triage_failed', 'ai_post_triage_error' ];
 
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
 	/**
 	 * Wire post actions.
 	 *
-	 * @var \JDeepD\Wire_Desk\Editorial\Post_Actions
+	 * @var \JDeepD\AI_Post_Triage\Editorial\Post_Actions
 	 */
 	private Post_Actions $actions;
 
 	/**
 	 * The list table, once the screen has loaded.
 	 *
-	 * @var \JDeepD\Wire_Desk\Modules\Queue\Queue_List_Table|null
+	 * @var \JDeepD\AI_Post_Triage\Modules\Queue\Queue_List_Table|null
 	 */
 	private ?Queue_List_Table $table = null;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post_Repository|null $repository Wire post table.
-	 * @param \JDeepD\Wire_Desk\Editorial\Post_Actions|null    $actions    Wire post actions.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository|null $repository Wire post table.
+	 * @param \JDeepD\AI_Post_Triage\Editorial\Post_Actions|null    $actions    Wire post actions.
 	 */
 	public function __construct( ?Wire_Post_Repository $repository = null, ?Post_Actions $actions = null ) {
 		$this->repository = $repository ?? new Wire_Post_Repository();
@@ -94,16 +94,16 @@ final class Queue_Screen implements Registrable {
 	 * @param int    $post_id Post ID.
 	 */
 	public static function nonce_action( string $action, int $post_id ): string {
-		return 'wire-desk-' . $action . '-post_' . $post_id;
+		return 'ai-post-triage-' . $action . '-post_' . $post_id;
 	}
 
 	/**
-	 * Adds the Wire Desk menu, with the queue as its first page.
+	 * Adds the AI Post Triage menu, with the queue as its first page.
 	 */
 	public function register_screen(): void {
 		$hook_suffix = add_menu_page(
-			__( 'Wire Desk', 'wire-desk' ),
-			__( 'Wire Desk', 'wire-desk' ),
+			__( 'AI Post Triage', 'ai-post-triage' ),
+			__( 'AI Post Triage', 'ai-post-triage' ),
 			Capabilities::REVIEW,
 			self::SCREEN_ID,
 			[ $this, 'render_screen' ],
@@ -113,8 +113,8 @@ final class Queue_Screen implements Registrable {
 
 		add_submenu_page(
 			self::SCREEN_ID,
-			__( 'Review queue', 'wire-desk' ),
-			__( 'Review queue', 'wire-desk' ),
+			__( 'Review queue', 'ai-post-triage' ),
+			__( 'Review queue', 'ai-post-triage' ),
 			Capabilities::REVIEW,
 			self::SCREEN_ID,
 			[ $this, 'render_screen' ]
@@ -181,10 +181,10 @@ final class Queue_Screen implements Registrable {
 		return add_query_arg(
 			array_filter(
 				[
-					'wire_desk_action' => $action,
-					'wire_desk_done'   => $done,
-					'wire_desk_failed' => $failed,
-					'wire_desk_error'  => is_string( $error ) ? $error : '',
+					'ai_post_triage_action' => $action,
+					'ai_post_triage_done'   => $done,
+					'ai_post_triage_failed' => $failed,
+					'ai_post_triage_error'  => is_string( $error ) ? $error : '',
 				]
 			),
 			remove_query_arg( array_merge( [ 'action', 'action2', 'post', '_wpnonce', '_wp_http_referer', 'filter_action' ], self::RESULT_ARGS ), $back )
@@ -198,10 +198,10 @@ final class Queue_Screen implements Registrable {
 	 * @return array<int, array{type: string, message: string}>
 	 */
 	public static function notices( array $query ): array {
-		$action = is_string( $query['wire_desk_action'] ?? null ) ? $query['wire_desk_action'] : '';
-		$done   = absint( $query['wire_desk_done'] ?? 0 );
-		$failed = absint( $query['wire_desk_failed'] ?? 0 );
-		$code   = is_string( $query['wire_desk_error'] ?? null ) ? $query['wire_desk_error'] : '';
+		$action = is_string( $query['ai_post_triage_action'] ?? null ) ? $query['ai_post_triage_action'] : '';
+		$done   = absint( $query['ai_post_triage_done'] ?? 0 );
+		$failed = absint( $query['ai_post_triage_failed'] ?? 0 );
+		$code   = is_string( $query['ai_post_triage_error'] ?? null ) ? $query['ai_post_triage_error'] : '';
 
 		if ( ! array_key_exists( $action, Post_Actions::labels() ) ) {
 			return [];
@@ -215,13 +215,13 @@ final class Queue_Screen implements Registrable {
 				'type'    => 'success',
 				'message' => match ( $action ) {
 					/* translators: %s: number of posts. */
-					Post_Actions::PUBLISH => sprintf( _n( '%s post published.', '%s posts published.', $done, 'wire-desk' ), $count ),
+					Post_Actions::PUBLISH => sprintf( _n( '%s post published.', '%s posts published.', $done, 'ai-post-triage' ), $count ),
 					/* translators: %s: number of posts. */
-					Post_Actions::DISMISS => sprintf( _n( '%s post dismissed.', '%s posts dismissed.', $done, 'wire-desk' ), $count ),
+					Post_Actions::DISMISS => sprintf( _n( '%s post dismissed.', '%s posts dismissed.', $done, 'ai-post-triage' ), $count ),
 					/* translators: %s: number of posts. */
-					Post_Actions::RESTORE => sprintf( _n( '%s post restored to the queue.', '%s posts restored to the queue.', $done, 'wire-desk' ), $count ),
+					Post_Actions::RESTORE => sprintf( _n( '%s post restored to the queue.', '%s posts restored to the queue.', $done, 'ai-post-triage' ), $count ),
 					/* translators: %s: number of posts. */
-					default               => sprintf( _n( '%s post will be scored again shortly.', '%s posts will be scored again shortly.', $done, 'wire-desk' ), $count ),
+					default               => sprintf( _n( '%s post will be scored again shortly.', '%s posts will be scored again shortly.', $done, 'ai-post-triage' ), $count ),
 				},
 			];
 		}
@@ -231,7 +231,7 @@ final class Queue_Screen implements Registrable {
 				'type'    => 'error',
 				'message' => sprintf(
 					/* translators: %s: number of posts. */
-					_n( '%s post could not be updated.', '%s posts could not be updated.', $failed, 'wire-desk' ),
+					_n( '%s post could not be updated.', '%s posts could not be updated.', $failed, 'ai-post-triage' ),
 					number_format_i18n( $failed )
 				) . ( isset( Post_Actions::error_messages()[ $code ] ) ? ' ' . Post_Actions::error_messages()[ $code ] : '' ),
 			];
@@ -365,9 +365,9 @@ final class Queue_Screen implements Registrable {
 			esc_html(
 				$count > self::BADGE_MAX
 					/* translators: %s: highest count shown, such as 99. */
-					? sprintf( __( 'More than %s high-priority posts need review', 'wire-desk' ), number_format_i18n( self::BADGE_MAX ) )
+					? sprintf( __( 'More than %s high-priority posts need review', 'ai-post-triage' ), number_format_i18n( self::BADGE_MAX ) )
 					/* translators: %s: number of posts. */
-					: sprintf( _n( '%s high-priority post needs review', '%s high-priority posts need review', $count, 'wire-desk' ), number_format_i18n( $count ) )
+					: sprintf( _n( '%s high-priority post needs review', '%s high-priority posts need review', $count, 'ai-post-triage' ), number_format_i18n( $count ) )
 			)
 		);
 

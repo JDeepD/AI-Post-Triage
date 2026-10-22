@@ -2,18 +2,18 @@
 /**
  * Integration tests for Post_Actions.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Editorial
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Editorial
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Editorial;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Editorial;
 
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Editorial\Post_Actions;
-use JDeepD\Wire_Desk\Jobs\Queue;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Editorial\Post_Actions;
+use JDeepD\AI_Post_Triage\Jobs\Queue;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -25,19 +25,19 @@ class Post_ActionsTest extends TestCase {
 	/**
 	 * Role that can review wire posts but not publish them.
 	 */
-	private const REVIEWER = 'wire_desk_test_reviewer';
+	private const REVIEWER = 'ai_post_triage_test_reviewer';
 
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
 	/**
 	 * Service under test.
 	 *
-	 * @var \JDeepD\Wire_Desk\Editorial\Post_Actions
+	 * @var \JDeepD\AI_Post_Triage\Editorial\Post_Actions
 	 */
 	private Post_Actions $actions;
 
@@ -78,7 +78,7 @@ class Post_ActionsTest extends TestCase {
 
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
 
-		add_action( 'wire_desk/post_action', [ $this, 'record' ], 10, 3 );
+		add_action( 'ai_post_triage/post_action', [ $this, 'record' ], 10, 3 );
 	}
 
 	/**
@@ -143,7 +143,7 @@ class Post_ActionsTest extends TestCase {
 	public function test_publish_needs_publish_capability(): void {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => self::REVIEWER ] ) );
 
-		$this->assertError( 'wire_desk_forbidden', 403, $this->actions->publish( $this->post_id ) );
+		$this->assertError( 'ai_post_triage_forbidden', 403, $this->actions->publish( $this->post_id ) );
 		$this->assertSame( 'draft', get_post_status( $this->post_id ) );
 		$this->assertTrue( $this->actions->dismiss( $this->post_id ) );
 	}
@@ -165,7 +165,7 @@ class Post_ActionsTest extends TestCase {
 	public function test_dismiss_published_post(): void {
 		$this->actions->publish( $this->post_id );
 
-		$this->assertError( 'wire_desk_published', 409, $this->actions->dismiss( $this->post_id ) );
+		$this->assertError( 'ai_post_triage_published', 409, $this->actions->dismiss( $this->post_id ) );
 		$this->assertSame( Wire_Post::STATE_PUBLISHED, $this->state() );
 	}
 
@@ -206,7 +206,7 @@ class Post_ActionsTest extends TestCase {
 	 * Test that only dismissed posts can be restored.
 	 */
 	public function test_restore_needs_dismissed_post(): void {
-		$this->assertError( 'wire_desk_not_dismissed', 409, $this->actions->restore( $this->post_id ) );
+		$this->assertError( 'ai_post_triage_not_dismissed', 409, $this->actions->restore( $this->post_id ) );
 	}
 
 	/**
@@ -251,7 +251,7 @@ class Post_ActionsTest extends TestCase {
 	public function test_actions_need_review_capability( string $action ): void {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'author' ] ) );
 
-		$this->assertError( 'wire_desk_forbidden', 403, $this->actions->run( $action, $this->post_id ) );
+		$this->assertError( 'ai_post_triage_forbidden', 403, $this->actions->run( $action, $this->post_id ) );
 		$this->assertSame( Wire_Post::STATE_QUEUED, $this->state() );
 		$this->assertFalse( Queue::is_scheduled( $this->post_id ) );
 		$this->assertSame( [], $this->fired );
@@ -266,7 +266,7 @@ class Post_ActionsTest extends TestCase {
 	public function test_actions_need_user( string $action ): void {
 		wp_set_current_user( 0 );
 
-		$this->assertError( 'wire_desk_forbidden', 403, $this->actions->run( $action, $this->post_id ) );
+		$this->assertError( 'ai_post_triage_forbidden', 403, $this->actions->run( $action, $this->post_id ) );
 	}
 
 	/**
@@ -278,8 +278,8 @@ class Post_ActionsTest extends TestCase {
 	public function test_actions_need_wire_post( string $action ): void {
 		$other = self::factory()->post->create( [ 'post_status' => 'draft' ] );
 
-		$this->assertError( 'wire_desk_not_found', 404, $this->actions->run( $action, $other ) );
-		$this->assertError( 'wire_desk_not_found', 404, $this->actions->run( $action, PHP_INT_MAX ) );
+		$this->assertError( 'ai_post_triage_not_found', 404, $this->actions->run( $action, $other ) );
+		$this->assertError( 'ai_post_triage_not_found', 404, $this->actions->run( $action, PHP_INT_MAX ) );
 		$this->assertSame( 'draft', get_post_status( $other ) );
 	}
 
@@ -313,7 +313,7 @@ class Post_ActionsTest extends TestCase {
 	 * Test that unknown actions are rejected.
 	 */
 	public function test_run_unknown_action(): void {
-		$this->assertError( 'wire_desk_unknown_action', 400, $this->actions->run( 'delete', $this->post_id ) );
+		$this->assertError( 'ai_post_triage_unknown_action', 400, $this->actions->run( 'delete', $this->post_id ) );
 	}
 
 	/**
@@ -378,7 +378,7 @@ class Post_ActionsTest extends TestCase {
 	}
 
 	/**
-	 * Test that add() adds a post that isn't in Wire Desk and schedules it, whatever its age.
+	 * Test that add() adds a post that isn't in AI Post Triage and schedules it, whatever its age.
 	 */
 	public function test_add_adds_and_schedules(): void {
 		$post_id = self::factory()->post->create(
@@ -410,7 +410,7 @@ class Post_ActionsTest extends TestCase {
 	}
 
 	/**
-	 * Test that adding a post already in Wire Desk keeps its state and schedules it again.
+	 * Test that adding a post already in AI Post Triage keeps its state and schedules it again.
 	 */
 	public function test_add_existing_post(): void {
 		$this->repository->set_state( $this->post_id, Wire_Post::STATE_DISMISSED );
@@ -426,12 +426,12 @@ class Post_ActionsTest extends TestCase {
 	public function test_add_errors(): void {
 		$trashed = self::factory()->post->create( [ 'post_status' => 'trash' ] );
 
-		$this->assertSame( 'wire_desk_cannot_add', $this->error_code( $this->actions->add( $trashed ) ) );
-		$this->assertSame( 'wire_desk_not_found', $this->error_code( $this->actions->add( 999999 ) ) );
+		$this->assertSame( 'ai_post_triage_cannot_add', $this->error_code( $this->actions->add( $trashed ) ) );
+		$this->assertSame( 'ai_post_triage_not_found', $this->error_code( $this->actions->add( 999999 ) ) );
 
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'author' ] ) );
 
-		$this->assertSame( 'wire_desk_forbidden', $this->error_code( $this->actions->add( self::factory()->post->create() ) ) );
+		$this->assertSame( 'ai_post_triage_forbidden', $this->error_code( $this->actions->add( self::factory()->post->create() ) ) );
 		$this->assertSame( [], $this->fired );
 	}
 

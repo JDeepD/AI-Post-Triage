@@ -1,5 +1,5 @@
 {
-	"name": "jdeepd/wire-desk",
+	"name": "jdeepd/ai-post-triage",
 	"type": "wordpress-plugin",
 	"license": "GPL-3.0-or-later",
 	"config": {
@@ -19,9 +19,9 @@
 	"prefer-stable": true,
 	"autoload": {
 		"psr-4": {
-			"JDeepD\\Wire_Desk\\": "inc/",
-			"JDeepD\\Wire_Desk\\Framework\\": "framework/",
-			"JDeepD\\Wire_Desk\\Tests\\": "tests/phpunit/"
+			"JDeepD\\AI_Post_Triage\\": "inc/",
+			"JDeepD\\AI_Post_Triage\\Framework\\": "framework/",
+			"JDeepD\\AI_Post_Triage\\Tests\\": "tests/phpunit/"
 		}
 	},
 	"repositories": [

@@ -2,15 +2,15 @@
 /**
  * Integration tests for Term_Search_Controller.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Modules\Settings
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Modules\Settings
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Settings;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Modules\Settings;
 
-use JDeepD\Wire_Desk\Modules\Settings\Term_Search_Controller;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Modules\Settings\Term_Search_Controller;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -23,7 +23,7 @@ class Term_Search_ControllerTest extends TestCase {
 	/**
 	 * Route under test.
 	 */
-	private const ROUTE = '/wire-desk/v1/terms';
+	private const ROUTE = '/ai-post-triage/v1/terms';
 
 	/**
 	 * Test that the route is registered.

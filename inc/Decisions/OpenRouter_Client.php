@@ -2,19 +2,19 @@
 /**
  * OpenRouter System One client.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Decisions;
+namespace JDeepD\AI_Post_Triage\Decisions;
 
-use JDeepD\Wire_Desk\Modules\Settings\Api_Key;
+use JDeepD\AI_Post_Triage\Modules\Settings\Api_Key;
 
 /**
  * Class - OpenRouter_Client
  *
- * @phpstan-import-type Question from \JDeepD\Wire_Desk\Modules\Settings\Settings
+ * @phpstan-import-type Question from \JDeepD\AI_Post_Triage\Modules\Settings\Settings
  */
 final class OpenRouter_Client implements Decision_Client {
 	/**
@@ -25,7 +25,7 @@ final class OpenRouter_Client implements Decision_Client {
 	/**
 	 * Constant holding the API key.
 	 */
-	public const KEY_CONSTANT = 'WIRE_DESK_OPENROUTER_API_KEY';
+	public const KEY_CONSTANT = 'AI_POST_TRIAGE_OPENROUTER_API_KEY';
 
 	/**
 	 * Connector holding the API key.
@@ -55,7 +55,7 @@ final class OpenRouter_Client implements Decision_Client {
 		 *
 		 * @param string $key API key. Empty when none is configured.
 		 */
-		$key = apply_filters( 'wire_desk/openrouter_api_key', $key );
+		$key = apply_filters( 'ai_post_triage/openrouter_api_key', $key );
 
 		return is_string( $key ) ? trim( $key ) : '';
 	}
@@ -95,13 +95,13 @@ final class OpenRouter_Client implements Decision_Client {
 	 */
 	public function decide( array $state, array $questions, string $model ): Decision|\WP_Error {
 		if ( ! $questions || '' === $model ) {
-			return new \WP_Error( self::ERROR_BAD_REQUEST, __( 'A model and at least one question are required.', 'wire-desk' ) );
+			return new \WP_Error( self::ERROR_BAD_REQUEST, __( 'A model and at least one question are required.', 'ai-post-triage' ) );
 		}
 
 		$key = self::api_key();
 
 		if ( '' === $key ) {
-			return new \WP_Error( self::ERROR_NO_KEY, __( 'No OpenRouter API key is configured.', 'wire-desk' ) );
+			return new \WP_Error( self::ERROR_NO_KEY, __( 'No OpenRouter API key is configured.', 'ai-post-triage' ) );
 		}
 
 		$payload = [];
@@ -126,7 +126,7 @@ final class OpenRouter_Client implements Decision_Client {
 		);
 
 		if ( false === $body ) {
-			return new \WP_Error( self::ERROR_BAD_REQUEST, __( 'The request could not be encoded.', 'wire-desk' ) );
+			return new \WP_Error( self::ERROR_BAD_REQUEST, __( 'The request could not be encoded.', 'ai-post-triage' ) );
 		}
 
 		$response = wp_safe_remote_post(
@@ -138,7 +138,7 @@ final class OpenRouter_Client implements Decision_Client {
 					'Content-Type'  => 'application/json',
 					'Accept'        => 'application/json',
 					'HTTP-Referer'  => home_url( '/' ),
-					'X-Title'       => 'Wire Desk',
+					'X-Title'       => 'AI Post Triage',
 				],
 				'body'    => $body,
 			]
@@ -194,7 +194,7 @@ final class OpenRouter_Client implements Decision_Client {
 		return new \WP_Error(
 			$code,
 			/* translators: 1: HTTP status code, 2: error message. */
-			sprintf( __( 'OpenRouter returned %1$d: %2$s', 'wire-desk' ), $status, $message ),
+			sprintf( __( 'OpenRouter returned %1$d: %2$s', 'ai-post-triage' ), $status, $message ),
 			$error_data
 		);
 	}
@@ -233,7 +233,7 @@ final class OpenRouter_Client implements Decision_Client {
 		if ( ! is_array( $data['answers'] ?? null ) || ! is_array( $data['usage'] ?? null ) ) {
 			return new \WP_Error(
 				self::ERROR_INVALID_RESPONSE,
-				__( 'OpenRouter returned a response without answers.', 'wire-desk' ),
+				__( 'OpenRouter returned a response without answers.', 'ai-post-triage' ),
 				[ 'status' => 200 ]
 			);
 		}
@@ -248,7 +248,7 @@ final class OpenRouter_Client implements Decision_Client {
 				return new \WP_Error(
 					self::ERROR_INVALID_RESPONSE,
 					/* translators: %s: question text. */
-					sprintf( __( 'OpenRouter returned no valid answer to: %s', 'wire-desk' ), $question['question'] ),
+					sprintf( __( 'OpenRouter returned no valid answer to: %s', 'ai-post-triage' ), $question['question'] ),
 					[ 'status' => 200 ]
 				);
 			}

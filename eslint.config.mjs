@@ -29,7 +29,7 @@ export default [
 			'@wordpress/i18n-text-domain': [
 				'error',
 				{
-					allowedTextDomain: 'wire-desk',
+					allowedTextDomain: 'ai-post-triage',
 				},
 			],
 

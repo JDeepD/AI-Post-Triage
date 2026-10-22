@@ -2,14 +2,14 @@
 /**
  * Grants the plugin's capabilities.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Core;
+namespace JDeepD\AI_Post_Triage\Core;
 
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
 
 /**
  * Class - Capabilities
@@ -18,12 +18,12 @@ final class Capabilities implements Registrable {
 	/**
 	 * Manage the plugin's settings.
 	 */
-	public const MANAGE = 'wire_desk_manage';
+	public const MANAGE = 'ai_post_triage_manage';
 
 	/**
 	 * Review the queue: view, dismiss, restore and re-score posts.
 	 */
-	public const REVIEW = 'wire_desk_review';
+	public const REVIEW = 'ai_post_triage_review';
 
 	/**
 	 * {@inheritDoc}
@@ -44,11 +44,11 @@ final class Capabilities implements Registrable {
 		];
 
 		/**
-		 * Filters the capability each Wire Desk capability is granted from.
+		 * Filters the capability each AI Post Triage capability is granted from.
 		 *
-		 * @param array<string, string> $map Wire Desk capability => capability that grants it.
+		 * @param array<string, string> $map AI Post Triage capability => capability that grants it.
 		 */
-		$map = apply_filters( 'wire_desk/capability_map', $defaults );
+		$map = apply_filters( 'ai_post_triage/capability_map', $defaults );
 
 		if ( ! is_array( $map ) ) {
 			return $defaults;

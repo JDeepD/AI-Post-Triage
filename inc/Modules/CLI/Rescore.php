@@ -1,22 +1,22 @@
 <?php
 /**
- * Rescore CLI command for Wire Desk.
+ * Rescore CLI command for AI Post Triage.
  *
- * @package JDeepD\Wire_Desk\Modules\CLI
+ * @package JDeepD\AI_Post_Triage\Modules\CLI
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Modules\CLI;
+namespace JDeepD\AI_Post_Triage\Modules\CLI;
 
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\CLI_Command;
-use JDeepD\Wire_Desk\Jobs\Rescore as Rescore_Job;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\CLI_Command;
+use JDeepD\AI_Post_Triage\Jobs\Rescore as Rescore_Job;
 use WP_CLI;
 
 /**
  * Class - Rescore
  *
- * Implements the `wire-desk rescore` WP-CLI command.
+ * Implements the `ai-post-triage rescore` WP-CLI command.
  */
 final class Rescore implements CLI_Command {
 	/**
@@ -50,8 +50,8 @@ final class Rescore implements CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp wire-desk rescore
-	 *     wp wire-desk rescore --limit=500
+	 *     wp ai-post-triage rescore
+	 *     wp ai-post-triage rescore --limit=500
 	 *
 	 * @param array<int, mixed>    $args       Positional arguments.
 	 * @param array<string, mixed> $assoc_args Associative arguments.

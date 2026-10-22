@@ -2,18 +2,18 @@
 /**
  * REST endpoints for listing wire posts and acting on them.
  *
- * @package JDeepD\Wire_Desk\Modules\REST
+ * @package JDeepD\AI_Post_Triage\Modules\REST
  */
 
 declare(strict_types = 1);
 
-namespace JDeepD\Wire_Desk\Modules\REST;
+namespace JDeepD\AI_Post_Triage\Modules\REST;
 
-use JDeepD\Wire_Desk\Core\Capabilities;
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Editorial\Post_Actions;
-use JDeepD\Wire_Desk\Framework\Contracts\Abstracts\Abstract_REST_Controller;
+use JDeepD\AI_Post_Triage\Core\Capabilities;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Editorial\Post_Actions;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Abstracts\Abstract_REST_Controller;
 use WP_Post;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -37,22 +37,22 @@ final class Posts_Controller extends Abstract_REST_Controller {
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
 	/**
 	 * Wire post actions.
 	 *
-	 * @var \JDeepD\Wire_Desk\Editorial\Post_Actions
+	 * @var \JDeepD\AI_Post_Triage\Editorial\Post_Actions
 	 */
 	private Post_Actions $actions;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post_Repository|null $repository Wire post table.
-	 * @param \JDeepD\Wire_Desk\Editorial\Post_Actions|null    $actions    Wire post actions.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository|null $repository Wire post table.
+	 * @param \JDeepD\AI_Post_Triage\Editorial\Post_Actions|null    $actions    Wire post actions.
 	 */
 	public function __construct( ?Wire_Post_Repository $repository = null, ?Post_Actions $actions = null ) {
 		$this->repository = $repository ?? new Wire_Post_Repository();
@@ -85,7 +85,7 @@ final class Posts_Controller extends Abstract_REST_Controller {
 			[
 				'args'   => [
 					'id' => [
-						'description' => __( 'Post ID.', 'wire-desk' ),
+						'description' => __( 'Post ID.', 'ai-post-triage' ),
 						'type'        => 'integer',
 					],
 				],
@@ -107,11 +107,11 @@ final class Posts_Controller extends Abstract_REST_Controller {
 			[
 				'args'   => [
 					'id'     => [
-						'description' => __( 'Post ID.', 'wire-desk' ),
+						'description' => __( 'Post ID.', 'ai-post-triage' ),
 						'type'        => 'integer',
 					],
 					'action' => [
-						'description' => __( 'Action to take.', 'wire-desk' ),
+						'description' => __( 'Action to take.', 'ai-post-triage' ),
 						'type'        => 'string',
 						'enum'        => array_keys( Post_Actions::labels() ),
 					],
@@ -137,7 +137,7 @@ final class Posts_Controller extends Abstract_REST_Controller {
 			return true;
 		}
 
-		return new \WP_Error( 'rest_forbidden', __( 'Sorry, you are not allowed to review wire posts.', 'wire-desk' ), [ 'status' => rest_authorization_required_code() ] );
+		return new \WP_Error( 'rest_forbidden', __( 'Sorry, you are not allowed to review wire posts.', 'ai-post-triage' ), [ 'status' => rest_authorization_required_code() ] );
 	}
 
 	/**
@@ -160,7 +160,7 @@ final class Posts_Controller extends Abstract_REST_Controller {
 		}
 
 		if ( ! current_user_can( 'edit_post', $row->post_id ) ) {
-			return new \WP_Error( 'rest_forbidden', __( 'Sorry, you are not allowed to review this wire post.', 'wire-desk' ), [ 'status' => rest_authorization_required_code() ] );
+			return new \WP_Error( 'rest_forbidden', __( 'Sorry, you are not allowed to review this wire post.', 'ai-post-triage' ), [ 'status' => rest_authorization_required_code() ] );
 		}
 
 		return true;
@@ -190,7 +190,7 @@ final class Posts_Controller extends Abstract_REST_Controller {
 			$cursor_row = $this->repository->get( $before ?: $after );
 
 			if ( null === $cursor_row ) {
-				return new \WP_Error( 'rest_invalid_param', __( 'The post to page from is not a wire post.', 'wire-desk' ), [ 'status' => 400 ] );
+				return new \WP_Error( 'rest_invalid_param', __( 'The post to page from is not a wire post.', 'ai-post-triage' ), [ 'status' => 400 ] );
 			}
 		}
 
@@ -257,7 +257,7 @@ final class Posts_Controller extends Abstract_REST_Controller {
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post       $item    Row.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post       $item    Row.
 	 * @param \WP_REST_Request<array<string, mixed>> $request Request.
 	 */
 	public function prepare_item_for_response( $item, $request ): WP_REST_Response {
@@ -310,29 +310,29 @@ final class Posts_Controller extends Abstract_REST_Controller {
 		return [
 			'context'  => $this->get_context_param( [ 'default' => 'view' ] ),
 			'state'    => [
-				'description' => __( 'Only posts in this state.', 'wire-desk' ),
+				'description' => __( 'Only posts in this state.', 'ai-post-triage' ),
 				'type'        => 'string',
 				'enum'        => array_keys( Wire_Post::state_slugs() ),
 			],
 			'band'     => [
-				'description' => __( 'Only posts in this priority band.', 'wire-desk' ),
+				'description' => __( 'Only posts in this priority band.', 'ai-post-triage' ),
 				'type'        => 'string',
 				'enum'        => array_keys( Wire_Post::band_slugs() ),
 			],
 			'per_page' => [
-				'description' => __( 'Posts per page.', 'wire-desk' ),
+				'description' => __( 'Posts per page.', 'ai-post-triage' ),
 				'type'        => 'integer',
 				'default'     => self::DEFAULT_PER_PAGE,
 				'minimum'     => 1,
 				'maximum'     => Wire_Post_Repository::MAX_PAGE_SIZE,
 			],
 			'before'   => [
-				'description' => __( 'Only posts older than this post.', 'wire-desk' ),
+				'description' => __( 'Only posts older than this post.', 'ai-post-triage' ),
 				'type'        => 'integer',
 				'minimum'     => 1,
 			],
 			'after'    => [
-				'description' => __( 'Only posts newer than this post.', 'wire-desk' ),
+				'description' => __( 'Only posts newer than this post.', 'ai-post-triage' ),
 				'type'        => 'integer',
 				'minimum'     => 1,
 			],
@@ -353,57 +353,57 @@ final class Posts_Controller extends Abstract_REST_Controller {
 
 		$this->schema = [
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'wire-desk-post',
+			'title'      => 'ai-post-triage-post',
 			'type'       => 'object',
 			'properties' => [
 				'id'          => [
-					'description' => __( 'Post ID.', 'wire-desk' ),
+					'description' => __( 'Post ID.', 'ai-post-triage' ),
 					'type'        => 'integer',
 					'context'     => $context,
 					'readonly'    => true,
 				],
 				'title'       => [
-					'description' => __( 'Post title, rendered.', 'wire-desk' ),
+					'description' => __( 'Post title, rendered.', 'ai-post-triage' ),
 					'type'        => 'string',
 					'context'     => $context,
 					'readonly'    => true,
 				],
 				'post_status' => [
-					'description' => __( 'Post status, or null when the post is gone.', 'wire-desk' ),
+					'description' => __( 'Post status, or null when the post is gone.', 'ai-post-triage' ),
 					'type'        => [ 'string', 'null' ],
 					'context'     => $context,
 					'readonly'    => true,
 				],
 				'edit_link'   => [
-					'description' => __( 'Link to edit the post, when the user can.', 'wire-desk' ),
+					'description' => __( 'Link to edit the post, when the user can.', 'ai-post-triage' ),
 					'type'        => [ 'string', 'null' ],
 					'format'      => 'uri',
 					'context'     => $context,
 					'readonly'    => true,
 				],
 				'date'        => [
-					'description' => __( 'Post date, in the site\'s timezone.', 'wire-desk' ),
+					'description' => __( 'Post date, in the site\'s timezone.', 'ai-post-triage' ),
 					'type'        => [ 'string', 'null' ],
 					'format'      => 'date-time',
 					'context'     => $context,
 					'readonly'    => true,
 				],
 				'state'       => [
-					'description' => __( 'Where the post is in the review queue.', 'wire-desk' ),
+					'description' => __( 'Where the post is in the review queue.', 'ai-post-triage' ),
 					'type'        => 'string',
 					'enum'        => array_keys( Wire_Post::state_slugs() ),
 					'context'     => $context,
 					'readonly'    => true,
 				],
 				'band'        => [
-					'description' => __( 'Priority band.', 'wire-desk' ),
+					'description' => __( 'Priority band.', 'ai-post-triage' ),
 					'type'        => 'string',
 					'enum'        => array_keys( Wire_Post::band_slugs() ),
 					'context'     => $context,
 					'readonly'    => true,
 				],
 				'score'       => [
-					'description' => __( 'Score from 0 to 100, or null before the post is scored.', 'wire-desk' ),
+					'description' => __( 'Score from 0 to 100, or null before the post is scored.', 'ai-post-triage' ),
 					'type'        => [ 'integer', 'null' ],
 					'minimum'     => 0,
 					'maximum'     => 100,
@@ -411,38 +411,38 @@ final class Posts_Controller extends Abstract_REST_Controller {
 					'readonly'    => true,
 				],
 				'model'       => [
-					'description' => __( 'Model that scored the post.', 'wire-desk' ),
+					'description' => __( 'Model that scored the post.', 'ai-post-triage' ),
 					'type'        => 'string',
 					'context'     => $context,
 					'readonly'    => true,
 				],
 				'cost'        => [
-					'description' => __( 'Cost of the last paid score, in US dollars.', 'wire-desk' ),
+					'description' => __( 'Cost of the last paid score, in US dollars.', 'ai-post-triage' ),
 					'type'        => 'number',
 					'context'     => [ 'edit' ],
 					'readonly'    => true,
 				],
 				'scored_at'   => [
-					'description' => __( 'When the post was last scored, in GMT.', 'wire-desk' ),
+					'description' => __( 'When the post was last scored, in GMT.', 'ai-post-triage' ),
 					'type'        => [ 'string', 'null' ],
 					'format'      => 'date-time',
 					'context'     => $context,
 					'readonly'    => true,
 				],
 				'error'       => [
-					'description' => __( 'Last scoring error.', 'wire-desk' ),
+					'description' => __( 'Last scoring error.', 'ai-post-triage' ),
 					'type'        => 'string',
 					'context'     => $context,
 					'readonly'    => true,
 				],
 				'attempts'    => [
-					'description' => __( 'Failed scoring attempts in a row.', 'wire-desk' ),
+					'description' => __( 'Failed scoring attempts in a row.', 'ai-post-triage' ),
 					'type'        => 'integer',
 					'context'     => [ 'edit' ],
 					'readonly'    => true,
 				],
 				'answers'     => [
-					'description' => __( 'The model\'s answer to each question, or null when none are kept.', 'wire-desk' ),
+					'description' => __( 'The model\'s answer to each question, or null when none are kept.', 'ai-post-triage' ),
 					'type'        => [ 'array', 'null' ],
 					'context'     => $context,
 					'readonly'    => true,
@@ -467,7 +467,7 @@ final class Posts_Controller extends Abstract_REST_Controller {
 					],
 				],
 				'actions'     => [
-					'description' => __( 'Actions the current user can take.', 'wire-desk' ),
+					'description' => __( 'Actions the current user can take.', 'ai-post-triage' ),
 					'type'        => 'array',
 					'items'       => [
 						'type' => 'string',
@@ -491,7 +491,7 @@ final class Posts_Controller extends Abstract_REST_Controller {
 		$row = $this->repository->get( $post_id );
 
 		if ( null === $row || ! get_post( $post_id ) instanceof WP_Post ) {
-			return new \WP_Error( 'rest_post_invalid_id', Post_Actions::error_messages()['wire_desk_not_found'], [ 'status' => 404 ] );
+			return new \WP_Error( 'rest_post_invalid_id', Post_Actions::error_messages()['ai_post_triage_not_found'], [ 'status' => 404 ] );
 		}
 
 		return $row;
@@ -532,7 +532,7 @@ final class Posts_Controller extends Abstract_REST_Controller {
 	/**
 	 * The paging cursor for a row.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post|null $item Row.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post|null $item Row.
 	 * @return array{post_date: string, post_id: int}|null
 	 */
 	private static function cursor( ?Wire_Post $item ): ?array {

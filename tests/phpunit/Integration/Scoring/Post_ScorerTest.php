@@ -2,24 +2,24 @@
 /**
  * Integration tests for Post_Scorer.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Scoring
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Scoring
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Scoring;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Scoring;
 
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Decisions\Decision;
-use JDeepD\Wire_Desk\Decisions\Decision_Client;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Scoring\Post_Scorer;
-use JDeepD\Wire_Desk\Scoring\Result;
-use JDeepD\Wire_Desk\Scoring\Scorer;
-use JDeepD\Wire_Desk\Scoring\State_Builder;
-use JDeepD\Wire_Desk\Tests\Fakes\Fake_Decision_Client;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Decisions\Decision;
+use JDeepD\AI_Post_Triage\Decisions\Decision_Client;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Scoring\Post_Scorer;
+use JDeepD\AI_Post_Triage\Scoring\Result;
+use JDeepD\AI_Post_Triage\Scoring\Scorer;
+use JDeepD\AI_Post_Triage\Scoring\State_Builder;
+use JDeepD\AI_Post_Triage\Tests\Fakes\Fake_Decision_Client;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -31,21 +31,21 @@ class Post_ScorerTest extends TestCase {
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
 	/**
 	 * Fake decision client.
 	 *
-	 * @var \JDeepD\Wire_Desk\Tests\Fakes\Fake_Decision_Client
+	 * @var \JDeepD\AI_Post_Triage\Tests\Fakes\Fake_Decision_Client
 	 */
 	private Fake_Decision_Client $client;
 
 	/**
 	 * Results passed to the scored action.
 	 *
-	 * @var \JDeepD\Wire_Desk\Scoring\Result[]
+	 * @var \JDeepD\AI_Post_Triage\Scoring\Result[]
 	 */
 	private array $scored = [];
 
@@ -95,13 +95,13 @@ class Post_ScorerTest extends TestCase {
 		);
 		$this->scored     = [];
 
-		add_action( 'wire_desk/scored', [ $this, 'record_scored' ] );
+		add_action( 'ai_post_triage/scored', [ $this, 'record_scored' ] );
 	}
 
 	/**
 	 * Records a scored result.
 	 *
-	 * @param \JDeepD\Wire_Desk\Scoring\Result $result Result.
+	 * @param \JDeepD\AI_Post_Triage\Scoring\Result $result Result.
 	 */
 	public function record_scored( Result $result ): void {
 		$this->scored[] = $result;
@@ -380,7 +380,7 @@ class Post_ScorerTest extends TestCase {
 		$result = $this->scorer()->score( $post_id );
 
 		$this->assertWPError( $result );
-		$this->assertSame( 'wire_desk_missing_answer', $result->get_error_code() );
+		$this->assertSame( 'ai_post_triage_missing_answer', $result->get_error_code() );
 		$this->assertSame( Wire_Post::STATE_FAILED, $this->repository->get( $post_id )?->state );
 	}
 
@@ -418,7 +418,7 @@ class Post_ScorerTest extends TestCase {
 			$result = $this->scorer()->score( $id );
 
 			$this->assertWPError( $result );
-			$this->assertSame( 'wire_desk_no_post', $result->get_error_code() );
+			$this->assertSame( 'ai_post_triage_no_post', $result->get_error_code() );
 			$this->assertNull( $this->repository->get( $id ) );
 		}
 

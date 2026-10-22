@@ -1,7 +1,7 @@
 <!--
 Thanks for taking the time to submit a Pull Request.
 Please make sure to review the Development Guide before submitting your PR
-https://github.com/JDeepD/wire-desk/blob/main/docs/DEVELOPMENT.md
+https://github.com/JDeepD/ai-post-triage/blob/main/docs/DEVELOPMENT.md
 -->
 
 ## What

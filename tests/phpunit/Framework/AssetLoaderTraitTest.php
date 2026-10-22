@@ -2,21 +2,21 @@
 /**
  * Integration tests for AssetLoaderTrait.
  *
- * @package JDeepD\Wire_Desk\Tests
+ * @package JDeepD\AI_Post_Triage\Tests
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Framework;
+namespace JDeepD\AI_Post_Triage\Tests\Framework;
 
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * Test double for our trait.
  */
 final class AssetLoaderTraitTestDouble {
-	use \JDeepD\Wire_Desk\Framework\AssetLoaderTrait;
+	use \JDeepD\AI_Post_Triage\Framework\AssetLoaderTrait;
 
 	/**
 	 * {@inheritDoc}
@@ -61,7 +61,7 @@ final class AssetLoaderTraitTestDouble {
 /**
  * Class - AssetLoaderTraitTest
  */
-#[CoversClass( \JDeepD\Wire_Desk\Framework\AssetLoaderTrait::class )]
+#[CoversClass( \JDeepD\AI_Post_Triage\Framework\AssetLoaderTrait::class )]
 class AssetLoaderTraitTest extends TestCase {
 	/**
 	 * Tests that get_asset_file returns null and logs an incorrect usage when the asset file is missing.

@@ -1,20 +1,20 @@
 <?php
 /**
- * Adds the Wire Desk panel to the block editor.
+ * Adds the AI Post Triage panel to the block editor.
  *
- * @package JDeepD\Wire_Desk\Modules\Editor
+ * @package JDeepD\AI_Post_Triage\Modules\Editor
  */
 
 declare(strict_types = 1);
 
-namespace JDeepD\Wire_Desk\Modules\Editor;
+namespace JDeepD\AI_Post_Triage\Modules\Editor;
 
-use JDeepD\Wire_Desk\Core\Assets;
-use JDeepD\Wire_Desk\Core\Capabilities;
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
-use JDeepD\Wire_Desk\Modules\Queue\Queue_Screen;
+use JDeepD\AI_Post_Triage\Core\Assets;
+use JDeepD\AI_Post_Triage\Core\Capabilities;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Modules\Queue\Queue_Screen;
 use WP_Post;
 
 /**
@@ -24,14 +24,14 @@ final class Editor_Panel implements Registrable {
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post_Repository|null $repository Wire post table.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository|null $repository Wire post table.
 	 */
 	public function __construct( ?Wire_Post_Repository $repository = null ) {
 		$this->repository = $repository ?? new Wire_Post_Repository();
@@ -58,7 +58,7 @@ final class Editor_Panel implements Registrable {
 		wp_enqueue_style( Assets::EDITOR_HANDLE );
 		wp_add_inline_script(
 			Assets::EDITOR_HANDLE,
-			'window.wireDeskEditor = ' . wp_json_encode( self::data( null !== $this->repository->get( $post->ID ) ) ) . ';',
+			'window.aiPostTriageEditor = ' . wp_json_encode( self::data( null !== $this->repository->get( $post->ID ) ) ) . ';',
 			'before'
 		);
 	}
@@ -66,7 +66,7 @@ final class Editor_Panel implements Registrable {
 	/**
 	 * Data for the panel script.
 	 *
-	 * @param bool $is_wire Whether the post is in Wire Desk.
+	 * @param bool $is_wire Whether the post is in AI Post Triage.
 	 * @return array{isWire: bool, queueUrl: string, bands: array<string, string>, states: array<string, string>}
 	 */
 	public static function data( bool $is_wire ): array {

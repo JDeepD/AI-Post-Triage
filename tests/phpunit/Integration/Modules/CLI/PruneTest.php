@@ -2,18 +2,18 @@
 /**
  * Integration tests for the Prune CLI command.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Modules\CLI
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Modules\CLI
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Modules\CLI;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Modules\CLI;
 
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Modules\CLI\Prune;
-use JDeepD\Wire_Desk\Tests\Fakes\Fake_WP_CLI;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Modules\CLI\Prune;
+use JDeepD\AI_Post_Triage\Tests\Fakes\Fake_WP_CLI;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -69,7 +69,7 @@ class PruneTest extends TestCase {
 	public function test_run_with_zero_retention(): void {
 		Fake_WP_CLI::install();
 		$repository = $this->scored( [ 400 ] );
-		add_filter( 'wire_desk/details_retention_days', '__return_zero' );
+		add_filter( 'ai_post_triage/details_retention_days', '__return_zero' );
 
 		Prune::run( [], [] );
 

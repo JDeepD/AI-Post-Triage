@@ -2,15 +2,15 @@
 /**
  * Integration tests for TemplateLoaderTrait.
  *
- * @package JDeepD\Wire_Desk\Tests
+ * @package JDeepD\AI_Post_Triage\Tests
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Framework;
+namespace JDeepD\AI_Post_Triage\Tests\Framework;
 
-use JDeepD\Wire_Desk\Framework\TemplateLoaderTrait;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Framework\TemplateLoaderTrait;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -104,7 +104,7 @@ final class TemplateLoaderTraitTestDouble {
 /**
  * Class - TemplateLoaderTraitTest
  */
-#[CoversClass( \JDeepD\Wire_Desk\Framework\TemplateLoaderTrait::class )]
+#[CoversClass( \JDeepD\AI_Post_Triage\Framework\TemplateLoaderTrait::class )]
 class TemplateLoaderTraitTest extends TestCase {
 	/**
 	 * Test double instance.

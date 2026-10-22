@@ -2,15 +2,15 @@
 /**
  * A decision client for tests.
  *
- * @package JDeepD\Wire_Desk\Tests\Fakes
+ * @package JDeepD\AI_Post_Triage\Tests\Fakes
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Fakes;
+namespace JDeepD\AI_Post_Triage\Tests\Fakes;
 
-use JDeepD\Wire_Desk\Decisions\Decision;
-use JDeepD\Wire_Desk\Decisions\Decision_Client;
+use JDeepD\AI_Post_Triage\Decisions\Decision;
+use JDeepD\AI_Post_Triage\Decisions\Decision_Client;
 
 /**
  * Class - Fake_Decision_Client
@@ -28,14 +28,14 @@ class Fake_Decision_Client implements Decision_Client {
 	/**
 	 * Results to return, in order.
 	 *
-	 * @var array<int, \JDeepD\Wire_Desk\Decisions\Decision|\WP_Error>
+	 * @var array<int, \JDeepD\AI_Post_Triage\Decisions\Decision|\WP_Error>
 	 */
 	private array $results;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param \JDeepD\Wire_Desk\Decisions\Decision|\WP_Error ...$results Results to return, in order.
+	 * @param \JDeepD\AI_Post_Triage\Decisions\Decision|\WP_Error ...$results Results to return, in order.
 	 */
 	public function __construct( Decision|\WP_Error ...$results ) {
 		$this->results = array_values( $results );

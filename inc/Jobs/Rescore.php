@@ -2,15 +2,15 @@
 /**
  * Queues the newest wire posts to be scored again.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Jobs;
+namespace JDeepD\AI_Post_Triage\Jobs;
 
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
 
 /**
  * Class - Rescore
@@ -19,7 +19,7 @@ final class Rescore implements Registrable {
 	/**
 	 * Action that schedules a batch of posts.
 	 */
-	public const BATCH_HOOK = 'wire_desk/rescore_batch';
+	public const BATCH_HOOK = 'ai_post_triage/rescore_batch';
 
 	/**
 	 * Posts per batch.
@@ -34,14 +34,14 @@ final class Rescore implements Registrable {
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post_Repository|null $repository Wire post table.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository|null $repository Wire post table.
 	 */
 	public function __construct( ?Wire_Post_Repository $repository = null ) {
 		$this->repository = $repository ?? new Wire_Post_Repository();

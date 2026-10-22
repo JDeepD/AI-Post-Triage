@@ -5,12 +5,12 @@
  * Allows plugins to provide template files that themes can override.
  * Follows WordPress template hierarchy: Child Theme > Parent Theme > Plugin.
  *
- * @package JDeepD\Wire_Desk\Framework
+ * @package JDeepD\AI_Post_Triage\Framework
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Framework;
+namespace JDeepD\AI_Post_Triage\Framework;
 
 /**
  * Trait - TemplateLoaderTrait.

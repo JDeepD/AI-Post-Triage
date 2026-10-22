@@ -2,12 +2,12 @@
 /**
  * Provide a base class for all unit tests by extending WP_UnitTestCase.
  *
- * @package JDeepD\Wire_Desk\Tests
+ * @package JDeepD\AI_Post_Triage\Tests
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests;
+namespace JDeepD\AI_Post_Triage\Tests;
 
 use WP_UnitTestCase;
 
@@ -82,13 +82,13 @@ abstract class TestCase extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Cancels Wire Desk jobs left waiting in the shared Action Scheduler tables.
+	 * Cancels AI Post Triage jobs left waiting in the shared Action Scheduler tables.
 	 */
 	protected function setUp(): void {
 		parent::setUp();
 
 		if ( function_exists( 'as_unschedule_all_actions' ) ) {
-			as_unschedule_all_actions( '', [], 'wire-desk' );
+			as_unschedule_all_actions( '', [], 'ai-post-triage' );
 		}
 	}
 }

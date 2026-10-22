@@ -4,126 +4,126 @@
 
 @use "../../shared/bands";
 
-.wire-desk-terms-picker {
+.ai-post-triage-terms-picker {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
 }
 
-.wire-desk-terms-picker select {
+.ai-post-triage-terms-picker select {
 	max-width: 25em;
 }
 
-.wire-desk-terms-meta {
+.ai-post-triage-terms-meta {
 	color: #646970;
 	margin-left: 4px;
 }
 
-.wire-desk-terms-selected {
+.ai-post-triage-terms-selected {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 4px 16px;
 	margin: 0 0 6px;
 }
 
-.wire-desk-terms-selected:empty {
+.ai-post-triage-terms-selected:empty {
 	display: none;
 }
 
-.wire-desk-terms-results {
+.ai-post-triage-terms-results {
 	margin: 4px 0 0;
 	max-width: 25em;
 }
 
-.wire-desk-terms-results li {
+.ai-post-triage-terms-results li {
 	margin: 0;
 	padding: 2px 0;
 }
 
-.wire-desk-terms-message {
+.ai-post-triage-terms-message {
 	color: #646970;
 }
 
-.wire-desk-questions table {
+.ai-post-triage-questions table {
 	margin-bottom: 12px;
 	max-width: 1000px;
 }
 
-.form-table .wire-desk-questions th,
-.form-table .wire-desk-questions td {
+.form-table .ai-post-triage-questions th,
+.form-table .ai-post-triage-questions td {
 	padding: 10px 12px;
 	vertical-align: middle;
 	width: auto;
 }
 
-.form-table .wire-desk-questions th {
+.form-table .ai-post-triage-questions th {
 	white-space: nowrap;
 }
 
-.form-table .wire-desk-questions th:first-child {
+.form-table .ai-post-triage-questions th:first-child {
 	width: 55%;
 }
 
-.wire-desk-try {
+.ai-post-triage-try {
 	max-width: 1000px;
 }
 
-.wire-desk-try .spinner {
+.ai-post-triage-try .spinner {
 	float: none;
 	margin-top: 0;
 }
 
-.wire-desk-try-result table {
+.ai-post-triage-try-result table {
 	margin-top: 12px;
 }
 
-.form-table .wire-desk-try-result th,
-.form-table .wire-desk-try-result td {
+.form-table .ai-post-triage-try-result th,
+.form-table .ai-post-triage-try-result td {
 	padding: 10px 12px;
 	width: auto;
 }
 
-.wire-desk-try-error {
+.ai-post-triage-try-error {
 	color: #d63638;
 }
 
-.wire-desk-try-summary {
+.ai-post-triage-try-summary {
 	margin: 16px 0 0;
 }
 
-.wire-desk-paused {
+.ai-post-triage-paused {
 	color: #d63638;
 }
 
-.wire-desk-rescore .spinner {
+.ai-post-triage-rescore .spinner {
 	float: none;
 	margin-top: 0;
 }
 
-.wire-desk-rescore-result:empty {
+.ai-post-triage-rescore-result:empty {
 	display: none;
 }
 
-.wire-desk-queue .column-band {
+.ai-post-triage-queue .column-band {
 	width: 9em;
 }
 
-.wire-desk-queue .column-state {
+.ai-post-triage-queue .column-state {
 	width: 11em;
 }
 
-.wire-desk-queue .column-model {
+.ai-post-triage-queue .column-model {
 	width: 12em;
 }
 
-.wire-desk-queue .column-date {
+.ai-post-triage-queue .column-date {
 	width: 16em;
 }
 
-.wire-desk-muted {
+.ai-post-triage-muted {
 	color: #646970;
 }
 
-.wire-desk-error {
+.ai-post-triage-error {
 	color: #d63638;
 }

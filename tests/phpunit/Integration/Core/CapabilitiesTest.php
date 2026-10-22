@@ -2,15 +2,15 @@
 /**
  * Integration tests for Capabilities.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Core
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Core
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Core;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Core;
 
-use JDeepD\Wire_Desk\Core\Capabilities;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Core\Capabilities;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -87,7 +87,7 @@ class CapabilitiesTest extends TestCase {
 		$author_id = self::factory()->user->create( [ 'role' => 'author' ] );
 
 		add_filter(
-			'wire_desk/capability_map',
+			'ai_post_triage/capability_map',
 			static fn ( array $map ): array => [ Capabilities::REVIEW => 'edit_posts' ] + $map
 		);
 
@@ -100,7 +100,7 @@ class CapabilitiesTest extends TestCase {
 	 */
 	public function test_map_ignores_invalid_values(): void {
 		add_filter(
-			'wire_desk/capability_map',
+			'ai_post_triage/capability_map',
 			static fn (): array => [
 				Capabilities::MANAGE => '',
 				Capabilities::REVIEW => [ 'edit_posts' ],
@@ -121,7 +121,7 @@ class CapabilitiesTest extends TestCase {
 	 * Test that a non-array filter result falls back to the defaults.
 	 */
 	public function test_map_ignores_non_array_filter_result(): void {
-		add_filter( 'wire_desk/capability_map', '__return_false' );
+		add_filter( 'ai_post_triage/capability_map', '__return_false' );
 
 		$this->assertSame( 'edit_others_posts', Capabilities::map()[ Capabilities::REVIEW ] );
 	}

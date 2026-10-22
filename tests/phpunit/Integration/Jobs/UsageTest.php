@@ -2,18 +2,18 @@
 /**
  * Integration tests for Usage.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Jobs
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Jobs
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Jobs;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Jobs;
 
-use JDeepD\Wire_Desk\Jobs\Usage;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Scoring\Result;
-use JDeepD\Wire_Desk\Scoring\Score;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Jobs\Usage;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Scoring\Result;
+use JDeepD\AI_Post_Triage\Scoring\Score;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -85,8 +85,8 @@ class UsageTest extends TestCase {
 	 * Test that scored posts are recorded.
 	 */
 	public function test_scored_action_records_cost(): void {
-		do_action( 'wire_desk/scored', new Result( 1, new Score( 80, 3, [] ), 'typesafe/jev-1.13', 0.00002, false ) );
-		do_action( 'wire_desk/scored', 'not a result' );
+		do_action( 'ai_post_triage/scored', new Result( 1, new Score( 80, 3, [] ), 'typesafe/jev-1.13', 0.00002, false ) );
+		do_action( 'ai_post_triage/scored', 'not a result' );
 
 		$this->assertSame( 0.00002, Usage::get()['cost'] );
 		$this->assertSame( 1, Usage::get()['calls'] );

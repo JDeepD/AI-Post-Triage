@@ -4,14 +4,14 @@
  *
  * Class to be extended by all taxonomies in the plugin. It includes the shared hook registration and default args.
  *
- * @package JDeepD\Wire_Desk\Framework\Contracts\Abstracts
+ * @package JDeepD\AI_Post_Triage\Framework\Contracts\Abstracts
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Framework\Contracts\Abstracts;
+namespace JDeepD\AI_Post_Triage\Framework\Contracts\Abstracts;
 
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
 
 /**
  * Class - Abstract_Taxonomy

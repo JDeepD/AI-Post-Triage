@@ -2,18 +2,18 @@
 /**
  * Integration tests for the Score CLI command.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Modules\CLI
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Modules\CLI
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Modules\CLI;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Modules\CLI;
 
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Modules\CLI\Score;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Modules\CLI\Score;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -58,7 +58,7 @@ class ScoreTest extends TestCase {
 			]
 		);
 
-		add_filter( 'wire_desk/openrouter_api_key', static fn (): string => 'sk-or-test' );
+		add_filter( 'ai_post_triage/openrouter_api_key', static fn (): string => 'sk-or-test' );
 		add_filter(
 			'pre_http_request',
 			function () {

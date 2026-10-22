@@ -2,19 +2,19 @@
 /**
  * Scores a decision model's answers against the rubric.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Scoring;
+namespace JDeepD\AI_Post_Triage\Scoring;
 
-use JDeepD\Wire_Desk\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
 
 /**
  * Class - Scorer
  *
- * @phpstan-import-type Question from \JDeepD\Wire_Desk\Modules\Settings\Settings
+ * @phpstan-import-type Question from \JDeepD\AI_Post_Triage\Modules\Settings\Settings
  */
 final class Scorer {
 	/**
@@ -28,12 +28,12 @@ final class Scorer {
 	 * A question is met when its answer matches the expected answer. The score is the weighted
 	 * share of matches. A missed required question makes the post Low whatever its score.
 	 *
-	 * @param \JDeepD\Wire_Desk\Scoring\Rubric $rubric  Questions, weights and thresholds.
-	 * @param array<string, float>             $answers Probability of "yes" from 0 to 1, keyed by question ID.
+	 * @param \JDeepD\AI_Post_Triage\Scoring\Rubric $rubric  Questions, weights and thresholds.
+	 * @param array<string, float>                  $answers Probability of "yes" from 0 to 1, keyed by question ID.
 	 */
 	public static function score( Rubric $rubric, array $answers ): Score|\WP_Error {
 		if ( ! $rubric->questions ) {
-			return new \WP_Error( 'wire_desk_no_questions', __( 'Add at least one question to score posts.', 'wire-desk' ) );
+			return new \WP_Error( 'ai_post_triage_no_questions', __( 'Add at least one question to score posts.', 'ai-post-triage' ) );
 		}
 
 		$total    = 0;
@@ -44,9 +44,9 @@ final class Scorer {
 		foreach ( $rubric->questions as $question ) {
 			if ( ! isset( $answers[ $question['id'] ] ) ) {
 				return new \WP_Error(
-					'wire_desk_missing_answer',
+					'ai_post_triage_missing_answer',
 					/* translators: %s: question text. */
-					sprintf( __( 'No answer to: %s', 'wire-desk' ), $question['question'] )
+					sprintf( __( 'No answer to: %s', 'ai-post-triage' ), $question['question'] )
 				);
 			}
 
@@ -81,8 +81,8 @@ final class Scorer {
 	/**
 	 * The band a score falls in.
 	 *
-	 * @param \JDeepD\Wire_Desk\Scoring\Rubric $rubric Thresholds.
-	 * @param int                              $score  Score from 0 to 100.
+	 * @param \JDeepD\AI_Post_Triage\Scoring\Rubric $rubric Thresholds.
+	 * @param int                                   $score  Score from 0 to 100.
 	 */
 	public static function band( Rubric $rubric, int $score ): int {
 		if ( $score >= $rubric->high_threshold ) {

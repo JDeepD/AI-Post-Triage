@@ -1,5 +1,5 @@
 {
-	"name": "wire-desk",
+	"name": "ai-post-triage",
 	"private": true,
 	"engines": {
 		"node": ">=24.15.0",
@@ -14,7 +14,7 @@
 		"vendor",
 		"README.md",
 		"readme.txt",
-		"wire-desk.php",
+		"ai-post-triage.php",
 		"uninstall.php"
 	],
 	"scripts": {

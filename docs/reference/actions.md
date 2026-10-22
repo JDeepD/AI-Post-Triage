@@ -4,16 +4,16 @@
 
 - [Action Hooks](#action-hooks)
   - [TOC](#toc)
-  - [`wire_desk/get_template_part_$slug`](#wire_deskget_template_part_slug)
-  - [`wire_desk/scored`](#wire_deskscored)
-  - [`wire_desk/post_action`](#wire_deskpost_action)
+  - [`ai_post_triage/get_template_part_$slug`](#ai_post_triageget_template_part_slug)
+  - [`ai_post_triage/scored`](#ai_post_triagescored)
+  - [`ai_post_triage/post_action`](#ai_post_triagepost_action)
 
-## `wire_desk/get_template_part_$slug`
+## `ai_post_triage/get_template_part_$slug`
 
 Fires when a template part is requested.
 
 ```php
-do_action( 'wire_desk/get_template_part_' . $slug, string $slug, ?string $name, array $args );
+do_action( 'ai_post_triage/get_template_part_' . $slug, string $slug, ?string $name, array $args );
 ```
 
 ### Parameters
@@ -22,24 +22,24 @@ do_action( 'wire_desk/get_template_part_' . $slug, string $slug, ?string $name, 
 - `$name (string|null)`: Optional. Template variation name.
 - `$args (array<string, mixed>)`: Optional. Data to pass to the template.
 
-## `wire_desk/scored`
+## `ai_post_triage/scored`
 
 Fires after the model scores a post and the score is saved. It doesn't fire when an unchanged post is skipped.
 
 ```php
-do_action( 'wire_desk/scored', JDeepD\Wire_Desk\Scoring\Result $result );
+do_action( 'ai_post_triage/scored', JDeepD\AI_Post_Triage\Scoring\Result $result );
 ```
 
 ### Parameters
 
 - `$result (Result)`: The post ID, its score, band and per-question answers, the model snapshot that answered, and the cost in US dollars.
 
-## `wire_desk/post_action`
+## `ai_post_triage/post_action`
 
 Fires after an editor publishes, dismisses, restores or re-scores a wire post, from the review queue, the REST API or the command line, or adds a post with "Add to review queue" on a post list. It doesn't fire when the action fails.
 
 ```php
-do_action( 'wire_desk/post_action', string $action, int $post_id, int $user_id );
+do_action( 'ai_post_triage/post_action', string $action, int $post_id, int $user_id );
 ```
 
 ### Parameters

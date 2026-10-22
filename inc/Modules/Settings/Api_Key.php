@@ -2,15 +2,15 @@
 /**
  * The OpenRouter API key saved on the settings screen.
  *
- * @package JDeepD\Wire_Desk\Modules\Settings
+ * @package JDeepD\AI_Post_Triage\Modules\Settings
  */
 
 declare(strict_types = 1);
 
-namespace JDeepD\Wire_Desk\Modules\Settings;
+namespace JDeepD\AI_Post_Triage\Modules\Settings;
 
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
-use JDeepD\Wire_Desk\Framework\Encryptor;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Framework\Encryptor;
 
 /**
  * Class - Api_Key
@@ -19,7 +19,7 @@ final class Api_Key implements Registrable {
 	/**
 	 * Option holding the encrypted key.
 	 */
-	public const OPTION = 'wire_desk_openrouter_api_key';
+	public const OPTION = 'ai_post_triage_openrouter_api_key';
 
 	/**
 	 * Longest key accepted.
@@ -42,7 +42,7 @@ final class Api_Key implements Registrable {
 			self::OPTION,
 			[
 				'type'              => 'string',
-				'label'             => __( 'OpenRouter API key', 'wire-desk' ),
+				'label'             => __( 'OpenRouter API key', 'ai-post-triage' ),
 				'default'           => '',
 				'sanitize_callback' => [ self::class, 'sanitize' ],
 				'show_in_rest'      => false,
@@ -79,7 +79,7 @@ final class Api_Key implements Registrable {
 		}
 
 		if ( strlen( $key ) > self::MAX_LENGTH || preg_match( '/\s/', $key ) ) {
-			add_settings_error( self::OPTION, 'invalid_key', __( 'The OpenRouter API key is not valid, so it was not saved.', 'wire-desk' ) );
+			add_settings_error( self::OPTION, 'invalid_key', __( 'The OpenRouter API key is not valid, so it was not saved.', 'ai-post-triage' ) );
 
 			return self::stored();
 		}
@@ -87,7 +87,7 @@ final class Api_Key implements Registrable {
 		$encrypted = Encryptor::encrypt( $key );
 
 		if ( false === $encrypted ) {
-			add_settings_error( self::OPTION, 'encrypt_failed', __( 'The OpenRouter API key could not be encrypted, so it was not saved.', 'wire-desk' ) );
+			add_settings_error( self::OPTION, 'encrypt_failed', __( 'The OpenRouter API key could not be encrypted, so it was not saved.', 'ai-post-triage' ) );
 
 			return self::stored();
 		}

@@ -2,20 +2,20 @@
 /**
  * Integration tests for Maintenance.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Jobs
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Jobs
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Jobs;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Jobs;
 
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Jobs\Maintenance;
-use JDeepD\Wire_Desk\Jobs\Queue;
-use JDeepD\Wire_Desk\Scoring\Result;
-use JDeepD\Wire_Desk\Scoring\Score;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Jobs\Maintenance;
+use JDeepD\AI_Post_Triage\Jobs\Queue;
+use JDeepD\AI_Post_Triage\Scoring\Result;
+use JDeepD\AI_Post_Triage\Scoring\Score;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -26,7 +26,7 @@ class MaintenanceTest extends TestCase {
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
@@ -48,11 +48,11 @@ class MaintenanceTest extends TestCase {
 
 		$this->assertSame( 10, has_action( 'admin_init', [ $maintenance, 'schedule' ] ) );
 		$this->assertSame( 10, has_action( Maintenance::HOOK, [ $maintenance, 'run' ] ) );
-		$this->assertSame( 10, has_action( 'wire_desk/scored', [ $maintenance, 'on_scored' ] ) );
+		$this->assertSame( 10, has_action( 'ai_post_triage/scored', [ $maintenance, 'on_scored' ] ) );
 	}
 
 	/**
-	 * Test that the daily run is scheduled once, in the Wire Desk group.
+	 * Test that the daily run is scheduled once, in the AI Post Triage group.
 	 */
 	public function test_schedule_once(): void {
 		$maintenance = new Maintenance();
@@ -81,13 +81,13 @@ class MaintenanceTest extends TestCase {
 	public function test_retention_days(): void {
 		$this->assertSame( Maintenance::DEFAULT_RETENTION_DAYS, Maintenance::retention_days() );
 
-		add_filter( 'wire_desk/details_retention_days', static fn (): int => 30 );
+		add_filter( 'ai_post_triage/details_retention_days', static fn (): int => 30 );
 		$this->assertSame( 30, Maintenance::retention_days() );
 
-		add_filter( 'wire_desk/details_retention_days', static fn (): int => -5, 11 );
+		add_filter( 'ai_post_triage/details_retention_days', static fn (): int => -5, 11 );
 		$this->assertSame( 0, Maintenance::retention_days() );
 
-		add_filter( 'wire_desk/details_retention_days', static fn (): string => 'soon', 12 );
+		add_filter( 'ai_post_triage/details_retention_days', static fn (): string => 'soon', 12 );
 		$this->assertSame( Maintenance::DEFAULT_RETENTION_DAYS, Maintenance::retention_days() );
 	}
 
@@ -116,7 +116,7 @@ class MaintenanceTest extends TestCase {
 	public function test_prune_keeps_answers_with_zero_retention(): void {
 		$old = $this->scored( 400 );
 
-		add_filter( 'wire_desk/details_retention_days', '__return_zero' );
+		add_filter( 'ai_post_triage/details_retention_days', '__return_zero' );
 
 		$this->assertSame( 0, ( new Maintenance( $this->repository ) )->prune()['details'] );
 		$this->assertNotNull( $this->repository->get( $old )?->details );

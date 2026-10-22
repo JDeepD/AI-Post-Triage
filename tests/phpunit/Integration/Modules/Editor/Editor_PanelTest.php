@@ -2,17 +2,17 @@
 /**
  * Integration tests for Editor_Panel.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Modules\Editor
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Modules\Editor
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Editor;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Modules\Editor;
 
-use JDeepD\Wire_Desk\Core\Assets;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Modules\Editor\Editor_Panel;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Core\Assets;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Modules\Editor\Editor_Panel;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -23,7 +23,7 @@ class Editor_PanelTest extends TestCase {
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
@@ -74,11 +74,11 @@ class Editor_PanelTest extends TestCase {
 		$this->assertTrue( wp_script_is( Assets::EDITOR_HANDLE, 'enqueued' ) );
 		$this->assertTrue( wp_style_is( Assets::EDITOR_HANDLE, 'enqueued' ) );
 		$this->assertTrue( $data['isWire'] ?? null );
-		$this->assertSame( admin_url( 'admin.php?page=wire-desk' ), $data['queueUrl'] ?? null );
+		$this->assertSame( admin_url( 'admin.php?page=ai-post-triage' ), $data['queueUrl'] ?? null );
 	}
 
 	/**
-	 * Test that the panel also loads for a post not yet in Wire Desk, so it can appear after a save.
+	 * Test that the panel also loads for a post not yet in AI Post Triage, so it can appear after a save.
 	 */
 	public function test_enqueue_for_other_post(): void {
 		$data = $this->enqueue_for( self::factory()->post->create() );
@@ -136,7 +136,7 @@ class Editor_PanelTest extends TestCase {
 
 		$inline = implode( '', (array) wp_scripts()->get_data( Assets::EDITOR_HANDLE, 'before' ) );
 
-		if ( ! preg_match( '/^window\.wireDeskEditor = (.*);$/s', $inline, $match ) ) {
+		if ( ! preg_match( '/^window\.aiPostTriageEditor = (.*);$/s', $inline, $match ) ) {
 			return [];
 		}
 

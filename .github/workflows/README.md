@@ -7,7 +7,7 @@ uses: rtCamp/plugin-skeleton-d/.github/workflows/reusable-build<-public>.yml@<co
 ```
 
 - The `*-public.yml` variants run on GitHub-hosted runners, for public repositories. For a private repository on self-hosted runners, drop the `-public` suffix: both variants of a pair accept the same inputs, so only the `uses:` line changes.
-- The plugin slug (`wire-desk`) is passed as `plugin-slug` to the PHPUnit and Playground workflows. The repository name must match it, since wp-env and the `package.json` scripts name the plugin directory after the checkout.
+- The plugin slug (`ai-post-triage`) is passed as `plugin-slug` to the PHPUnit and Playground workflows. The repository name must match it, since wp-env and the `package.json` scripts name the plugin directory after the checkout.
 - Secrets are not inherited, so they are passed explicitly with `secrets:`. See [Secrets](#secrets).
 
 ### Versioning

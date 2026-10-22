@@ -2,14 +2,14 @@
 /**
  * The main plugin file.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk;
+namespace JDeepD\AI_Post_Triage;
 
-use JDeepD\Wire_Desk\Framework\Contracts\Traits\Singleton;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Traits\Singleton;
 
 /**
  * Class - Main
@@ -21,7 +21,7 @@ final class Main {
 	 * Registrable classes are entrypoints that "hook" into WordPress.
 	 * They should implement the Registrable interface.
 	 *
-	 * @var class-string<\JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable>[]
+	 * @var class-string<\JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable>[]
 	 */
 	private const REGISTRABLE_CLASSES = [
 		Core\Schema::class,
@@ -66,8 +66,8 @@ final class Main {
 		$this->load();
 
 		// Register activation and deactivation hooks.
-		register_activation_hook( WIRE_DESK_FILE, [ self::class, 'activate' ] );
-		register_deactivation_hook( WIRE_DESK_FILE, [ self::class, 'deactivate' ] );
+		register_activation_hook( AI_POST_TRIAGE_FILE, [ self::class, 'activate' ] );
+		register_deactivation_hook( AI_POST_TRIAGE_FILE, [ self::class, 'deactivate' ] );
 
 		// Do other stuff here like dep-checking, telemetry, etc.
 	}
@@ -94,7 +94,7 @@ final class Main {
 		// For complicated stuff, you might want to use a Core\Activation class.
 
 		// For simple stuff, you can do it here.
-		update_option( 'wire_desk_version', WIRE_DESK_VERSION );
+		update_option( 'ai_post_triage_version', AI_POST_TRIAGE_VERSION );
 
 		Core\Schema::install();
 	}

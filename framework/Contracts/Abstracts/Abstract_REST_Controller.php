@@ -4,14 +4,14 @@
  *
  * Includes the shared namespace, version and hook registration.
  *
- * @package JDeepD\Wire_Desk\Framework\Contracts\Abstracts
+ * @package JDeepD\AI_Post_Triage\Framework\Contracts\Abstracts
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Framework\Contracts\Abstracts;
+namespace JDeepD\AI_Post_Triage\Framework\Contracts\Abstracts;
 
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
 use WP_REST_Controller;
 
 /**
@@ -25,7 +25,7 @@ abstract class Abstract_REST_Controller extends WP_REST_Controller implements Re
 	 *
 	 * @var non-falsy-string
 	 */
-	protected $namespace = 'wire-desk/v';
+	protected $namespace = 'ai-post-triage/v';
 
 	/**
 	 * Version number for the REST API routes.

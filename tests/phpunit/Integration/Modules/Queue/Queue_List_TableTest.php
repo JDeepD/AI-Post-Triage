@@ -2,20 +2,20 @@
 /**
  * Integration tests for Queue_List_Table.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Modules\Queue
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Modules\Queue
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Queue;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Modules\Queue;
 
-use JDeepD\Wire_Desk\Core\Schema;
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Editorial\Post_Actions;
-use JDeepD\Wire_Desk\Modules\Queue\Queue_List_Table;
-use JDeepD\Wire_Desk\Modules\Queue\Queue_Screen;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Core\Schema;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Editorial\Post_Actions;
+use JDeepD\AI_Post_Triage\Modules\Queue\Queue_List_Table;
+use JDeepD\AI_Post_Triage\Modules\Queue\Queue_Screen;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -26,7 +26,7 @@ class Queue_List_TableTest extends TestCase {
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
@@ -154,7 +154,7 @@ class Queue_List_TableTest extends TestCase {
 		update_user_option( get_current_user_id(), Queue_Screen::PER_PAGE_OPTION, 2 );
 
 		$this->assertMatchesRegularExpression(
-			'#page=wire-desk&(amp;|\#038;)view=dismissed&(amp;|\#038;)band=high&(amp;|\#038;)before=\d+#',
+			'#page=ai-post-triage&(amp;|\#038;)view=dismissed&(amp;|\#038;)band=high&(amp;|\#038;)before=\d+#',
 			$this->render(
 				$this->table(
 					[
@@ -177,7 +177,7 @@ class Queue_List_TableTest extends TestCase {
 		$this->table( [ 'view' => 'failed' ] )->views();
 		$views = (string) ob_get_clean();
 
-		$this->assertMatchesRegularExpression( '#page=wire-desk"[^>]*>Needs review <span class="count">\(2\)</span>#', $views );
+		$this->assertMatchesRegularExpression( '#page=ai-post-triage"[^>]*>Needs review <span class="count">\(2\)</span>#', $views );
 		$this->assertMatchesRegularExpression( '#view=failed" class="current" aria-current="page">Failed <span class="count">\(1\)</span>#', $views );
 		$this->assertMatchesRegularExpression( '#view=all"[^>]*>All <span class="count">\(3\)</span>#', $views );
 	}
@@ -213,9 +213,9 @@ class Queue_List_TableTest extends TestCase {
 
 		$this->assertMatchesRegularExpression( '#<a class="row-title" href="[^"]*post=' . $post_id . '&(amp;|\#038;)action=edit">Quake hits coast</a>#', $html );
 		$this->assertStringContainsString( 'Draft', $html );
-		$this->assertStringContainsString( '<span class="wire-desk-band wire-desk-band-high">High</span> <span class="wire-desk-score">87</span>', $html );
+		$this->assertStringContainsString( '<span class="ai-post-triage-band ai-post-triage-band-high">High</span> <span class="ai-post-triage-score">87</span>', $html );
 		$this->assertStringContainsString( 'Needs review', $html );
-		$this->assertStringContainsString( 'typesafe/jev-1.13<br /><span class="wire-desk-muted">$0.0012</span>', $html );
+		$this->assertStringContainsString( 'typesafe/jev-1.13<br /><span class="ai-post-triage-muted">$0.0012</span>', $html );
 		$this->assertStringContainsString( 'March 5, 2024 at 2:30 pm', $html );
 		$this->assertMatchesRegularExpression( '#Scored \\d+ seconds? ago#', $html );
 	}
@@ -229,9 +229,9 @@ class Queue_List_TableTest extends TestCase {
 
 		$html = $this->render( $this->table( [ 'view' => 'failed' ] ) );
 
-		$this->assertStringContainsString( 'Scoring failed<br /><span class="wire-desk-error">The model is overloaded.</span>', $html );
-		$this->assertStringContainsString( '<span class="wire-desk-band wire-desk-band-not-scored">Not scored</span>', $html );
-		$this->assertStringNotContainsString( 'wire-desk-score', $html );
+		$this->assertStringContainsString( 'Scoring failed<br /><span class="ai-post-triage-error">The model is overloaded.</span>', $html );
+		$this->assertStringContainsString( '<span class="ai-post-triage-band ai-post-triage-band-not-scored">Not scored</span>', $html );
+		$this->assertStringNotContainsString( 'ai-post-triage-score', $html );
 	}
 
 	/**
@@ -258,7 +258,7 @@ class Queue_List_TableTest extends TestCase {
 		);
 
 		add_role(
-			'wire_desk_reviewer',
+			'ai_post_triage_reviewer',
 			'Reviewer',
 			[
 				'read'              => true,
@@ -266,14 +266,14 @@ class Queue_List_TableTest extends TestCase {
 				'edit_others_posts' => true,
 			]
 		);
-		wp_set_current_user( self::factory()->user->create( [ 'role' => 'wire_desk_reviewer' ] ) );
+		wp_set_current_user( self::factory()->user->create( [ 'role' => 'ai_post_triage_reviewer' ] ) );
 		update_user_option( get_current_user_id(), Queue_Screen::PER_PAGE_OPTION, 2 );
 
 		$this->assertSame( [ $three ], $this->ids( $this->table() ) );
 		$this->assertSame( [ $one ], $this->ids( $this->table( [ 'before' => $two ] ) ) );
 		$this->assertStringContainsString( 'before=' . $two, $this->render( $this->table() ) );
 
-		remove_role( 'wire_desk_reviewer' );
+		remove_role( 'ai_post_triage_reviewer' );
 	}
 
 	/**
@@ -350,7 +350,7 @@ class Queue_List_TableTest extends TestCase {
 		$query = [];
 		wp_parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $query );
 
-		$this->assertSame( 'wire-desk', $query['page'] ?? null );
+		$this->assertSame( 'ai-post-triage', $query['page'] ?? null );
 		$this->assertSame( 'medium', $query['band'] ?? null );
 		$this->assertSame( (string) $post_id, $query['post'] ?? null );
 		$this->assertSame( 1, wp_verify_nonce( (string) ( $query['_wpnonce'] ?? '' ), Queue_Screen::nonce_action( 'dismiss', $post_id ) ) );
@@ -378,7 +378,7 @@ class Queue_List_TableTest extends TestCase {
 	/**
 	 * Renders a table.
 	 *
-	 * @param \JDeepD\Wire_Desk\Modules\Queue\Queue_List_Table $table Table.
+	 * @param \JDeepD\AI_Post_Triage\Modules\Queue\Queue_List_Table $table Table.
 	 */
 	private function render( Queue_List_Table $table ): string {
 		ob_start();
@@ -389,7 +389,7 @@ class Queue_List_TableTest extends TestCase {
 	/**
 	 * Post IDs of a table's rows.
 	 *
-	 * @param \JDeepD\Wire_Desk\Modules\Queue\Queue_List_Table $table Table.
+	 * @param \JDeepD\AI_Post_Triage\Modules\Queue\Queue_List_Table $table Table.
 	 * @return int[]
 	 */
 	private function ids( Queue_List_Table $table ): array {

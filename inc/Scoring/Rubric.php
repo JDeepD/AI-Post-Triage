@@ -2,19 +2,19 @@
 /**
  * The questions, weights and thresholds a post is scored against.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Scoring;
+namespace JDeepD\AI_Post_Triage\Scoring;
 
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
 
 /**
  * Class - Rubric
  *
- * @phpstan-import-type Question from \JDeepD\Wire_Desk\Modules\Settings\Settings
+ * @phpstan-import-type Question from \JDeepD\AI_Post_Triage\Modules\Settings\Settings
  */
 final class Rubric {
 	/**

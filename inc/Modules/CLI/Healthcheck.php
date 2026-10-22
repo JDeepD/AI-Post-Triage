@@ -1,30 +1,30 @@
 <?php
 /**
- * Healthcheck CLI command for Wire Desk.
+ * Healthcheck CLI command for AI Post Triage.
  *
- * @package JDeepD\Wire_Desk\Modules\CLI
+ * @package JDeepD\AI_Post_Triage\Modules\CLI
  * @since 0.0.1
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Modules\CLI;
+namespace JDeepD\AI_Post_Triage\Modules\CLI;
 
 use ActionScheduler_Store;
-use JDeepD\Wire_Desk\Core\Schema;
-use JDeepD\Wire_Desk\Decisions\Model_Catalogue;
-use JDeepD\Wire_Desk\Decisions\OpenRouter_Client;
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\CLI_Command;
-use JDeepD\Wire_Desk\Jobs\Maintenance;
-use JDeepD\Wire_Desk\Jobs\Queue;
-use JDeepD\Wire_Desk\Jobs\Usage;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Core\Schema;
+use JDeepD\AI_Post_Triage\Decisions\Model_Catalogue;
+use JDeepD\AI_Post_Triage\Decisions\OpenRouter_Client;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\CLI_Command;
+use JDeepD\AI_Post_Triage\Jobs\Maintenance;
+use JDeepD\AI_Post_Triage\Jobs\Queue;
+use JDeepD\AI_Post_Triage\Jobs\Usage;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
 use WP_CLI;
 
 /**
  * Class - Healthcheck
  *
- * Implements the `wire-desk health-check` WP-CLI command.
+ * Implements the `ai-post-triage health-check` WP-CLI command.
  *
  * @phpstan-type Check array{status: 'pass'|'warn'|'fail', message: string}
  */
@@ -67,8 +67,8 @@ final class Healthcheck implements CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp wire-desk health-check
-	 *     wp wire-desk health-check --skip-remote
+	 *     wp ai-post-triage health-check
+	 *     wp ai-post-triage health-check --skip-remote
 	 *
 	 * @param array<int, mixed>    $args       Positional arguments.
 	 * @param array<string, mixed> $assoc_args Associative arguments.
@@ -81,7 +81,7 @@ final class Healthcheck implements CLI_Command {
 			self::FAIL => '✗ FAIL',
 		];
 
-		WP_CLI::log( 'Wire Desk Health Check' );
+		WP_CLI::log( 'AI Post Triage Health Check' );
 		WP_CLI::log( '==============================' );
 
 		foreach ( $checks as $name => $check ) {
@@ -111,8 +111,8 @@ final class Healthcheck implements CLI_Command {
 	 */
 	public static function checks( bool $remote = true ): array {
 		$checks = [
-			'plugin_active'     => self::result( class_exists( 'JDeepD\Wire_Desk\Main' ), 'Plugin classes are loaded.', 'Plugin classes are missing.' ),
-			'constants'         => self::result( defined( 'WIRE_DESK_PATH' ) && defined( 'WIRE_DESK_URL' ), 'Plugin constants are defined.', 'Plugin constants are missing.' ),
+			'plugin_active'     => self::result( class_exists( 'JDeepD\AI_Post_Triage\Main' ), 'Plugin classes are loaded.', 'Plugin classes are missing.' ),
+			'constants'         => self::result( defined( 'AI_POST_TRIAGE_PATH' ) && defined( 'AI_POST_TRIAGE_URL' ), 'Plugin constants are defined.', 'Plugin constants are missing.' ),
 			'composer_autoload' => self::result( class_exists( 'Composer\Autoload\ClassLoader' ), 'Composer autoloader is loaded.', 'Composer autoloader is missing.' ),
 			'table'             => self::result(
 				Schema::table_exists() && Schema::is_current(),
@@ -129,7 +129,7 @@ final class Healthcheck implements CLI_Command {
 						OpenRouter_Client::SOURCE_CONNECTOR => ' by the OpenRouter connector',
 					][ OpenRouter_Client::key_source() ] ?? ''
 				),
-				sprintf( 'No OpenRouter API key. Save one on the Wire Desk settings screen, define %s, or connect OpenRouter.', OpenRouter_Client::KEY_CONSTANT )
+				sprintf( 'No OpenRouter API key. Save one on the AI Post Triage settings screen, define %s, or connect OpenRouter.', OpenRouter_Client::KEY_CONSTANT )
 			),
 		];
 
@@ -158,8 +158,8 @@ final class Healthcheck implements CLI_Command {
 				: self::check( self::PASS, sprintf( '%d %s waiting to be scored.', $waiting, 1 === $waiting ? 'post is' : 'posts are' ) );
 
 			$checks['failed_jobs'] = $failed
-				? self::check( self::WARN, sprintf( '%s%d Wire Desk %s failed. See Tools > Scheduled Actions.', $failed >= 100 ? 'At least ' : '', $failed, 1 === $failed ? 'job' : 'jobs' ) )
-				: self::check( self::PASS, 'No Wire Desk jobs have failed.' );
+				? self::check( self::WARN, sprintf( '%s%d AI Post Triage %s failed. See Tools > Scheduled Actions.', $failed >= 100 ? 'At least ' : '', $failed, 1 === $failed ? 'job' : 'jobs' ) )
+				: self::check( self::PASS, 'No AI Post Triage jobs have failed.' );
 
 			$checks['prune_job'] = function_exists( 'as_has_scheduled_action' ) && as_has_scheduled_action( Maintenance::HOOK, [], Queue::GROUP )
 				? self::check( self::PASS, 'The daily prune is scheduled.' )
@@ -206,9 +206,9 @@ final class Healthcheck implements CLI_Command {
 	}
 
 	/**
-	 * Counts Wire Desk jobs, up to a limit.
+	 * Counts AI Post Triage jobs, up to a limit.
 	 *
-	 * @param string $hook   Hook, or empty for every Wire Desk job.
+	 * @param string $hook   Hook, or empty for every AI Post Triage job.
 	 * @param string $status Job status.
 	 * @param int    $limit  Highest count needed.
 	 */

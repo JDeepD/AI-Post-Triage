@@ -2,7 +2,7 @@
 /**
  * Checkbox settings field.
  *
- * @package wire-desk
+ * @package ai-post-triage
  */
 
 declare(strict_types = 1);

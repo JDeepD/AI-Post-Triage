@@ -2,21 +2,21 @@
 /**
  * Integration tests for Templates class.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Core
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Core
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Core;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Core;
 
-use JDeepD\Wire_Desk\Core\Templates;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Core\Templates;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * Class - TemplatesTest
  */
-#[CoversClass( \JDeepD\Wire_Desk\Core\Templates::class )]
+#[CoversClass( \JDeepD\AI_Post_Triage\Core\Templates::class )]
 class TemplatesTest extends TestCase {
 	/**
 	 * Reset the Templates singleton instance.
@@ -38,10 +38,10 @@ class TemplatesTest extends TestCase {
 	 */
 	protected function tearDown(): void {
 		$this->reset_templates_instance();
-		remove_all_filters( 'wire_desk/template_args' );
-		remove_all_filters( 'wire_desk/located_template' );
-		remove_all_filters( 'wire_desk/template_paths' );
-		remove_all_actions( 'wire_desk/get_template_part_test' );
+		remove_all_filters( 'ai_post_triage/template_args' );
+		remove_all_filters( 'ai_post_triage/located_template' );
+		remove_all_filters( 'ai_post_triage/template_paths' );
+		remove_all_actions( 'ai_post_triage/get_template_part_test' );
 
 		parent::tearDown();
 	}
@@ -66,7 +66,7 @@ class TemplatesTest extends TestCase {
 
 		$captured = [];
 		add_action(
-			'wire_desk/get_template_part_test',
+			'ai_post_triage/get_template_part_test',
 			static function ( string $slug, ?string $name, array $args ) use ( &$captured ): void {
 				$captured = [
 					'slug' => $slug,
@@ -99,7 +99,7 @@ class TemplatesTest extends TestCase {
 
 		// Add filter to locate our temp template.
 		add_filter(
-			'wire_desk/located_template',
+			'ai_post_triage/located_template',
 			static function ( $located, $templates ) use ( $template_path ) {
 				if ( in_array( 'test-template.php', $templates, true ) ) {
 					return $template_path;

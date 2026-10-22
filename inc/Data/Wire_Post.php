@@ -2,12 +2,12 @@
 /**
  * A row of the wire post table.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Data;
+namespace JDeepD\AI_Post_Triage\Data;
 
 /**
  * Class - Wire_Post
@@ -165,10 +165,10 @@ final class Wire_Post {
 	 */
 	public static function band_labels(): array {
 		return [
-			self::BAND_NONE   => __( 'Not scored', 'wire-desk' ),
-			self::BAND_LOW    => __( 'Low', 'wire-desk' ),
-			self::BAND_MEDIUM => __( 'Medium', 'wire-desk' ),
-			self::BAND_HIGH   => __( 'High', 'wire-desk' ),
+			self::BAND_NONE   => __( 'Not scored', 'ai-post-triage' ),
+			self::BAND_LOW    => __( 'Low', 'ai-post-triage' ),
+			self::BAND_MEDIUM => __( 'Medium', 'ai-post-triage' ),
+			self::BAND_HIGH   => __( 'High', 'ai-post-triage' ),
 		];
 	}
 
@@ -208,11 +208,11 @@ final class Wire_Post {
 	 */
 	public static function state_labels(): array {
 		return [
-			self::STATE_QUEUED    => __( 'Waiting to be scored', 'wire-desk' ),
-			self::STATE_SCORED    => __( 'Needs review', 'wire-desk' ),
-			self::STATE_FAILED    => __( 'Scoring failed', 'wire-desk' ),
-			self::STATE_DISMISSED => __( 'Dismissed', 'wire-desk' ),
-			self::STATE_PUBLISHED => __( 'Published', 'wire-desk' ),
+			self::STATE_QUEUED    => __( 'Waiting to be scored', 'ai-post-triage' ),
+			self::STATE_SCORED    => __( 'Needs review', 'ai-post-triage' ),
+			self::STATE_FAILED    => __( 'Scoring failed', 'ai-post-triage' ),
+			self::STATE_DISMISSED => __( 'Dismissed', 'ai-post-triage' ),
+			self::STATE_PUBLISHED => __( 'Published', 'ai-post-triage' ),
 		];
 	}
 

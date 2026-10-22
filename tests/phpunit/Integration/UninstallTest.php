@@ -2,18 +2,18 @@
 /**
  * Integration tests for uninstall.php.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration
+ * @package JDeepD\AI_Post_Triage\Tests\Integration
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration;
+namespace JDeepD\AI_Post_Triage\Tests\Integration;
 
-use JDeepD\Wire_Desk\Core\Schema;
-use JDeepD\Wire_Desk\Jobs\Maintenance;
-use JDeepD\Wire_Desk\Jobs\Queue;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Core\Schema;
+use JDeepD\AI_Post_Triage\Jobs\Maintenance;
+use JDeepD\AI_Post_Triage\Jobs\Queue;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversNothing;
 
 /**
@@ -98,15 +98,15 @@ class UninstallTest extends TestCase {
 	 * Runs the uninstaller.
 	 */
 	private function run_uninstall(): void {
-		if ( function_exists( 'JDeepD\Wire_Desk\run_uninstaller' ) ) {
-			\JDeepD\Wire_Desk\run_uninstaller();
+		if ( function_exists( 'JDeepD\AI_Post_Triage\run_uninstaller' ) ) {
+			\JDeepD\AI_Post_Triage\run_uninstaller();
 			return;
 		}
 
 		if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-			define( 'WP_UNINSTALL_PLUGIN', plugin_basename( WIRE_DESK_FILE ) );
+			define( 'WP_UNINSTALL_PLUGIN', plugin_basename( AI_POST_TRIAGE_FILE ) );
 		}
 
-		require WIRE_DESK_PATH . 'uninstall.php';
+		require AI_POST_TRIAGE_PATH . 'uninstall.php';
 	}
 }

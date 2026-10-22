@@ -2,18 +2,18 @@
 /**
  * Scores a post and saves the result.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Scoring;
+namespace JDeepD\AI_Post_Triage\Scoring;
 
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Decisions\Decision_Client;
-use JDeepD\Wire_Desk\Decisions\OpenRouter_Client;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Decisions\Decision_Client;
+use JDeepD\AI_Post_Triage\Decisions\OpenRouter_Client;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
 use WP_Post;
 
 /**
@@ -23,22 +23,22 @@ final class Post_Scorer {
 	/**
 	 * Client that answers the questions.
 	 *
-	 * @var \JDeepD\Wire_Desk\Decisions\Decision_Client
+	 * @var \JDeepD\AI_Post_Triage\Decisions\Decision_Client
 	 */
 	private Decision_Client $client;
 
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param \JDeepD\Wire_Desk\Decisions\Decision_Client|null $client     Client that answers the questions.
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post_Repository|null $repository Wire post table.
+	 * @param \JDeepD\AI_Post_Triage\Decisions\Decision_Client|null $client     Client that answers the questions.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository|null $repository Wire post table.
 	 */
 	public function __construct( ?Decision_Client $client = null, ?Wire_Post_Repository $repository = null ) {
 		$this->client     = $client ?? new OpenRouter_Client();
@@ -58,13 +58,13 @@ final class Post_Scorer {
 		$post = get_post( $post_id );
 
 		if ( ! $post instanceof WP_Post || wp_is_post_revision( $post ) || 'auto-draft' === $post->post_status ) {
-			return new \WP_Error( 'wire_desk_no_post', __( 'The post does not exist.', 'wire-desk' ) );
+			return new \WP_Error( 'ai_post_triage_no_post', __( 'The post does not exist.', 'ai-post-triage' ) );
 		}
 
 		$row = $this->repository->get( $post->ID );
 
 		if ( null === $row && ! $this->repository->add_queued( $post->ID, $post->post_date ) ) {
-			return new \WP_Error( 'wire_desk_db_error', __( 'The post could not be added to the Wire Desk table.', 'wire-desk' ) );
+			return new \WP_Error( 'ai_post_triage_db_error', __( 'The post could not be added to the AI Post Triage table.', 'ai-post-triage' ) );
 		}
 
 		$settings = Settings::get();
@@ -93,7 +93,7 @@ final class Post_Scorer {
 		}
 
 		if ( ! $this->repository->save_score( $post->ID, $score->band, $score->score, $decision->model, $hash, $decision->cost, $score->details ) ) {
-			return new \WP_Error( 'wire_desk_db_error', __( 'The score could not be saved.', 'wire-desk' ) );
+			return new \WP_Error( 'ai_post_triage_db_error', __( 'The score could not be saved.', 'ai-post-triage' ) );
 		}
 
 		$result = new Result( $post->ID, $score, $decision->model, $decision->cost, false );
@@ -101,9 +101,9 @@ final class Post_Scorer {
 		/**
 		 * Fires after a post is scored.
 		 *
-		 * @param \JDeepD\Wire_Desk\Scoring\Result $result The score, the model that answered and the cost.
+		 * @param \JDeepD\AI_Post_Triage\Scoring\Result $result The score, the model that answered and the cost.
 		 */
-		do_action( 'wire_desk/scored', $result );
+		do_action( 'ai_post_triage/scored', $result );
 
 		return $result;
 	}
@@ -111,10 +111,10 @@ final class Post_Scorer {
 	/**
 	 * Scores a post's saved answers against the current rubric, without asking the model.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post $row    The post's row.
-	 * @param \JDeepD\Wire_Desk\Scoring\Rubric $rubric Current rubric.
-	 * @param string                           $hash   Input fingerprint.
-	 * @return ?\JDeepD\Wire_Desk\Scoring\Result Null when the saved answers can't be scored.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post $row    The post's row.
+	 * @param \JDeepD\AI_Post_Triage\Scoring\Rubric $rubric Current rubric.
+	 * @param string                                $hash   Input fingerprint.
+	 * @return ?\JDeepD\AI_Post_Triage\Scoring\Result Null when the saved answers can't be scored.
 	 */
 	private function rescore( Wire_Post $row, Rubric $rubric, string $hash ): ?Result {
 		$answers = [];

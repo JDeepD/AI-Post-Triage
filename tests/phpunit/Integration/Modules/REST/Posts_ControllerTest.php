@@ -2,17 +2,17 @@
 /**
  * Integration tests for Posts_Controller.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Modules\REST
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Modules\REST
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Modules\REST;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Modules\REST;
 
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Modules\REST\Posts_Controller;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Modules\REST\Posts_Controller;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use WP_REST_Request;
@@ -26,17 +26,17 @@ class Posts_ControllerTest extends TestCase {
 	/**
 	 * Collection route.
 	 */
-	private const ROUTE = '/wire-desk/v1/posts';
+	private const ROUTE = '/ai-post-triage/v1/posts';
 
 	/**
 	 * Role that can review wire posts but not publish them or edit private posts.
 	 */
-	private const REVIEWER = 'wire_desk_test_reviewer';
+	private const REVIEWER = 'ai_post_triage_test_reviewer';
 
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
@@ -88,7 +88,7 @@ class Posts_ControllerTest extends TestCase {
 		$schema = ( new Posts_Controller() )->get_public_item_schema();
 
 		$this->assertIsCallable( rest_get_server()->get_route_options( self::ROUTE )['schema'] ?? null );
-		$this->assertSame( 'wire-desk-post', $schema['title'] ?? null );
+		$this->assertSame( 'ai-post-triage-post', $schema['title'] ?? null );
 		$this->assertSame(
 			[ 'id', 'title', 'post_status', 'edit_link', 'date', 'state', 'band', 'score', 'model', 'cost', 'scored_at', 'error', 'attempts', 'answers', 'actions' ],
 			array_keys( $schema['properties'] ?? [] )
@@ -284,7 +284,7 @@ class Posts_ControllerTest extends TestCase {
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( $post_id, $response->get_data()['id'] );
-		$this->assertSame( rest_url( 'wire-desk/v1/posts/' . $post_id ), $links['self'][0]['href'] ?? null );
+		$this->assertSame( rest_url( 'ai-post-triage/v1/posts/' . $post_id ), $links['self'][0]['href'] ?? null );
 		$this->assertSame( rest_url( 'wp/v2/posts/' . $post_id ), $links['https://api.w.org/post'][0]['href'] ?? null );
 	}
 
@@ -378,7 +378,7 @@ class Posts_ControllerTest extends TestCase {
 		$restore = $this->request( 'POST', self::ROUTE . '/' . $post_id . '/restore' );
 
 		$this->assertSame( 409, $restore->get_status() );
-		$this->assertSame( 'wire_desk_not_dismissed', $restore->get_data()['code'] );
+		$this->assertSame( 'ai_post_triage_not_dismissed', $restore->get_data()['code'] );
 
 		$this->assertSame( 404, $this->request( 'POST', self::ROUTE . '/999999/dismiss' )->get_status() );
 		$this->assertSame( 404, $this->request( 'POST', self::ROUTE . '/' . $post_id . '/delete' )->get_status() );
@@ -388,7 +388,7 @@ class Posts_ControllerTest extends TestCase {
 		$publish = $this->request( 'POST', self::ROUTE . '/' . $post_id . '/publish' );
 
 		$this->assertSame( 403, $publish->get_status() );
-		$this->assertSame( 'wire_desk_forbidden', $publish->get_data()['code'] );
+		$this->assertSame( 'ai_post_triage_forbidden', $publish->get_data()['code'] );
 
 		wp_set_current_user( 0 );
 

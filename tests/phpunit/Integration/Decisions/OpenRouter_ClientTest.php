@@ -2,18 +2,18 @@
 /**
  * Integration tests for OpenRouter_Client.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Decisions
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Decisions
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Decisions;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Decisions;
 
-use JDeepD\Wire_Desk\Decisions\Decision;
-use JDeepD\Wire_Desk\Decisions\Decision_Client;
-use JDeepD\Wire_Desk\Decisions\OpenRouter_Client;
-use JDeepD\Wire_Desk\Modules\Settings\Api_Key;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Decisions\Decision;
+use JDeepD\AI_Post_Triage\Decisions\Decision_Client;
+use JDeepD\AI_Post_Triage\Decisions\OpenRouter_Client;
+use JDeepD\AI_Post_Triage\Modules\Settings\Api_Key;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
@@ -29,12 +29,12 @@ class OpenRouter_ClientTest extends TestCase {
 	/**
 	 * Option holding the test connector's key.
 	 */
-	private const CONNECTOR_OPTION = 'wire_desk_test_openrouter_key';
+	private const CONNECTOR_OPTION = 'ai_post_triage_test_openrouter_key';
 
 	/**
 	 * Environment variable holding the test connector's key.
 	 */
-	private const CONNECTOR_ENV = 'WIRE_DESK_TEST_OPENROUTER_KEY';
+	private const CONNECTOR_ENV = 'AI_POST_TRIAGE_TEST_OPENROUTER_KEY';
 
 	/**
 	 * Questions asked in each test.
@@ -80,7 +80,7 @@ class OpenRouter_ClientTest extends TestCase {
 
 		$this->requests = [];
 
-		add_filter( 'wire_desk/openrouter_api_key', [ $this, 'filter_key' ] );
+		add_filter( 'ai_post_triage/openrouter_api_key', [ $this, 'filter_key' ] );
 	}
 
 	/**
@@ -195,7 +195,7 @@ class OpenRouter_ClientTest extends TestCase {
 	 * Test that no request is sent without an API key.
 	 */
 	public function test_decide_requires_key(): void {
-		remove_filter( 'wire_desk/openrouter_api_key', [ $this, 'filter_key' ] );
+		remove_filter( 'ai_post_triage/openrouter_api_key', [ $this, 'filter_key' ] );
 		$this->respond( 200, 'success' );
 
 		$result = ( new OpenRouter_Client() )->decide( [ 'headline' => 'x' ], self::QUESTIONS, 'typesafe/jev-1.13' );
@@ -408,7 +408,7 @@ class OpenRouter_ClientTest extends TestCase {
 	 * Test that there is no key when nothing is configured.
 	 */
 	public function test_api_key_is_empty_without_configuration(): void {
-		remove_filter( 'wire_desk/openrouter_api_key', [ $this, 'filter_key' ] );
+		remove_filter( 'ai_post_triage/openrouter_api_key', [ $this, 'filter_key' ] );
 		$this->register_connector();
 
 		$this->assertSame( '', OpenRouter_Client::api_key() );
@@ -418,7 +418,7 @@ class OpenRouter_ClientTest extends TestCase {
 	 * Test that the key saved for the OpenRouter connector is used.
 	 */
 	public function test_api_key_reads_connector_option(): void {
-		remove_filter( 'wire_desk/openrouter_api_key', [ $this, 'filter_key' ] );
+		remove_filter( 'ai_post_triage/openrouter_api_key', [ $this, 'filter_key' ] );
 		$this->register_connector();
 		update_option( self::CONNECTOR_OPTION, 'sk-or-option' );
 
@@ -429,7 +429,7 @@ class OpenRouter_ClientTest extends TestCase {
 	 * Test that the connector's environment variable wins over its option.
 	 */
 	public function test_api_key_prefers_connector_env(): void {
-		remove_filter( 'wire_desk/openrouter_api_key', [ $this, 'filter_key' ] );
+		remove_filter( 'ai_post_triage/openrouter_api_key', [ $this, 'filter_key' ] );
 		$this->register_connector();
 		update_option( self::CONNECTOR_OPTION, 'sk-or-option' );
 		putenv( self::CONNECTOR_ENV . '=sk-or-env' ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.runtime_configuration_putenv -- Test setup.
@@ -441,7 +441,7 @@ class OpenRouter_ClientTest extends TestCase {
 	 * Test that the key saved on the settings screen is used, ahead of the connector.
 	 */
 	public function test_api_key_prefers_saved_key_over_connector(): void {
-		remove_filter( 'wire_desk/openrouter_api_key', [ $this, 'filter_key' ] );
+		remove_filter( 'ai_post_triage/openrouter_api_key', [ $this, 'filter_key' ] );
 		$this->register_connector();
 		update_option( self::CONNECTOR_OPTION, 'sk-or-option' );
 
@@ -461,7 +461,7 @@ class OpenRouter_ClientTest extends TestCase {
 	 * Test that there is no source without a key.
 	 */
 	public function test_key_source_without_key(): void {
-		remove_filter( 'wire_desk/openrouter_api_key', [ $this, 'filter_key' ] );
+		remove_filter( 'ai_post_triage/openrouter_api_key', [ $this, 'filter_key' ] );
 
 		$this->assertSame( '', OpenRouter_Client::key_source() );
 	}
@@ -472,7 +472,7 @@ class OpenRouter_ClientTest extends TestCase {
 	#[RunInSeparateProcess]
 	#[PreserveGlobalState( false )]
 	public function test_api_key_prefers_constant(): void {
-		remove_filter( 'wire_desk/openrouter_api_key', [ $this, 'filter_key' ] );
+		remove_filter( 'ai_post_triage/openrouter_api_key', [ $this, 'filter_key' ] );
 		Api_Key::save( 'sk-or-saved' );
 		define( OpenRouter_Client::KEY_CONSTANT, ' sk-or-constant ' );
 

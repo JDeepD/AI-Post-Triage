@@ -2,15 +2,15 @@
 /**
  * Handles efficient plugin template loading (and overloading).
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Core;
+namespace JDeepD\AI_Post_Triage\Core;
 
-use JDeepD\Wire_Desk\Framework\Contracts\Traits\Singleton;
-use JDeepD\Wire_Desk\Framework\TemplateLoaderTrait;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Traits\Singleton;
+use JDeepD\AI_Post_Triage\Framework\TemplateLoaderTrait;
 
 /**
  * Class Templates
@@ -24,7 +24,7 @@ final class Templates {
 	/**
 	 * The hook prefix for all filters and actions in this trait.
 	 */
-	private const HOOK_PREFIX = 'wire_desk';
+	private const HOOK_PREFIX = 'ai_post_triage';
 
 	/**
 	 * The relative template dir.
@@ -34,7 +34,7 @@ final class Templates {
 	/**
 	 * The theme dir for template overrides
 	 */
-	private const TEMPLATE_THEME_DIR = 'wire-desk';
+	private const TEMPLATE_THEME_DIR = 'ai-post-triage';
 
 	/**
 	 * {@inheritDoc}
@@ -42,7 +42,7 @@ final class Templates {
 	protected function __construct() {
 		$this->hook_prefix        = self::HOOK_PREFIX;
 		$this->template_theme_dir = self::TEMPLATE_THEME_DIR;
-		$this->template_dir       = WIRE_DESK_PATH . self::TEMPLATE_DIR;
+		$this->template_dir       = AI_POST_TRIAGE_PATH . self::TEMPLATE_DIR;
 	}
 
 	/**

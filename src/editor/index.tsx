@@ -56,7 +56,7 @@ type ApiError = {
 
 declare global {
 	interface Window {
-		wireDeskEditor?: EditorData;
+		aiPostTriageEditor?: EditorData;
 	}
 }
 
@@ -69,13 +69,13 @@ const NOT_FOUND = 'rest_post_invalid_id';
  */
 const errorMessage = ( error: unknown ): string =>
 	( error as ApiError )?.message ||
-	__( 'Wire Desk could not be reached.', 'wire-desk' );
+	__( 'AI Post Triage could not be reached.', 'ai-post-triage' );
 
 /**
- * The Wire Desk panel in the post sidebar.
+ * The AI Post Triage panel in the post sidebar.
  */
-const WireDeskPanel = () => {
-	const data = window.wireDeskEditor;
+const AIPostTriagePanel = () => {
+	const data = window.aiPostTriageEditor;
 	const { postId, isSaving } = useSelect( ( select ) => {
 		const editor = select( editorStore );
 
@@ -100,7 +100,7 @@ const WireDeskPanel = () => {
 		try {
 			setItem(
 				await apiFetch< WirePost >( {
-					path: `/wire-desk/v1/posts/${ postId }`,
+					path: `/ai-post-triage/v1/posts/${ postId }`,
 				} )
 			);
 			setError( '' );
@@ -134,12 +134,15 @@ const WireDeskPanel = () => {
 		try {
 			setItem(
 				await apiFetch< WirePost >( {
-					path: `/wire-desk/v1/posts/${ postId }/rescore`,
+					path: `/ai-post-triage/v1/posts/${ postId }/rescore`,
 					method: 'POST',
 				} )
 			);
 			void createSuccessNotice(
-				__( 'This post will be scored again shortly.', 'wire-desk' ),
+				__(
+					'This post will be scored again shortly.',
+					'ai-post-triage'
+				),
 				{ type: 'snackbar' }
 			);
 		} catch ( thrown ) {
@@ -157,36 +160,38 @@ const WireDeskPanel = () => {
 
 	return (
 		<PluginDocumentSettingPanel
-			name="wire-desk"
-			title={ __( 'Wire Desk', 'wire-desk' ) }
-			className="wire-desk-panel"
+			name="ai-post-triage"
+			title={ __( 'AI Post Triage', 'ai-post-triage' ) }
+			className="ai-post-triage-panel"
 		>
-			{ error && <p className="wire-desk-panel-error">{ error }</p> }
+			{ error && <p className="ai-post-triage-panel-error">{ error }</p> }
 
 			{ item && (
 				<>
-					<p className="wire-desk-panel-summary">
+					<p className="ai-post-triage-panel-summary">
 						<span
-							className={ `wire-desk-band wire-desk-band-${ item.band }` }
+							className={ `ai-post-triage-band ai-post-triage-band-${ item.band }` }
 						>
 							{ data.bands[ item.band ] ?? item.band }
 						</span>
 						{ null !== item.score && (
-							<span className="wire-desk-score">
+							<span className="ai-post-triage-score">
 								{ item.score }
 							</span>
 						) }
-						<span className="wire-desk-panel-state">
+						<span className="ai-post-triage-panel-state">
 							{ data.states[ item.state ] ?? item.state }
 						</span>
 					</p>
 
 					{ item.error && 'failed' === item.state && (
-						<p className="wire-desk-panel-error">{ item.error }</p>
+						<p className="ai-post-triage-panel-error">
+							{ item.error }
+						</p>
 					) }
 
 					{ item.answers && item.answers.length > 0 && (
-						<ul className="wire-desk-panel-answers">
+						<ul className="ai-post-triage-panel-answers">
 							{ item.answers.map( ( answer ) => (
 								<li
 									key={ answer.id }
@@ -195,28 +200,34 @@ const WireDeskPanel = () => {
 									}
 								>
 									<span
-										className="wire-desk-panel-mark"
+										className="ai-post-triage-panel-mark"
 										aria-hidden="true"
 									>
 										{ answer.met ? '✓' : '✗' }
 									</span>
 									<span className="screen-reader-text">
 										{ answer.met
-											? __( 'Met:', 'wire-desk' )
-											: __( 'Not met:', 'wire-desk' ) }
+											? __( 'Met:', 'ai-post-triage' )
+											: __(
+													'Not met:',
+													'ai-post-triage'
+											  ) }
 									</span>
-									<span className="wire-desk-panel-question">
+									<span className="ai-post-triage-panel-question">
 										{ answer.question }
-										<span className="wire-desk-panel-meta">
+										<span className="ai-post-triage-panel-meta">
 											{ sprintf(
 												/* translators: %d: the model's probability of yes, as a percentage. */
-												__( '%d%% yes', 'wire-desk' ),
+												__(
+													'%d%% yes',
+													'ai-post-triage'
+												),
 												Math.round( answer.yes * 100 )
 											) }
 											{ answer.required &&
 												` · ${ __(
 													'Required',
-													'wire-desk'
+													'ai-post-triage'
 												) }` }
 										</span>
 									</span>
@@ -226,17 +237,17 @@ const WireDeskPanel = () => {
 					) }
 
 					{ item.scored_at && (
-						<p className="wire-desk-panel-meta">
+						<p className="ai-post-triage-panel-meta">
 							{ sprintf(
 								/* translators: 1: model ID, 2: time since the post was scored, such as 5 minutes ago. */
-								__( 'Scored by %1$s %2$s', 'wire-desk' ),
+								__( 'Scored by %1$s %2$s', 'ai-post-triage' ),
 								item.model,
 								humanTimeDiff( `${ item.scored_at }Z` )
 							) }
 						</p>
 					) }
 
-					<div className="wire-desk-panel-actions">
+					<div className="ai-post-triage-panel-actions">
 						{ item.actions.includes( 'rescore' ) && (
 							<Button
 								variant="secondary"
@@ -246,11 +257,11 @@ const WireDeskPanel = () => {
 								accessibleWhenDisabled
 								onClick={ () => void rescore() }
 							>
-								{ __( 'Re-score', 'wire-desk' ) }
+								{ __( 'Re-score', 'ai-post-triage' ) }
 							</Button>
 						) }
 						<ExternalLink href={ data.queueUrl }>
-							{ __( 'Review queue', 'wire-desk' ) }
+							{ __( 'Review queue', 'ai-post-triage' ) }
 						</ExternalLink>
 					</div>
 				</>
@@ -259,4 +270,4 @@ const WireDeskPanel = () => {
 	);
 };
 
-registerPlugin( 'wire-desk', { render: WireDeskPanel } );
+registerPlugin( 'ai-post-triage', { render: AIPostTriagePanel } );

@@ -2,15 +2,15 @@
 /**
  * Integration tests for AutoloaderTrait.
  *
- * @package JDeepD\Wire_Desk\Tests
+ * @package JDeepD\AI_Post_Triage\Tests
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Framework;
+namespace JDeepD\AI_Post_Triage\Tests\Framework;
 
-use JDeepD\Wire_Desk\Framework\AutoloaderTrait;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Framework\AutoloaderTrait;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -44,7 +44,7 @@ final class AutoloaderTraitTestDouble {
 /**
  * Class - AutoloaderTraitTest
  */
-#[CoversClass( \JDeepD\Wire_Desk\Framework\AutoloaderTrait::class )]
+#[CoversClass( \JDeepD\AI_Post_Triage\Framework\AutoloaderTrait::class )]
 class AutoloaderTraitTest extends TestCase {
 	/**
 	 * {@inheritDoc}

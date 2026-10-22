@@ -2,15 +2,15 @@
 /**
  * Enqueue plugin assets, like styles, scripts, and blocks.
  *
- * @package JDeepD\Wire_Desk\Core
+ * @package JDeepD\AI_Post_Triage\Core
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Core;
+namespace JDeepD\AI_Post_Triage\Core;
 
-use JDeepD\Wire_Desk\Framework\AssetLoaderTrait;
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Framework\AssetLoaderTrait;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
 
 /**
  * Class Assets
@@ -21,7 +21,7 @@ final class Assets implements Registrable {
 	/**
 	 * Prefix for all asset handles.
 	 */
-	private const PREFIX = 'wire-desk-';
+	private const PREFIX = 'ai-post-triage-';
 
 	/**
 	 * Asset handles
@@ -41,8 +41,8 @@ final class Assets implements Registrable {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->plugin_dir = (string) WIRE_DESK_PATH;
-		$this->plugin_url = (string) WIRE_DESK_URL;
+		$this->plugin_dir = (string) AI_POST_TRIAGE_PATH;
+		$this->plugin_url = (string) AI_POST_TRIAGE_URL;
 		$this->assets_dir = 'build';
 	}
 
@@ -67,7 +67,7 @@ final class Assets implements Registrable {
 		$this->register_script( self::ADMIN_HANDLE, 'admin-ui' );
 		$this->register_style( self::ADMIN_HANDLE, 'admin-ui', [ 'common' ] );
 
-		wp_set_script_translations( self::ADMIN_HANDLE, 'wire-desk' );
+		wp_set_script_translations( self::ADMIN_HANDLE, 'ai-post-triage' );
 	}
 
 	/**
@@ -77,7 +77,7 @@ final class Assets implements Registrable {
 		$this->register_script( self::EDITOR_HANDLE, 'editor' );
 		$this->register_style( self::EDITOR_HANDLE, 'editor', [ 'wp-components' ] );
 
-		wp_set_script_translations( self::EDITOR_HANDLE, 'wire-desk' );
+		wp_set_script_translations( self::EDITOR_HANDLE, 'ai-post-triage' );
 	}
 
 	/**

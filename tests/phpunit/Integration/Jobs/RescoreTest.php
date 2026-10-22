@@ -2,24 +2,24 @@
 /**
  * Integration tests for Rescore.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Jobs
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Jobs
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Jobs;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Jobs;
 
 use ActionScheduler_Action;
 use ActionScheduler_Store;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Decisions\Decision;
-use JDeepD\Wire_Desk\Jobs\Queue;
-use JDeepD\Wire_Desk\Jobs\Rescore;
-use JDeepD\Wire_Desk\Jobs\Score_Job;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Scoring\Post_Scorer;
-use JDeepD\Wire_Desk\Tests\Fakes\Fake_Decision_Client;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Decisions\Decision;
+use JDeepD\AI_Post_Triage\Jobs\Queue;
+use JDeepD\AI_Post_Triage\Jobs\Rescore;
+use JDeepD\AI_Post_Triage\Jobs\Score_Job;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Scoring\Post_Scorer;
+use JDeepD\AI_Post_Triage\Tests\Fakes\Fake_Decision_Client;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -30,7 +30,7 @@ class RescoreTest extends TestCase {
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 

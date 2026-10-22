@@ -2,14 +2,14 @@
 /**
  * Records WP_CLI\Utils\format_items() calls in Fake_WP_CLI.
  *
- * @package JDeepD\Wire_Desk\Tests\Fakes
+ * @package JDeepD\AI_Post_Triage\Tests\Fakes
  */
 
 declare( strict_types = 1 );
 
 namespace WP_CLI\Utils;
 
-use JDeepD\Wire_Desk\Tests\Fakes\Fake_WP_CLI;
+use JDeepD\AI_Post_Triage\Tests\Fakes\Fake_WP_CLI;
 
 if ( ! function_exists( 'WP_CLI\Utils\format_items' ) ) {
 	/**

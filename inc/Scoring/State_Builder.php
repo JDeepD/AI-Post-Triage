@@ -2,14 +2,14 @@
 /**
  * Builds what the model reads about a post.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Scoring;
+namespace JDeepD\AI_Post_Triage\Scoring;
 
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
 
 /**
  * Class - State_Builder
@@ -66,7 +66,7 @@ final class State_Builder {
 		 * @param array<string, string> $state Facts about the post, such as `headline`, `summary`, `body` and `newsroom`.
 		 * @param \WP_Post              $post  Post.
 		 */
-		$state = apply_filters( 'wire_desk/state', $state, $post );
+		$state = apply_filters( 'ai_post_triage/state', $state, $post );
 
 		return self::normalize( $state );
 	}

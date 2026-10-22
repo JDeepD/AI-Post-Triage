@@ -2,18 +2,18 @@
 /**
  * Runs scoring jobs.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Jobs;
+namespace JDeepD\AI_Post_Triage\Jobs;
 
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Decisions\Decision_Client;
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Scoring\Post_Scorer;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Decisions\Decision_Client;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Scoring\Post_Scorer;
 
 /**
  * Class - Score_Job
@@ -69,22 +69,22 @@ final class Score_Job implements Registrable {
 	/**
 	 * Scores posts.
 	 *
-	 * @var \JDeepD\Wire_Desk\Scoring\Post_Scorer|null
+	 * @var \JDeepD\AI_Post_Triage\Scoring\Post_Scorer|null
 	 */
 	private ?Post_Scorer $scorer;
 
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param \JDeepD\Wire_Desk\Scoring\Post_Scorer|null       $scorer     Scores posts.
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post_Repository|null $repository Wire post table.
+	 * @param \JDeepD\AI_Post_Triage\Scoring\Post_Scorer|null       $scorer     Scores posts.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository|null $repository Wire post table.
 	 */
 	public function __construct( ?Post_Scorer $scorer = null, ?Wire_Post_Repository $repository = null ) {
 		$this->scorer     = $scorer;
@@ -141,7 +141,7 @@ final class Score_Job implements Registrable {
 
 		$result = ( $this->scorer ?? new Post_Scorer() )->score( $post_id );
 
-		if ( ! is_wp_error( $result ) || 'wire_desk_no_post' === $result->get_error_code() ) {
+		if ( ! is_wp_error( $result ) || 'ai_post_triage_no_post' === $result->get_error_code() ) {
 			return;
 		}
 

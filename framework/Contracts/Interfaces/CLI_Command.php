@@ -2,12 +2,12 @@
 /**
  * Interface for WP_CLI commands.
  *
- * @package JDeepD\Wire_Desk\Framework\Contracts\Interfaces
+ * @package JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Framework\Contracts\Interfaces;
+namespace JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces;
 
 /**
  * Interface - CLI_Command

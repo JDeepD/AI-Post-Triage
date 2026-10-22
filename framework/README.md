@@ -1,4 +1,4 @@
-# Wire Desk - Framework
+# AI Post Triage - Framework
 
 The core rtCamp plugin framework provides a set of reusable and composable, "Open-Code" PHP classes. These files work best when left as close to the original as possible, to make it easy to pull in updates from the main repository. However, they can be modified by plugins as needed.
 

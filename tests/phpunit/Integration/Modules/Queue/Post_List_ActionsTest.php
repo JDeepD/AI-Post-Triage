@@ -2,18 +2,18 @@
 /**
  * Integration tests for Post_List_Actions.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Modules\Queue
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Modules\Queue
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Queue;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Modules\Queue;
 
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Jobs\Queue;
-use JDeepD\Wire_Desk\Modules\Queue\Post_List_Actions;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Jobs\Queue;
+use JDeepD\AI_Post_Triage\Modules\Queue\Post_List_Actions;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -24,7 +24,7 @@ class Post_List_ActionsTest extends TestCase {
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
@@ -45,7 +45,7 @@ class Post_List_ActionsTest extends TestCase {
 	 * Resets the screen, request and settings.
 	 */
 	protected function tearDown(): void {
-		unset( $_GET['wire_desk_added'], $_GET['wire_desk_add_failed'], $_GET['post'], $_REQUEST['_wpnonce'], $_REQUEST['_wp_http_referer'] );
+		unset( $_GET['ai_post_triage_added'], $_GET['ai_post_triage_add_failed'], $_GET['post'], $_REQUEST['_wpnonce'], $_REQUEST['_wp_http_referer'] );
 		delete_option( Settings::OPTION_KEY );
 		set_current_screen( 'front' );
 
@@ -104,7 +104,7 @@ class Post_List_ActionsTest extends TestCase {
 	}
 
 	/**
-	 * Test the row action for a post not yet in Wire Desk, with a nonce for that post.
+	 * Test the row action for a post not yet in AI Post Triage, with a nonce for that post.
 	 */
 	public function test_row_action_adds(): void {
 		$post_id = self::factory()->post->create( [ 'post_status' => 'draft' ] );
@@ -115,7 +115,7 @@ class Post_List_ActionsTest extends TestCase {
 
 		$this->assertSame( 'Edit', $actions['edit'] );
 		$this->assertStringContainsString( '>Add to review queue</a>', $link );
-		$this->assertStringContainsString( 'admin-post.php?action=wire_desk_add&#038;post=' . $post_id, $link );
+		$this->assertStringContainsString( 'admin-post.php?action=ai_post_triage_add&#038;post=' . $post_id, $link );
 
 		preg_match( '#_wpnonce=([a-f0-9]+)#', $link, $nonce );
 
@@ -123,7 +123,7 @@ class Post_List_ActionsTest extends TestCase {
 	}
 
 	/**
-	 * Test that a post in Wire Desk links to the queue instead.
+	 * Test that a post in AI Post Triage links to the queue instead.
 	 */
 	public function test_row_action_links_to_queue(): void {
 		$this->wire_types( [ 'post' ] );
@@ -132,7 +132,7 @@ class Post_List_ActionsTest extends TestCase {
 
 		$actions = ( new Post_List_Actions( $this->repository ) )->row_actions( [], get_post( $post_id ) );
 
-		$this->assertStringContainsString( 'page=wire-desk&#038;view=all">In review queue</a>', $actions[ Post_List_Actions::ACTION ] ?? '' );
+		$this->assertStringContainsString( 'page=ai-post-triage&#038;view=all">In review queue</a>', $actions[ Post_List_Actions::ACTION ] ?? '' );
 	}
 
 	/**
@@ -168,9 +168,9 @@ class Post_List_ActionsTest extends TestCase {
 		$posts   = self::factory()->post->create_many( 2, [ 'post_status' => 'draft' ] );
 		$trashed = self::factory()->post->create( [ 'post_status' => 'trash' ] );
 
-		$url = $list->handle_bulk_action( admin_url( 'edit.php?paged=2&wire_desk_added=9' ), Post_List_Actions::ACTION, [ ...$posts, $trashed ] );
+		$url = $list->handle_bulk_action( admin_url( 'edit.php?paged=2&ai_post_triage_added=9' ), Post_List_Actions::ACTION, [ ...$posts, $trashed ] );
 
-		$this->assertSame( admin_url( 'edit.php?paged=2&wire_desk_added=2&wire_desk_add_failed=1' ), $url );
+		$this->assertSame( admin_url( 'edit.php?paged=2&ai_post_triage_added=2&ai_post_triage_add_failed=1' ), $url );
 		$this->assertCount( 2, $this->repository->get_many( $posts ) );
 		$this->assertTrue( Queue::is_scheduled( $posts[0] ) );
 		$this->assertSame( 'edit.php', $list->handle_bulk_action( 'edit.php', 'trash', $posts ) );
@@ -196,21 +196,21 @@ class Post_List_ActionsTest extends TestCase {
 	public function test_notice(): void {
 		$list = new Post_List_Actions( $this->repository );
 
-		$_GET['wire_desk_added']      = '3';
-		$_GET['wire_desk_add_failed'] = '1';
+		$_GET['ai_post_triage_added']      = '3';
+		$_GET['ai_post_triage_add_failed'] = '1';
 
 		ob_start();
 		$list->notice();
 		$output = (string) ob_get_clean();
 
 		$this->assertStringContainsString( '3 posts added to the review queue. They are scored in the background.', $output );
-		$this->assertStringContainsString( 'page=wire-desk&amp;view=waiting', $output );
+		$this->assertStringContainsString( 'page=ai-post-triage&amp;view=waiting', $output );
 		$this->assertStringContainsString( 'No OpenRouter API key is set, so scoring will fail.', $output );
 		$this->assertStringContainsString( 'notice-warning', $output );
 		$this->assertStringContainsString( '1 post could not be added to the review queue.', $output );
 
-		add_filter( 'wire_desk/openrouter_api_key', static fn (): string => 'sk-or-test' );
-		unset( $_GET['wire_desk_add_failed'] );
+		add_filter( 'ai_post_triage/openrouter_api_key', static fn (): string => 'sk-or-test' );
+		unset( $_GET['ai_post_triage_add_failed'] );
 
 		ob_start();
 		$list->notice();
@@ -224,7 +224,7 @@ class Post_List_ActionsTest extends TestCase {
 	 * Test that the result arguments are removed from the address bar.
 	 */
 	public function test_removable_query_args(): void {
-		$this->assertSame( [ 'message', 'wire_desk_added', 'wire_desk_add_failed' ], ( new Post_List_Actions() )->removable_query_args( [ 'message' ] ) );
+		$this->assertSame( [ 'message', 'ai_post_triage_added', 'ai_post_triage_add_failed' ], ( new Post_List_Actions() )->removable_query_args( [ 'message' ] ) );
 	}
 
 	/**

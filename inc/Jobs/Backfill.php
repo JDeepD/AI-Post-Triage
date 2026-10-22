@@ -1,16 +1,16 @@
 <?php
 /**
- * Adds existing wire posts to Wire Desk, newest first, a batch at a time.
+ * Adds existing wire posts to AI Post Triage, newest first, a batch at a time.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Jobs;
+namespace JDeepD\AI_Post_Triage\Jobs;
 
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
 use WP_Post;
 
 /**
@@ -22,7 +22,7 @@ final class Backfill {
 	/**
 	 * Option holding the progress, so a stopped backfill can carry on.
 	 */
-	public const OPTION = 'wire_desk_backfill';
+	public const OPTION = 'ai_post_triage_backfill';
 
 	/**
 	 * Posts read per batch by default.
@@ -37,21 +37,21 @@ final class Backfill {
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
 	/**
 	 * Adds posts the way a save does.
 	 *
-	 * @var \JDeepD\Wire_Desk\Jobs\Post_Listener
+	 * @var \JDeepD\AI_Post_Triage\Jobs\Post_Listener
 	 */
 	private Post_Listener $listener;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post_Repository|null $repository Wire post table.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository|null $repository Wire post table.
 	 */
 	public function __construct( ?Wire_Post_Repository $repository = null ) {
 		$this->repository = $repository ?? new Wire_Post_Repository();

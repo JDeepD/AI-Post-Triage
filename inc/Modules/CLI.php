@@ -1,15 +1,15 @@
 <?php
 /**
- * WP-CLI Commands for Wire Desk.
+ * WP-CLI Commands for AI Post Triage.
  *
- * @package JDeepD\Wire_Desk\Modules
+ * @package JDeepD\AI_Post_Triage\Modules
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Modules;
+namespace JDeepD\AI_Post_Triage\Modules;
 
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
 
 /**
  * Class - CLI
@@ -29,7 +29,7 @@ final class CLI implements Registrable {
 
 		foreach ( $this->get_commands() as $name => $command ) {
 			\WP_CLI::add_command(
-				"wire-desk {$name}",
+				"ai-post-triage {$name}",
 				$command['callback'],
 				[
 					'shortdesc' => $command['description'],

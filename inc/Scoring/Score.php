@@ -2,12 +2,12 @@
 /**
  * A post's score against the rubric.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Scoring;
+namespace JDeepD\AI_Post_Triage\Scoring;
 
 /**
  * Class - Score

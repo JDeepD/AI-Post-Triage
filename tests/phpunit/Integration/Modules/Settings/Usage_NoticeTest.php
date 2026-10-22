@@ -2,17 +2,17 @@
 /**
  * Integration tests for Usage_Notice.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Modules\Settings
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Modules\Settings
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Settings;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Modules\Settings;
 
-use JDeepD\Wire_Desk\Jobs\Usage;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Modules\Settings\Usage_Notice;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Jobs\Usage;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Modules\Settings\Usage_Notice;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -73,7 +73,7 @@ class Usage_NoticeTest extends TestCase {
 
 		$this->assertStringContainsString( 'notice-warning', $output );
 		$this->assertStringContainsString( 'spent today&#039;s budget of $2.50', $output );
-		$this->assertStringContainsString( 'page=wire-desk-settings', $output );
+		$this->assertStringContainsString( 'page=ai-post-triage-settings', $output );
 	}
 
 	/**
@@ -92,7 +92,7 @@ class Usage_NoticeTest extends TestCase {
 	public function test_render_on_settings_screen(): void {
 		$this->pause( 'Server error' );
 
-		$this->assertStringContainsString( 'notice-error', $this->render( 'wire-desk_page_wire-desk-settings' ) );
+		$this->assertStringContainsString( 'notice-error', $this->render( 'ai-post-triage_page_ai-post-triage-settings' ) );
 	}
 
 	/**
@@ -126,7 +126,7 @@ class Usage_NoticeTest extends TestCase {
 		( new Usage_Notice() )->handle_resume();
 
 		$this->assertSame( 0, Usage::paused_until() );
-		$this->assertStringContainsString( 'page=wire-desk-settings', $redirect );
+		$this->assertStringContainsString( 'page=ai-post-triage-settings', $redirect );
 	}
 
 	/**
@@ -184,7 +184,7 @@ class Usage_NoticeTest extends TestCase {
 	 *
 	 * @param string $screen Screen ID.
 	 */
-	private function render( string $screen = 'toplevel_page_wire-desk' ): string {
+	private function render( string $screen = 'toplevel_page_ai-post-triage' ): string {
 		set_current_screen( $screen );
 
 		ob_start();

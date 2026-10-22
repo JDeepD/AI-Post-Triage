@@ -2,21 +2,21 @@
 /**
  * Registers the Settings Screen
  *
- * @package JDeepD\Wire_Desk\Modules\Settings
+ * @package JDeepD\AI_Post_Triage\Modules\Settings
  */
 
 declare(strict_types = 1);
 
-namespace JDeepD\Wire_Desk\Modules\Settings;
+namespace JDeepD\AI_Post_Triage\Modules\Settings;
 
-use JDeepD\Wire_Desk\Core\Assets;
-use JDeepD\Wire_Desk\Core\Capabilities;
-use JDeepD\Wire_Desk\Core\Templates;
-use JDeepD\Wire_Desk\Decisions\Model_Catalogue;
-use JDeepD\Wire_Desk\Decisions\OpenRouter_Client;
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
-use JDeepD\Wire_Desk\Jobs\Usage;
-use JDeepD\Wire_Desk\Modules\Queue\Queue_Screen;
+use JDeepD\AI_Post_Triage\Core\Assets;
+use JDeepD\AI_Post_Triage\Core\Capabilities;
+use JDeepD\AI_Post_Triage\Core\Templates;
+use JDeepD\AI_Post_Triage\Decisions\Model_Catalogue;
+use JDeepD\AI_Post_Triage\Decisions\OpenRouter_Client;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Jobs\Usage;
+use JDeepD\AI_Post_Triage\Modules\Queue\Queue_Screen;
 
 /**
  * Class - Admin_Screen
@@ -27,12 +27,12 @@ final class Admin_Screen implements Registrable {
 	/**
 	 * The screen ID for the settings page.
 	 */
-	public const SCREEN_ID = 'wire-desk-settings';
+	public const SCREEN_ID = 'ai-post-triage-settings';
 
 	/**
 	 * The settings section for plugin data.
 	 */
-	public const DATA_SECTION = 'wire_desk_data';
+	public const DATA_SECTION = 'ai_post_triage_data';
 
 	/**
 	 * {@inheritDoc}
@@ -41,7 +41,7 @@ final class Admin_Screen implements Registrable {
 		add_action( 'admin_menu', [ $this, 'register_screen' ], 20 );
 		add_action( 'admin_init', [ $this, 'register_fields' ] );
 		add_filter( 'option_page_capability_' . Settings::SETTING_GROUP, [ $this, 'get_capability' ] );
-		add_filter( 'plugin_action_links_' . plugin_basename( WIRE_DESK_FILE ), [ $this, 'add_action_links' ], 2 );
+		add_filter( 'plugin_action_links_' . plugin_basename( AI_POST_TRIAGE_FILE ), [ $this, 'add_action_links' ], 2 );
 	}
 
 	/**
@@ -55,20 +55,20 @@ final class Admin_Screen implements Registrable {
 		$links[] = sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( admin_url( sprintf( 'admin.php?page=%s', self::SCREEN_ID ) ) ),
-			__( 'Settings', 'wire-desk' )
+			__( 'Settings', 'ai-post-triage' )
 		);
 
 		return $links;
 	}
 
 	/**
-	 * Adds the settings screen to the Wire Desk menu.
+	 * Adds the settings screen to the AI Post Triage menu.
 	 */
 	public function register_screen(): void {
 		$hook_suffix = add_submenu_page(
 			Queue_Screen::SCREEN_ID,
-			__( 'Wire Desk Settings', 'wire-desk' ),
-			__( 'Settings', 'wire-desk' ),
+			__( 'AI Post Triage Settings', 'ai-post-triage' ),
+			__( 'Settings', 'ai-post-triage' ),
 			Capabilities::MANAGE,
 			self::SCREEN_ID,
 			[ $this, 'render_screen' ]
@@ -93,13 +93,13 @@ final class Admin_Screen implements Registrable {
 	 */
 	public static function sections(): array {
 		return [
-			'wire_desk_sources'   => __( 'Sources', 'wire-desk' ),
-			'wire_desk_scoring'   => __( 'Scoring', 'wire-desk' ),
-			'wire_desk_questions' => __( 'Questions', 'wire-desk' ),
-			'wire_desk_bands'     => __( 'Priority bands', 'wire-desk' ),
-			'wire_desk_model'     => __( 'Model', 'wire-desk' ),
-			'wire_desk_limits'    => __( 'Limits', 'wire-desk' ),
-			self::DATA_SECTION    => __( 'Data', 'wire-desk' ),
+			'ai_post_triage_sources'   => __( 'Sources', 'ai-post-triage' ),
+			'ai_post_triage_scoring'   => __( 'Scoring', 'ai-post-triage' ),
+			'ai_post_triage_questions' => __( 'Questions', 'ai-post-triage' ),
+			'ai_post_triage_bands'     => __( 'Priority bands', 'ai-post-triage' ),
+			'ai_post_triage_model'     => __( 'Model', 'ai-post-triage' ),
+			'ai_post_triage_limits'    => __( 'Limits', 'ai-post-triage' ),
+			self::DATA_SECTION         => __( 'Data', 'ai-post-triage' ),
 		];
 	}
 
@@ -112,133 +112,133 @@ final class Admin_Screen implements Registrable {
 		return [
 			[
 				'key'      => 'post_types',
-				'title'    => __( 'Post types', 'wire-desk' ),
-				'section'  => 'wire_desk_sources',
+				'title'    => __( 'Post types', 'ai-post-triage' ),
+				'section'  => 'ai_post_triage_sources',
 				'template' => 'post-types',
 			],
 			[
 				'key'      => 'terms',
-				'title'    => __( 'Terms', 'wire-desk' ),
-				'section'  => 'wire_desk_sources',
+				'title'    => __( 'Terms', 'ai-post-triage' ),
+				'section'  => 'ai_post_triage_sources',
 				'template' => 'terms',
 			],
 			[
 				'key'      => 'auto_score',
-				'title'    => __( 'Automatic scoring', 'wire-desk' ),
-				'section'  => 'wire_desk_scoring',
+				'title'    => __( 'Automatic scoring', 'ai-post-triage' ),
+				'section'  => 'ai_post_triage_scoring',
 				'template' => 'checkbox',
-				'label'    => __( 'Score wire posts when they are saved', 'wire-desk' ),
+				'label'    => __( 'Score wire posts when they are saved', 'ai-post-triage' ),
 			],
 			[
 				'key'         => 'window_days',
-				'title'       => __( 'Scoring window', 'wire-desk' ),
-				'section'     => 'wire_desk_scoring',
+				'title'       => __( 'Scoring window', 'ai-post-triage' ),
+				'section'     => 'ai_post_triage_scoring',
 				'template'    => 'number',
 				'min'         => 0,
 				'max'         => Settings::MAX_WINDOW_DAYS,
 				'step'        => 1,
-				'description' => __( 'Only posts from the last this many days are scored automatically. 0 means no limit.', 'wire-desk' ),
+				'description' => __( 'Only posts from the last this many days are scored automatically. 0 means no limit.', 'ai-post-triage' ),
 			],
 			[
 				'key'      => 'input',
-				'title'    => __( 'Model reads', 'wire-desk' ),
-				'section'  => 'wire_desk_scoring',
+				'title'    => __( 'Model reads', 'ai-post-triage' ),
+				'section'  => 'ai_post_triage_scoring',
 				'template' => 'input',
 			],
 			[
 				'key'         => 'context',
-				'title'       => __( 'Newsroom context', 'wire-desk' ),
-				'section'     => 'wire_desk_scoring',
+				'title'       => __( 'Newsroom context', 'ai-post-triage' ),
+				'section'     => 'ai_post_triage_scoring',
 				'template'    => 'context',
-				'description' => __( 'Who the newsroom serves, sent with every post. For example: a national daily in Colombia.', 'wire-desk' ),
+				'description' => __( 'Who the newsroom serves, sent with every post. For example: a national daily in Colombia.', 'ai-post-triage' ),
 			],
 			[
 				'key'         => 'rescore',
-				'title'       => __( 'Re-score', 'wire-desk' ),
-				'section'     => 'wire_desk_scoring',
+				'title'       => __( 'Re-score', 'ai-post-triage' ),
+				'section'     => 'ai_post_triage_scoring',
 				'template'    => 'rescore',
 				'max'         => Rescore_Controller::MAX_LIMIT,
-				'description' => __( 'Scores the newest wire posts again with the saved settings, in the background. Posts whose text, questions and model haven\'t changed aren\'t sent to the model again and cost nothing.', 'wire-desk' ),
+				'description' => __( 'Scores the newest wire posts again with the saved settings, in the background. Posts whose text, questions and model haven\'t changed aren\'t sent to the model again and cost nothing.', 'ai-post-triage' ),
 			],
 			[
 				'key'      => 'questions',
-				'title'    => __( 'Questions', 'wire-desk' ),
-				'section'  => 'wire_desk_questions',
+				'title'    => __( 'Questions', 'ai-post-triage' ),
+				'section'  => 'ai_post_triage_questions',
 				'template' => 'questions',
 			],
 			[
 				'key'         => 'high_threshold',
-				'title'       => __( 'High', 'wire-desk' ),
-				'section'     => 'wire_desk_bands',
+				'title'       => __( 'High', 'ai-post-triage' ),
+				'section'     => 'ai_post_triage_bands',
 				'template'    => 'number',
 				'min'         => 1,
 				'max'         => 100,
 				'step'        => 1,
-				'description' => __( 'Posts scoring at least this much are High.', 'wire-desk' ),
+				'description' => __( 'Posts scoring at least this much are High.', 'ai-post-triage' ),
 			],
 			[
 				'key'         => 'medium_threshold',
-				'title'       => __( 'Medium', 'wire-desk' ),
-				'section'     => 'wire_desk_bands',
+				'title'       => __( 'Medium', 'ai-post-triage' ),
+				'section'     => 'ai_post_triage_bands',
 				'template'    => 'number',
 				'min'         => 0,
 				'max'         => 100,
 				'step'        => 1,
-				'description' => __( 'Posts scoring at least this much are Medium. The rest are Low.', 'wire-desk' ),
+				'description' => __( 'Posts scoring at least this much are Medium. The rest are Low.', 'ai-post-triage' ),
 			],
 			[
 				'key'      => 'api_key',
 				'option'   => Api_Key::OPTION,
-				'title'    => __( 'OpenRouter API key', 'wire-desk' ),
-				'section'  => 'wire_desk_model',
+				'title'    => __( 'OpenRouter API key', 'ai-post-triage' ),
+				'section'  => 'ai_post_triage_model',
 				'template' => 'api-key',
 			],
 			[
 				'key'      => 'model',
-				'title'    => __( 'Model', 'wire-desk' ),
-				'section'  => 'wire_desk_model',
+				'title'    => __( 'Model', 'ai-post-triage' ),
+				'section'  => 'ai_post_triage_model',
 				'template' => 'model',
 			],
 			[
 				'key'         => 'try',
-				'title'       => __( 'Try a headline', 'wire-desk' ),
-				'section'     => 'wire_desk_model',
+				'title'       => __( 'Try a headline', 'ai-post-triage' ),
+				'section'     => 'ai_post_triage_model',
 				'template'    => 'try',
-				'description' => __( 'Asks the selected model the saved questions. Each try is a paid request.', 'wire-desk' ),
+				'description' => __( 'Asks the selected model the saved questions. Each try is a paid request.', 'ai-post-triage' ),
 			],
 			[
 				'key'         => 'daily_budget',
-				'title'       => __( 'Daily budget (USD)', 'wire-desk' ),
-				'section'     => 'wire_desk_limits',
+				'title'       => __( 'Daily budget (USD)', 'ai-post-triage' ),
+				'section'     => 'ai_post_triage_limits',
 				'template'    => 'number',
 				'min'         => 0,
 				'step'        => 0.01,
-				'description' => __( 'Scoring stops for the day once this is spent. 0 means no limit.', 'wire-desk' ),
+				'description' => __( 'Scoring stops for the day once this is spent. 0 means no limit.', 'ai-post-triage' ),
 			],
 			[
 				'key'         => 'concurrency',
-				'title'       => __( 'Jobs at once', 'wire-desk' ),
-				'section'     => 'wire_desk_limits',
+				'title'       => __( 'Jobs at once', 'ai-post-triage' ),
+				'section'     => 'ai_post_triage_limits',
 				'template'    => 'number',
 				'min'         => 1,
 				'max'         => Settings::MAX_CONCURRENCY,
 				'step'        => 1,
-				'description' => __( 'How many posts are scored at the same time.', 'wire-desk' ),
+				'description' => __( 'How many posts are scored at the same time.', 'ai-post-triage' ),
 			],
 			[
 				'key'      => 'usage',
-				'title'    => __( 'Today', 'wire-desk' ),
-				'section'  => 'wire_desk_limits',
+				'title'    => __( 'Today', 'ai-post-triage' ),
+				'section'  => 'ai_post_triage_limits',
 				'template' => 'usage',
 			],
 			[
 				'key'         => 'delete_data_on_uninstall',
 				'option'      => Settings::DELETE_DATA_OPTION_KEY,
-				'title'       => __( 'Uninstall', 'wire-desk' ),
+				'title'       => __( 'Uninstall', 'ai-post-triage' ),
 				'section'     => self::DATA_SECTION,
 				'template'    => 'checkbox',
-				'label'       => __( 'Delete all Wire Desk data when the plugin is deleted', 'wire-desk' ),
-				'description' => __( 'Drops the Wire Desk table and deletes its settings. This can\'t be undone.', 'wire-desk' ),
+				'label'       => __( 'Delete all AI Post Triage data when the plugin is deleted', 'ai-post-triage' ),
+				'description' => __( 'Drops the AI Post Triage table and deletes its settings. This can\'t be undone.', 'ai-post-triage' ),
 			],
 		];
 	}
@@ -431,12 +431,11 @@ final class Admin_Screen implements Registrable {
 	}
 
 	/**
-	 * Enqueue and localize scripts.
+	 * Enqueue scripts.
 	 *
 	 * @internal Used by register_screen().
 	 */
 	public function enqueue_scripts(): void {
-		wp_localize_script( Assets::ADMIN_HANDLE, 'wireDeskAdmin', self::get_localized_data() );
 		wp_enqueue_script( Assets::ADMIN_HANDLE );
 		wp_enqueue_style( Assets::ADMIN_HANDLE );
 	}
@@ -448,19 +447,6 @@ final class Admin_Screen implements Registrable {
 	 * @phpstan-param Field $field
 	 */
 	private static function field_id( array $field ): string {
-		return 'wire-desk-' . str_replace( '_', '-', $field['key'] );
-	}
-
-	/**
-	 * Localize plugin data for script access.
-	 *
-	 * Will be available via window.wireDeskAdmin.
-	 *
-	 * @return array<string, mixed>
-	 */
-	private function get_localized_data(): array {
-		return [
-			'pluginVersion' => WIRE_DESK_VERSION,
-		];
+		return 'ai-post-triage-' . str_replace( '_', '-', $field['key'] );
 	}
 }

@@ -1,22 +1,22 @@
 <?php
 /**
- * Prune CLI command for Wire Desk.
+ * Prune CLI command for AI Post Triage.
  *
- * @package JDeepD\Wire_Desk\Modules\CLI
+ * @package JDeepD\AI_Post_Triage\Modules\CLI
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Modules\CLI;
+namespace JDeepD\AI_Post_Triage\Modules\CLI;
 
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\CLI_Command;
-use JDeepD\Wire_Desk\Jobs\Maintenance;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\CLI_Command;
+use JDeepD\AI_Post_Triage\Jobs\Maintenance;
 use WP_CLI;
 
 /**
  * Class - Prune
  *
- * Implements the `wire-desk prune` WP-CLI command.
+ * Implements the `ai-post-triage prune` WP-CLI command.
  */
 final class Prune implements CLI_Command {
 	/**
@@ -36,20 +36,20 @@ final class Prune implements CLI_Command {
 	}
 
 	/**
-	 * Clears the per-question answers of old posts, and deletes finished Wire Desk jobs.
+	 * Clears the per-question answers of old posts, and deletes finished AI Post Triage jobs.
 	 *
-	 * Wire Desk does this once a day on its own. Scores and bands are kept; only the
+	 * AI Post Triage does this once a day on its own. Scores and bands are kept; only the
 	 * answers behind them are cleared.
 	 *
 	 * ## OPTIONS
 	 *
 	 * [--days=<number>]
-	 * : Clear answers of posts older than this many days. Defaults to the `wire_desk/details_retention_days` filter, 90 days.
+	 * : Clear answers of posts older than this many days. Defaults to the `ai_post_triage/details_retention_days` filter, 90 days.
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp wire-desk prune
-	 *     wp wire-desk prune --days=30
+	 *     wp ai-post-triage prune
+	 *     wp ai-post-triage prune --days=30
 	 *
 	 * @param array<int, mixed>    $args       Positional arguments.
 	 * @param array<string, mixed> $assoc_args Associative arguments.

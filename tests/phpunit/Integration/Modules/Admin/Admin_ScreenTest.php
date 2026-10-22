@@ -2,22 +2,22 @@
 /**
  * Admin_ScreenTest file.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Modules\Admin
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Modules\Admin
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Admin;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Modules\Admin;
 
-use JDeepD\Wire_Desk\Core\Assets;
-use JDeepD\Wire_Desk\Core\Capabilities;
-use JDeepD\Wire_Desk\Decisions\Model_Catalogue;
-use JDeepD\Wire_Desk\Jobs\Usage;
-use JDeepD\Wire_Desk\Modules\Queue\Queue_Screen;
-use JDeepD\Wire_Desk\Modules\Settings\Admin_Screen;
-use JDeepD\Wire_Desk\Modules\Settings\Api_Key;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Core\Assets;
+use JDeepD\AI_Post_Triage\Core\Capabilities;
+use JDeepD\AI_Post_Triage\Decisions\Model_Catalogue;
+use JDeepD\AI_Post_Triage\Jobs\Usage;
+use JDeepD\AI_Post_Triage\Modules\Queue\Queue_Screen;
+use JDeepD\AI_Post_Triage\Modules\Settings\Admin_Screen;
+use JDeepD\AI_Post_Triage\Modules\Settings\Api_Key;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -67,7 +67,7 @@ class Admin_ScreenTest extends TestCase {
 		$this->assertSame( 20, \has_action( 'admin_menu', [ $screen, 'register_screen' ] ) );
 		$this->assertNotFalse( \has_action( 'admin_init', [ $screen, 'register_fields' ] ) );
 		$this->assertNotFalse( \has_filter( 'option_page_capability_' . Settings::SETTING_GROUP, [ $screen, 'get_capability' ] ) );
-		$this->assertNotFalse( \has_filter( 'plugin_action_links_' . \plugin_basename( WIRE_DESK_FILE ), [ $screen, 'add_action_links' ] ) );
+		$this->assertNotFalse( \has_filter( 'plugin_action_links_' . \plugin_basename( AI_POST_TRIAGE_FILE ), [ $screen, 'add_action_links' ] ) );
 	}
 
 	/**
@@ -77,12 +77,12 @@ class Admin_ScreenTest extends TestCase {
 		$actual = ( new Admin_Screen() )->add_action_links( [ '<a href="plugins.php">Plugins</a>' ] );
 
 		$this->assertCount( 2, $actual );
-		$this->assertStringContainsString( 'admin.php?page=wire-desk-settings', $actual[1] );
+		$this->assertStringContainsString( 'admin.php?page=ai-post-triage-settings', $actual[1] );
 		$this->assertStringContainsString( 'Settings', $actual[1] );
 	}
 
 	/**
-	 * Test that register_screen adds Settings under the Wire Desk menu, after the queue, with its load hook.
+	 * Test that register_screen adds Settings under the AI Post Triage menu, after the queue, with its load hook.
 	 */
 	public function test_register_screen_adds_settings_page_under_queue(): void {
 		global $submenu;
@@ -142,23 +142,23 @@ class Admin_ScreenTest extends TestCase {
 
 		$this->assertSame(
 			[
-				'wire-desk-post-types',
-				'wire-desk-terms',
-				'wire-desk-auto-score',
-				'wire-desk-window-days',
-				'wire-desk-input',
-				'wire-desk-context',
-				'wire-desk-rescore',
-				'wire-desk-questions',
-				'wire-desk-high-threshold',
-				'wire-desk-medium-threshold',
-				'wire-desk-api-key',
-				'wire-desk-model',
-				'wire-desk-try',
-				'wire-desk-daily-budget',
-				'wire-desk-concurrency',
-				'wire-desk-usage',
-				'wire-desk-delete-data-on-uninstall',
+				'ai-post-triage-post-types',
+				'ai-post-triage-terms',
+				'ai-post-triage-auto-score',
+				'ai-post-triage-window-days',
+				'ai-post-triage-input',
+				'ai-post-triage-context',
+				'ai-post-triage-rescore',
+				'ai-post-triage-questions',
+				'ai-post-triage-high-threshold',
+				'ai-post-triage-medium-threshold',
+				'ai-post-triage-api-key',
+				'ai-post-triage-model',
+				'ai-post-triage-try',
+				'ai-post-triage-daily-budget',
+				'ai-post-triage-concurrency',
+				'ai-post-triage-usage',
+				'ai-post-triage-delete-data-on-uninstall',
 			],
 			$registered
 		);
@@ -188,17 +188,17 @@ class Admin_ScreenTest extends TestCase {
 			$this->assertStringContainsString( '>' . esc_html( $title ) . '</h2>', $output );
 		}
 
-		$this->assertMatchesRegularExpression( '/name="wire_desk_settings\[post_types\]\[\]" value="page"\s+checked/', $output );
-		$this->assertStringContainsString( 'name="wire_desk_settings[window_days]"', $output );
+		$this->assertMatchesRegularExpression( '/name="ai_post_triage_settings\[post_types\]\[\]" value="page"\s+checked/', $output );
+		$this->assertStringContainsString( 'name="ai_post_triage_settings[window_days]"', $output );
 		$this->assertStringContainsString( 'value="7"', $output );
 		$this->assertMatchesRegularExpression( '/value="title_content"\s+checked/', $output );
 		$this->assertStringContainsString( 'Regional newsroom</textarea>', $output );
-		$this->assertStringContainsString( '<input type="hidden" name="wire_desk_settings[auto_score]" value="0" />', $output );
-		$this->assertStringContainsString( 'name="wire_desk_settings[model]"', $output );
+		$this->assertStringContainsString( '<input type="hidden" name="ai_post_triage_settings[auto_score]" value="0" />', $output );
+		$this->assertStringContainsString( 'name="ai_post_triage_settings[model]"', $output );
 		$this->assertStringContainsString( 'value="typesafe/jev-1.13"', $output );
 		$this->assertStringContainsString( 'name="' . Settings::DELETE_DATA_OPTION_KEY . '"', $output );
-		$this->assertSame( 4 + 1, substr_count( $output, 'data-wire-desk-remove-question' ) );
-		$this->assertStringContainsString( 'wire_desk_settings[questions][__INDEX__][question]', $output );
+		$this->assertSame( 4 + 1, substr_count( $output, 'data-ai-post-triage-remove-question' ) );
+		$this->assertStringContainsString( 'ai_post_triage_settings[questions][__INDEX__][question]', $output );
 	}
 
 	/**
@@ -207,7 +207,7 @@ class Admin_ScreenTest extends TestCase {
 	public function test_render_screen_lists_models_by_name(): void {
 		$output = $this->render_screen();
 
-		$this->assertMatchesRegularExpression( '#<select id="wire-desk-model" name="wire_desk_settings\[model\]">#', $output );
+		$this->assertMatchesRegularExpression( '#<select id="ai-post-triage-model" name="ai_post_triage_settings\[model\]">#', $output );
 		$this->assertMatchesRegularExpression( '#<option value="cloudflare/clef" >Cloudflare: Clef</option>#', $output );
 		$this->assertMatchesRegularExpression( "#<option value=\"typesafe/jev-1.13\"  selected='selected'>TypeSafe: Jev 1.13</option>#", $output );
 		$this->assertStringNotContainsString( 'not in the list', $output );
@@ -230,8 +230,8 @@ class Admin_ScreenTest extends TestCase {
 
 		$output = $this->render_screen();
 
-		$this->assertStringNotContainsString( '<select id="wire-desk-model"', $output );
-		$this->assertMatchesRegularExpression( '#<input\s+type="text"\s+class="regular-text"\s+id="wire-desk-model"\s+name="wire_desk_settings\[model\]"\s+value="typesafe/jev-1.13"#', $output );
+		$this->assertStringNotContainsString( '<select id="ai-post-triage-model"', $output );
+		$this->assertMatchesRegularExpression( '#<input\s+type="text"\s+class="regular-text"\s+id="ai-post-triage-model"\s+name="ai_post_triage_settings\[model\]"\s+value="typesafe/jev-1.13"#', $output );
 		$this->assertStringContainsString( 'The model list could not be loaded from OpenRouter.', $output );
 	}
 
@@ -241,9 +241,9 @@ class Admin_ScreenTest extends TestCase {
 	public function test_render_screen_try_box_has_no_setting(): void {
 		$output = $this->render_screen();
 
-		$this->assertMatchesRegularExpression( '#<textarea\s+id="wire-desk-try"\s+class="large-text"\s+rows="2"\s+maxlength="500"#', $output );
-		$this->assertStringNotContainsString( 'wire_desk_settings[try]', $output );
-		$this->assertStringContainsString( 'data-wire-desk-try-submit', $output );
+		$this->assertMatchesRegularExpression( '#<textarea\s+id="ai-post-triage-try"\s+class="large-text"\s+rows="2"\s+maxlength="500"#', $output );
+		$this->assertStringNotContainsString( 'ai_post_triage_settings[try]', $output );
+		$this->assertStringContainsString( 'data-ai-post-triage-try-submit', $output );
 	}
 
 	/**
@@ -252,9 +252,9 @@ class Admin_ScreenTest extends TestCase {
 	public function test_render_screen_rescore_box_has_no_setting(): void {
 		$output = $this->render_screen();
 
-		$this->assertMatchesRegularExpression( '#id="wire-desk-rescore"\s+min="1"\s+max="1000"#', $output );
-		$this->assertStringNotContainsString( 'wire_desk_settings[rescore]', $output );
-		$this->assertStringContainsString( 'data-wire-desk-rescore-submit', $output );
+		$this->assertMatchesRegularExpression( '#id="ai-post-triage-rescore"\s+min="1"\s+max="1000"#', $output );
+		$this->assertStringNotContainsString( 'ai_post_triage_settings[rescore]', $output );
+		$this->assertStringContainsString( 'data-ai-post-triage-rescore-submit', $output );
 	}
 
 	/**
@@ -267,7 +267,7 @@ class Admin_ScreenTest extends TestCase {
 		$output = $this->render_screen();
 
 		$this->assertStringContainsString( '$0.0123 of $5.00 spent, 1 post scored.', $output );
-		$this->assertStringNotContainsString( 'wire-desk-paused', $output );
+		$this->assertStringNotContainsString( 'ai-post-triage-paused', $output );
 
 		update_option( Settings::OPTION_KEY, [ 'daily_budget' => 0 ] );
 
@@ -284,9 +284,9 @@ class Admin_ScreenTest extends TestCase {
 
 		$output = $this->render_screen();
 
-		$this->assertStringContainsString( 'wire-desk-paused', $output );
+		$this->assertStringContainsString( 'ai-post-triage-paused', $output );
 		$this->assertStringContainsString( 'Last error: Server error', $output );
-		$this->assertStringContainsString( 'action=wire_desk_resume', $output );
+		$this->assertStringContainsString( 'action=ai_post_triage_resume', $output );
 	}
 
 	/**
@@ -295,7 +295,7 @@ class Admin_ScreenTest extends TestCase {
 	public function test_render_screen_api_key_hides_saved_key(): void {
 		$output = $this->render_screen();
 
-		$this->assertMatchesRegularExpression( '#<input\s+type="password"\s+class="regular-text"\s+id="wire-desk-api-key"\s+name="wire_desk_openrouter_api_key\[key\]"\s+value=""#', $output );
+		$this->assertMatchesRegularExpression( '#<input\s+type="password"\s+class="regular-text"\s+id="ai-post-triage-api-key"\s+name="ai_post_triage_openrouter_api_key\[key\]"\s+value=""#', $output );
 		$this->assertStringNotContainsString( 'Remove the saved key', $output );
 
 		Api_Key::save( 'sk-or-v1-secret0000abcd' );
@@ -305,14 +305,14 @@ class Admin_ScreenTest extends TestCase {
 		$this->assertStringNotContainsString( 'secret0000', $output );
 		$this->assertStringNotContainsString( (string) get_option( Api_Key::OPTION ), $output );
 		$this->assertStringContainsString( 'A key ending in <code>…abcd</code> is saved, encrypted.', $output );
-		$this->assertStringContainsString( 'name="wire_desk_openrouter_api_key[remove]"', $output );
+		$this->assertStringContainsString( 'name="ai_post_triage_openrouter_api_key[remove]"', $output );
 	}
 
 	/**
 	 * Test that, with no key saved, the field mentions the constant as the other way to set one.
 	 */
 	public function test_render_screen_api_key_mentions_constant(): void {
-		$this->assertStringContainsString( 'You can also define the <code>WIRE_DESK_OPENROUTER_API_KEY</code> constant', $this->render_screen() );
+		$this->assertStringContainsString( 'You can also define the <code>AI_POST_TRIAGE_OPENROUTER_API_KEY</code> constant', $this->render_screen() );
 	}
 
 	/**
@@ -321,19 +321,19 @@ class Admin_ScreenTest extends TestCase {
 	#[RunInSeparateProcess]
 	#[PreserveGlobalState( false )]
 	public function test_render_screen_api_key_locked_by_constant(): void {
-		define( 'WIRE_DESK_OPENROUTER_API_KEY', 'sk-or-constant' );
+		define( 'AI_POST_TRIAGE_OPENROUTER_API_KEY', 'sk-or-constant' );
 
 		$output = $this->render_screen();
 
-		$this->assertMatchesRegularExpression( '#id="wire-desk-api-key"[^>]*disabled#s', $output );
-		$this->assertStringContainsString( 'The key is set by the <code>WIRE_DESK_OPENROUTER_API_KEY</code> constant', $output );
+		$this->assertMatchesRegularExpression( '#id="ai-post-triage-api-key"[^>]*disabled#s', $output );
+		$this->assertStringContainsString( 'The key is set by the <code>AI_POST_TRIAGE_OPENROUTER_API_KEY</code> constant', $output );
 		$this->assertStringNotContainsString( 'sk-or-constant', $output );
 	}
 
 	/**
 	 * Test that an unreadable saved key asks for it again.
 	 *
-	 * @expectedIncorrectUsage JDeepD\Wire_Desk\Framework\Encryptor::decrypt
+	 * @expectedIncorrectUsage JDeepD\AI_Post_Triage\Framework\Encryptor::decrypt
 	 */
 	public function test_render_screen_api_key_unreadable(): void {
 		update_option( Api_Key::OPTION, 'not base64 at all!' );
@@ -389,8 +389,8 @@ class Admin_ScreenTest extends TestCase {
 
 		$output = $this->render_screen();
 
-		$this->assertSame( 1, substr_count( $output, 'data-wire-desk-term-taxonomy' ) );
-		$this->assertSame( 1, substr_count( $output, 'data-wire-desk-term-search' ) );
+		$this->assertSame( 1, substr_count( $output, 'data-ai-post-triage-term-taxonomy' ) );
+		$this->assertSame( 1, substr_count( $output, 'data-ai-post-triage-term-search' ) );
 		$this->assertMatchesRegularExpression( '#<option value="category" data-label="Categories">\s+Categories \(Posts\)\s+</option>#', $output );
 		$this->assertMatchesRegularExpression( '#<option value="wire_feed" data-label="Feeds">\s+Feeds \(Wire items\)\s+</option>#', $output );
 		$this->assertMatchesRegularExpression( '#<option value="wire_agency" data-label="Agencies">\s+Agencies \(Wire items\)\s+</option>#', $output );
@@ -411,7 +411,7 @@ class Admin_ScreenTest extends TestCase {
 
 		$output = $this->render_screen();
 
-		$this->assertMatchesRegularExpression( '/name="wire_desk_settings\[terms\]\[category\]\[\]" value="' . $category . '" checked \/>\s+Wire Feed\s+<span class="wire-desk-terms-meta">Categories<\/span>/', $output );
+		$this->assertMatchesRegularExpression( '/name="ai_post_triage_settings\[terms\]\[category\]\[\]" value="' . $category . '" checked \/>\s+Wire Feed\s+<span class="ai-post-triage-terms-meta">Categories<\/span>/', $output );
 	}
 
 	/**
@@ -474,7 +474,7 @@ class Admin_ScreenTest extends TestCase {
 	 * Test that removing every question saves no questions.
 	 */
 	public function test_submitting_form_without_questions_removes_them(): void {
-		$html = (string) preg_replace( '#<tbody data-wire-desk-questions>.*?</tbody>#s', '<tbody data-wire-desk-questions></tbody>', $this->render_screen() );
+		$html = (string) preg_replace( '#<tbody data-ai-post-triage-questions>.*?</tbody>#s', '<tbody data-ai-post-triage-questions></tbody>', $this->render_screen() );
 
 		$values = Settings::sanitize( $this->submit( $html )[ Settings::OPTION_KEY ] ?? null );
 

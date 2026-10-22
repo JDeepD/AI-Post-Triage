@@ -2,16 +2,16 @@
 /**
  * Integration tests for Wire_Detector.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Jobs
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Jobs
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Jobs;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Jobs;
 
-use JDeepD\Wire_Desk\Jobs\Wire_Detector;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Jobs\Wire_Detector;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use WP_Post;
 
@@ -101,7 +101,7 @@ class Wire_DetectorTest extends TestCase {
 		$post = self::factory()->post->create_and_get();
 
 		add_filter(
-			'wire_desk/is_wire_content',
+			'ai_post_triage/is_wire_content',
 			static fn ( bool $is_wire, WP_Post $filtered ): bool => $is_wire || $filtered->ID === $post->ID,
 			10,
 			2

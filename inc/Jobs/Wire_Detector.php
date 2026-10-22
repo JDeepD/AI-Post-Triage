@@ -2,14 +2,14 @@
 /**
  * Decides whether a post is wire content.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Jobs;
+namespace JDeepD\AI_Post_Triage\Jobs;
 
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
 use WP_Post;
 
 /**
@@ -40,7 +40,7 @@ final class Wire_Detector {
 		 * @param bool     $is_wire Whether the post is wire content.
 		 * @param \WP_Post $post    Post.
 		 */
-		return (bool) apply_filters( 'wire_desk/is_wire_content', $is_wire, $post );
+		return (bool) apply_filters( 'ai_post_triage/is_wire_content', $is_wire, $post );
 	}
 
 	/**

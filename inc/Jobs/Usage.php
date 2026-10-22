@@ -2,16 +2,16 @@
 /**
  * Tracks today's scoring spend and pauses scoring after repeated failures.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Jobs;
+namespace JDeepD\AI_Post_Triage\Jobs;
 
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Scoring\Result;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Scoring\Result;
 
 /**
  * Class - Usage
@@ -22,7 +22,7 @@ final class Usage implements Registrable {
 	/**
 	 * Option holding the usage.
 	 */
-	public const OPTION = 'wire_desk_usage';
+	public const OPTION = 'ai_post_triage_usage';
 
 	/**
 	 * Failed requests in a row that pause scoring.
@@ -38,7 +38,7 @@ final class Usage implements Registrable {
 	 * {@inheritDoc}
 	 */
 	public function register_hooks(): void {
-		add_action( 'wire_desk/scored', [ $this, 'on_scored' ] );
+		add_action( 'ai_post_triage/scored', [ $this, 'on_scored' ] );
 	}
 
 	/**

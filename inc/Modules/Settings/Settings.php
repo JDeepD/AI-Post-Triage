@@ -2,14 +2,14 @@
 /**
  * Registers the plugin's admin settings.
  *
- * @package JDeepD\Wire_Desk\Modules\Settings
+ * @package JDeepD\AI_Post_Triage\Modules\Settings
  */
 
 declare(strict_types = 1);
 
-namespace JDeepD\Wire_Desk\Modules\Settings;
+namespace JDeepD\AI_Post_Triage\Modules\Settings;
 
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
 
 /**
  * Class - Settings
@@ -34,7 +34,7 @@ final class Settings implements Registrable {
 	/**
 	 * The setting prefix.
 	 */
-	private const SETTING_PREFIX = 'wire_desk_';
+	private const SETTING_PREFIX = 'ai_post_triage_';
 
 	/**
 	 * The setting group.
@@ -101,15 +101,15 @@ final class Settings implements Registrable {
 		$settings = [
 			self::OPTION_KEY             => [
 				'type'              => 'object',
-				'label'             => __( 'Wire Desk settings', 'wire-desk' ),
+				'label'             => __( 'AI Post Triage settings', 'ai-post-triage' ),
 				'default'           => self::defaults(),
 				'sanitize_callback' => [ self::class, 'sanitize' ],
 				'show_in_rest'      => false,
 			],
 			self::DELETE_DATA_OPTION_KEY => [
 				'type'              => 'boolean',
-				'label'             => __( 'Delete data on uninstall', 'wire-desk' ),
-				'description'       => __( 'Delete the Wire Desk table and settings when the plugin is deleted.', 'wire-desk' ),
+				'label'             => __( 'Delete data on uninstall', 'ai-post-triage' ),
+				'description'       => __( 'Delete the AI Post Triage table and settings when the plugin is deleted.', 'ai-post-triage' ),
 				'default'           => false,
 				'sanitize_callback' => 'rest_sanitize_boolean',
 				'show_in_rest'      => [
@@ -230,9 +230,9 @@ final class Settings implements Registrable {
 	 */
 	public static function input_modes(): array {
 		return [
-			'title'         => __( 'Title only', 'wire-desk' ),
-			'title_excerpt' => __( 'Title and excerpt (or first paragraph)', 'wire-desk' ),
-			'title_content' => __( 'Title and body', 'wire-desk' ),
+			'title'         => __( 'Title only', 'ai-post-triage' ),
+			'title_excerpt' => __( 'Title and excerpt (or first paragraph)', 'ai-post-triage' ),
+			'title_content' => __( 'Title and body', 'ai-post-triage' ),
 		];
 	}
 
@@ -283,7 +283,7 @@ final class Settings implements Registrable {
 				$output['high_threshold']   = $high;
 				$output['medium_threshold'] = $medium;
 			} else {
-				self::add_error( 'thresholds', __( 'The High threshold must be above the Medium threshold.', 'wire-desk' ) );
+				self::add_error( 'thresholds', __( 'The High threshold must be above the Medium threshold.', 'ai-post-triage' ) );
 			}
 		}
 
@@ -293,7 +293,7 @@ final class Settings implements Registrable {
 			if ( preg_match( self::MODEL_PATTERN, $model ) ) {
 				$output['model'] = $model;
 			} else {
-				self::add_error( 'model', __( 'The model ID is not valid.', 'wire-desk' ) );
+				self::add_error( 'model', __( 'The model ID is not valid.', 'ai-post-triage' ) );
 			}
 		}
 
@@ -378,7 +378,7 @@ final class Settings implements Registrable {
 				self::add_error(
 					'questions',
 					/* translators: %d: maximum number of questions. */
-					sprintf( __( 'Only the first %d questions were saved.', 'wire-desk' ), self::MAX_QUESTIONS )
+					sprintf( __( 'Only the first %d questions were saved.', 'ai-post-triage' ), self::MAX_QUESTIONS )
 				);
 				break;
 			}

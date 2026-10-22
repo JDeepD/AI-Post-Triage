@@ -2,7 +2,7 @@
 /**
  * Re-score the newest posts settings field.
  *
- * @package wire-desk
+ * @package ai-post-triage
  */
 
 declare(strict_types = 1);
@@ -11,8 +11,8 @@ defined( 'ABSPATH' ) || exit;
 
 /** @var array{id: string, description: string, max: int} $args */
 ?>
-<div class="wire-desk-rescore" data-wire-desk-rescore>
-	<label for="<?php echo esc_attr( $args['id'] ); ?>"><?php esc_html_e( 'Newest', 'wire-desk' ); ?></label>
+<div class="ai-post-triage-rescore" data-ai-post-triage-rescore>
+	<label for="<?php echo esc_attr( $args['id'] ); ?>"><?php esc_html_e( 'Newest', 'ai-post-triage' ); ?></label>
 	<input
 		type="number"
 		class="small-text"
@@ -21,13 +21,13 @@ defined( 'ABSPATH' ) || exit;
 		max="<?php echo esc_attr( (string) $args['max'] ); ?>"
 		step="1"
 		value="100"
-		data-wire-desk-rescore-limit
+		data-ai-post-triage-rescore-limit
 	/>
-	<?php esc_html_e( 'posts', 'wire-desk' ); ?>
-	<button type="button" class="button" data-wire-desk-rescore-submit><?php esc_html_e( 'Re-score', 'wire-desk' ); ?></button>
-	<span class="spinner" data-wire-desk-rescore-spinner></span>
+	<?php esc_html_e( 'posts', 'ai-post-triage' ); ?>
+	<button type="button" class="button" data-ai-post-triage-rescore-submit><?php esc_html_e( 'Re-score', 'ai-post-triage' ); ?></button>
+	<span class="spinner" data-ai-post-triage-rescore-spinner></span>
 	<?php if ( '' !== $args['description'] ) : ?>
 		<p class="description"><?php echo esc_html( $args['description'] ); ?></p>
 	<?php endif; ?>
-	<p class="wire-desk-rescore-result" data-wire-desk-rescore-result aria-live="polite"></p>
+	<p class="ai-post-triage-rescore-result" data-ai-post-triage-rescore-result aria-live="polite"></p>
 </div>

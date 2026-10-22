@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <ruleset
-	name="Wire Desk Coding Standards"
+	name="AI Post Triage Coding Standards"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/PHPCSStandards/PHP_CodeSniffer/master/phpcs.xsd"
 >
-	<description>Sniffs for Wire Desk</description>
+	<description>Sniffs for AI Post Triage</description>
 
 	<!-- What to scan: include any root-level PHP files and any folders that contain PHP -->
 	<file>./framework/</file>
@@ -12,7 +12,7 @@
 	<file>./templates/</file>
 	<file>./tests/performance/</file>
 	<file>./tests/phpunit/</file>
-	<file>./wire-desk.php</file>
+	<file>./ai-post-triage.php</file>
 	<file>./uninstall.php</file>
 
 	<!-- These are excluded from the above paths.-->
@@ -93,9 +93,9 @@
 		<exclude-pattern>templates/**</exclude-pattern>
 		<properties>
 			<property name="prefixes" type="array">
-				<element value="WIRE_DESK" /><!-- Constant -->
-				<element value="JDeepD\Wire_Desk" /><!-- Class -->
-				<element value="wire_desk_" /><!-- Function/variable -->
+				<element value="AI_POST_TRIAGE" /><!-- Constant -->
+				<element value="JDeepD\AI_Post_Triage" /><!-- Class -->
+				<element value="ai_post_triage_" /><!-- Function/variable -->
 			</property>
 		</properties>
 	</rule>
@@ -105,7 +105,7 @@
 		<exclude-pattern>templates/**</exclude-pattern>
 	</rule>
 
-	<!-- Hook names use "/" after the prefix, e.g. wire_desk/capability_map. -->
+	<!-- Hook names use "/" after the prefix, e.g. ai_post_triage/capability_map. -->
 	<rule ref="WordPress.NamingConventions.ValidHookName">
 		<properties>
 			<property name="additionalWordDelimiters" value="/" />
@@ -119,8 +119,8 @@
 	<rule ref="WordPress.WP.Capabilities">
 		<properties>
 			<property name="custom_capabilities" type="array">
-				<element value="wire_desk_manage" />
-				<element value="wire_desk_review" />
+				<element value="ai_post_triage_manage" />
+				<element value="ai_post_triage_review" />
 			</property>
 		</properties>
 	</rule>
@@ -129,7 +129,7 @@
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="wire-desk" />
+				<element value="ai-post-triage" />
 			</property>
 		</properties>
 	</rule>

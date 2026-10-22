@@ -2,12 +2,12 @@
 /**
  * A decision model's answers.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Decisions;
+namespace JDeepD\AI_Post_Triage\Decisions;
 
 /**
  * Class - Decision

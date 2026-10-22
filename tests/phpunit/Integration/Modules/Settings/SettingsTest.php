@@ -2,15 +2,15 @@
 /**
  * SettingsTest file.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Modules\Settings
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Modules\Settings
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Settings;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Modules\Settings;
 
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**

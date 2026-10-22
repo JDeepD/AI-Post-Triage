@@ -1,25 +1,25 @@
 <?php
 /**
- * Stats CLI command for Wire Desk.
+ * Stats CLI command for AI Post Triage.
  *
- * @package JDeepD\Wire_Desk\Modules\CLI
+ * @package JDeepD\AI_Post_Triage\Modules\CLI
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Modules\CLI;
+namespace JDeepD\AI_Post_Triage\Modules\CLI;
 
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\CLI_Command;
-use JDeepD\Wire_Desk\Jobs\Usage;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\CLI_Command;
+use JDeepD\AI_Post_Triage\Jobs\Usage;
 use WP_CLI;
 use function WP_CLI\Utils\format_items;
 
 /**
  * Class - Stats
  *
- * Implements the `wire-desk stats` WP-CLI command.
+ * Implements the `ai-post-triage stats` WP-CLI command.
  */
 final class Stats implements CLI_Command {
 	/**
@@ -64,8 +64,8 @@ final class Stats implements CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp wire-desk stats
-	 *     wp wire-desk stats --days=7 --format=json
+	 *     wp ai-post-triage stats
+	 *     wp ai-post-triage stats --days=7 --format=json
 	 *
 	 * @param array<int, mixed>    $args       Positional arguments.
 	 * @param array<string, mixed> $assoc_args Associative arguments.

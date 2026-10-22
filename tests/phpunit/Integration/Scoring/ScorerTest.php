@@ -2,25 +2,25 @@
 /**
  * Tests for Scorer.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Scoring
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Scoring
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Scoring;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Scoring;
 
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Scoring\Rubric;
-use JDeepD\Wire_Desk\Scoring\Score;
-use JDeepD\Wire_Desk\Scoring\Scorer;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Scoring\Rubric;
+use JDeepD\AI_Post_Triage\Scoring\Score;
+use JDeepD\AI_Post_Triage\Scoring\Scorer;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Class - ScorerTest
  *
- * @phpstan-import-type Question from \JDeepD\Wire_Desk\Modules\Settings\Settings
+ * @phpstan-import-type Question from \JDeepD\AI_Post_Triage\Modules\Settings\Settings
  */
 #[CoversClass( Scorer::class )]
 #[CoversClass( Score::class )]
@@ -348,7 +348,7 @@ class ScorerTest extends TestCase {
 		$result = Scorer::score( new Rubric( [], [ 'medium' => 2 ], 70, 40 ), [ 'a' => 1.0 ] );
 
 		$this->assertWPError( $result );
-		$this->assertSame( 'wire_desk_no_questions', $result->get_error_code() );
+		$this->assertSame( 'ai_post_triage_no_questions', $result->get_error_code() );
 	}
 
 	/**
@@ -366,7 +366,7 @@ class ScorerTest extends TestCase {
 		);
 
 		$this->assertWPError( $result );
-		$this->assertSame( 'wire_desk_missing_answer', $result->get_error_code() );
+		$this->assertSame( 'ai_post_triage_missing_answer', $result->get_error_code() );
 		$this->assertStringContainsString( 'Question b?', $result->get_error_message() );
 	}
 
@@ -375,7 +375,7 @@ class ScorerTest extends TestCase {
 	 */
 	public function test_rubric_from_settings(): void {
 		update_option(
-			'wire_desk_settings',
+			'ai_post_triage_settings',
 			[
 				'questions'        => [ self::make_question( 'a', 'no', 'low', true ) ],
 				'high_threshold'   => 80,

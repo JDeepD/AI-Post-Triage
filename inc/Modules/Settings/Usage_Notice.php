@@ -2,17 +2,17 @@
 /**
  * Tells admins when scoring is paused, and lets them resume it.
  *
- * @package JDeepD\Wire_Desk\Modules\Settings
+ * @package JDeepD\AI_Post_Triage\Modules\Settings
  */
 
 declare(strict_types = 1);
 
-namespace JDeepD\Wire_Desk\Modules\Settings;
+namespace JDeepD\AI_Post_Triage\Modules\Settings;
 
-use JDeepD\Wire_Desk\Core\Capabilities;
-use JDeepD\Wire_Desk\Framework\Contracts\Interfaces\Registrable;
-use JDeepD\Wire_Desk\Jobs\Usage;
-use JDeepD\Wire_Desk\Modules\Queue\Queue_Screen;
+use JDeepD\AI_Post_Triage\Core\Capabilities;
+use JDeepD\AI_Post_Triage\Framework\Contracts\Interfaces\Registrable;
+use JDeepD\AI_Post_Triage\Jobs\Usage;
+use JDeepD\AI_Post_Triage\Modules\Queue\Queue_Screen;
 
 /**
  * Class - Usage_Notice
@@ -21,7 +21,7 @@ final class Usage_Notice implements Registrable {
 	/**
 	 * Admin-post action that resumes scoring.
 	 */
-	public const RESUME_ACTION = 'wire_desk_resume';
+	public const RESUME_ACTION = 'ai_post_triage_resume';
 
 	/**
 	 * {@inheritDoc}
@@ -32,10 +32,10 @@ final class Usage_Notice implements Registrable {
 	}
 
 	/**
-	 * Shows a notice on Wire Desk's screens while scoring is paused or today's budget is spent.
+	 * Shows a notice on AI Post Triage's screens while scoring is paused or today's budget is spent.
 	 */
 	public function render(): void {
-		if ( ! current_user_can( Capabilities::MANAGE ) || ! self::is_wire_desk_screen() ) {
+		if ( ! current_user_can( Capabilities::MANAGE ) || ! self::is_ai_post_triage_screen() ) {
 			return;
 		}
 
@@ -43,7 +43,7 @@ final class Usage_Notice implements Registrable {
 
 		if ( '' !== $message ) {
 			wp_admin_notice(
-				$message . ' <a href="' . esc_url( self::resume_url() ) . '">' . esc_html__( 'Resume now', 'wire-desk' ) . '</a>',
+				$message . ' <a href="' . esc_url( self::resume_url() ) . '">' . esc_html__( 'Resume now', 'ai-post-triage' ) . '</a>',
 				[ 'type' => 'error' ]
 			);
 			return;
@@ -51,7 +51,7 @@ final class Usage_Notice implements Registrable {
 
 		if ( Usage::budget_reached() ) {
 			wp_admin_notice(
-				esc_html( self::budget_message() ) . ' <a href="' . esc_url( admin_url( 'admin.php?page=' . Admin_Screen::SCREEN_ID ) ) . '">' . esc_html__( 'Change the budget', 'wire-desk' ) . '</a>',
+				esc_html( self::budget_message() ) . ' <a href="' . esc_url( admin_url( 'admin.php?page=' . Admin_Screen::SCREEN_ID ) ) . '">' . esc_html__( 'Change the budget', 'ai-post-triage' ) . '</a>',
 				[ 'type' => 'warning' ]
 			);
 		}
@@ -64,7 +64,7 @@ final class Usage_Notice implements Registrable {
 		check_admin_referer( self::RESUME_ACTION );
 
 		if ( ! current_user_can( Capabilities::MANAGE ) ) {
-			wp_die( esc_html__( 'Sorry, you are not allowed to resume scoring.', 'wire-desk' ), 403 );
+			wp_die( esc_html__( 'Sorry, you are not allowed to resume scoring.', 'ai-post-triage' ), 403 );
 		}
 
 		Usage::resume();
@@ -77,7 +77,7 @@ final class Usage_Notice implements Registrable {
 	/**
 	 * Whether the current screen is the review queue or the settings screen.
 	 */
-	public static function is_wire_desk_screen(): bool {
+	public static function is_ai_post_triage_screen(): bool {
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 
 		if ( ! $screen ) {
@@ -109,14 +109,14 @@ final class Usage_Notice implements Registrable {
 		return esc_html(
 			sprintf(
 				/* translators: 1: number of failed requests, 2: time scoring resumes. */
-				__( 'Wire Desk paused scoring after %1$d failed requests in a row. It tries again at %2$s.', 'wire-desk' ),
+				__( 'AI Post Triage paused scoring after %1$d failed requests in a row. It tries again at %2$s.', 'ai-post-triage' ),
 				$usage['failures'],
 				(string) wp_date( (string) get_option( 'time_format' ), $until )
 			)
 		) . ( '' !== $usage['last_error'] ? ' ' . esc_html(
 			sprintf(
 				/* translators: %s: error message. */
-				__( 'Last error: %s', 'wire-desk' ),
+				__( 'Last error: %s', 'ai-post-triage' ),
 				$usage['last_error']
 			)
 		) : '' );
@@ -128,7 +128,7 @@ final class Usage_Notice implements Registrable {
 	public static function budget_message(): string {
 		return sprintf(
 			/* translators: %s: daily budget in US dollars. */
-			__( 'Wire Desk has spent today\'s budget of $%s. Scoring continues tomorrow.', 'wire-desk' ),
+			__( 'AI Post Triage has spent today\'s budget of $%s. Scoring continues tomorrow.', 'ai-post-triage' ),
 			number_format_i18n( Settings::get()['daily_budget'], 2 )
 		);
 	}

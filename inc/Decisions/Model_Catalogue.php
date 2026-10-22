@@ -2,14 +2,14 @@
 /**
  * Decision models available on OpenRouter.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Decisions;
+namespace JDeepD\AI_Post_Triage\Decisions;
 
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
 
 /**
  * Class - Model_Catalogue
@@ -23,7 +23,7 @@ final class Model_Catalogue {
 	/**
 	 * Transient holding the list.
 	 */
-	public const TRANSIENT = 'wire_desk_models';
+	public const TRANSIENT = 'ai_post_triage_models';
 
 	/**
 	 * How long the list is kept.
@@ -95,7 +95,7 @@ final class Model_Catalogue {
 		 *
 		 * @param string[] $prefixes Model ID prefixes.
 		 */
-		$unsupported = array_filter( (array) apply_filters( 'wire_desk/unsupported_models', self::UNSUPPORTED_PREFIXES ), 'is_string' );
+		$unsupported = array_filter( (array) apply_filters( 'ai_post_triage/unsupported_models', self::UNSUPPORTED_PREFIXES ), 'is_string' );
 
 		$models = [];
 
@@ -124,6 +124,6 @@ final class Model_Catalogue {
 	 * The error for a list that couldn't be loaded.
 	 */
 	private static function unavailable(): \WP_Error {
-		return new \WP_Error( 'wire_desk_models_unavailable', __( 'The model list could not be loaded from OpenRouter.', 'wire-desk' ) );
+		return new \WP_Error( 'ai_post_triage_models_unavailable', __( 'The model list could not be loaded from OpenRouter.', 'ai-post-triage' ) );
 	}
 }

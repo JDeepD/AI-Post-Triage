@@ -2,21 +2,21 @@
 /**
  * Integration tests for Assets.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Core
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Core
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Core;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Core;
 
-use JDeepD\Wire_Desk\Core\Assets;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Core\Assets;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
  * Class - AssetsTest
  */
-#[CoversClass( \JDeepD\Wire_Desk\Core\Assets::class )]
+#[CoversClass( \JDeepD\AI_Post_Triage\Core\Assets::class )]
 class AssetsTest extends TestCase {
 	/**
 	 * Ensure no errors are thrown when the Assets class is instantiated.
@@ -84,7 +84,7 @@ class AssetsTest extends TestCase {
 			$script = wp_scripts()->registered[ $handle ] ?? null;
 
 			$this->assertNotNull( $script );
-			$this->assertSame( 'wire-desk', $script->textdomain );
+			$this->assertSame( 'ai-post-triage', $script->textdomain );
 			$this->assertSame( '', (string) $script->translations_path );
 			$this->assertContains( 'wp-i18n', $script->deps );
 		}

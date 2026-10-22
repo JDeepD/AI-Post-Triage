@@ -2,19 +2,19 @@
 /**
  * Integration tests for Try_Controller.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Modules\Settings
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Modules\Settings
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Settings;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Modules\Settings;
 
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Decisions\Decision;
-use JDeepD\Wire_Desk\Decisions\Decision_Client;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Modules\Settings\Try_Controller;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Decisions\Decision;
+use JDeepD\AI_Post_Triage\Decisions\Decision_Client;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Modules\Settings\Try_Controller;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use WP_REST_Request;
@@ -28,7 +28,7 @@ class Try_ControllerTest extends TestCase {
 	/**
 	 * Route under test.
 	 */
-	private const ROUTE = '/wire-desk/v1/try';
+	private const ROUTE = '/ai-post-triage/v1/try';
 
 	/**
 	 * Requests sent to the HTTP API.
@@ -46,7 +46,7 @@ class Try_ControllerTest extends TestCase {
 		$this->requests = [];
 
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'administrator' ] ) );
-		add_filter( 'wire_desk/openrouter_api_key', static fn (): string => 'sk-or-test' );
+		add_filter( 'ai_post_triage/openrouter_api_key', static fn (): string => 'sk-or-test' );
 	}
 
 	/**
@@ -185,7 +185,7 @@ class Try_ControllerTest extends TestCase {
 		$response = ( new Try_Controller( $client ) )->create_item( $this->request( [ 'headline' => 'Quake hits city' ] ) );
 
 		$this->assertWPError( $response );
-		$this->assertSame( 'wire_desk_missing_answer', $response->get_error_code() );
+		$this->assertSame( 'ai_post_triage_missing_answer', $response->get_error_code() );
 		$this->assertSame( [ 'status' => 502 ], $response->get_error_data() );
 	}
 
@@ -277,7 +277,7 @@ class Try_ControllerTest extends TestCase {
 	/**
 	 * A client that records what it was asked. By default it answers every saved question.
 	 *
-	 * @param \JDeepD\Wire_Desk\Decisions\Decision|\WP_Error|null $result What the client returns.
+	 * @param \JDeepD\AI_Post_Triage\Decisions\Decision|\WP_Error|null $result What the client returns.
 	 */
 	private function fake_client( Decision|\WP_Error|null $result = null ): Decision_Client {
 		$result ??= new Decision( array_fill_keys( array_column( Settings::questions(), 'id' ), 0.5 ), 'typesafe/jev-1.13', 0.0, '' );
@@ -307,14 +307,14 @@ class Try_ControllerTest extends TestCase {
 			/**
 			 * What it returns.
 			 *
-			 * @var \JDeepD\Wire_Desk\Decisions\Decision|\WP_Error
+			 * @var \JDeepD\AI_Post_Triage\Decisions\Decision|\WP_Error
 			 */
 			private Decision|\WP_Error $result;
 
 			/**
 			 * Constructor.
 			 *
-			 * @param \JDeepD\Wire_Desk\Decisions\Decision|\WP_Error $result What it returns.
+			 * @param \JDeepD\AI_Post_Triage\Decisions\Decision|\WP_Error $result What it returns.
 			 */
 			public function __construct( Decision|\WP_Error $result ) {
 				$this->result = $result;

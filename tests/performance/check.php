@@ -1,6 +1,6 @@
 <?php
 /**
- * Seeds about a million wire posts into separate tables and checks that Wire Desk's queries hold up.
+ * Seeds about a million wire posts into separate tables and checks that AI Post Triage's queries hold up.
  *
  * Run it with `npm run perf -- <command>` from the plugin directory:
  *
@@ -8,28 +8,28 @@
  *   check        Explain and time every query that has to scale, and fail if one misses its index or target.
  *   drop         Drop the wdperf_ tables.
  *
- * Only the Wire Desk table, the posts table and the postmeta table are redirected to the wdperf_ tables.
+ * Only the AI Post Triage table, the posts table and the postmeta table are redirected to the wdperf_ tables.
  * Options, users and Action Scheduler stay on the site's own tables, so the test suite is not affected.
  *
  * phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.WP.GlobalVariablesOverride.Prohibited, WordPress.NamingConventions.ValidPostTypeSlug.NotStringLiteral -- A dev-only tool that builds its own tables from integers and fixed strings.
  *
- * @package JDeepD\Wire_Desk\Tests\Performance
+ * @package JDeepD\AI_Post_Triage\Tests\Performance
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Performance;
+namespace JDeepD\AI_Post_Triage\Tests\Performance;
 
-use JDeepD\Wire_Desk\Core\Schema;
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Jobs\Backfill;
-use JDeepD\Wire_Desk\Jobs\Maintenance;
-use JDeepD\Wire_Desk\Jobs\Post_Listener;
-use JDeepD\Wire_Desk\Jobs\Queue;
-use JDeepD\Wire_Desk\Modules\Queue\Queue_List_Table;
-use JDeepD\Wire_Desk\Modules\Queue\Queue_Screen;
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Core\Schema;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Jobs\Backfill;
+use JDeepD\AI_Post_Triage\Jobs\Maintenance;
+use JDeepD\AI_Post_Triage\Jobs\Post_Listener;
+use JDeepD\AI_Post_Triage\Jobs\Queue;
+use JDeepD\AI_Post_Triage\Modules\Queue\Queue_List_Table;
+use JDeepD\AI_Post_Triage\Modules\Queue\Queue_Screen;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
 use ReflectionMethod;
 use WP_CLI;
 use WP_REST_Request;
@@ -91,7 +91,7 @@ final class Perf_Check {
 	}
 
 	/**
-	 * Points Wire Desk's table, posts and postmeta at the wdperf_ tables.
+	 * Points AI Post Triage's table, posts and postmeta at the wdperf_ tables.
 	 */
 	private function redirect(): void {
 		global $wpdb;
@@ -165,7 +165,7 @@ final class Perf_Check {
 	}
 
 	/**
-	 * One Wire Desk row for a seeded post: mostly dismissed or published, a third waiting for review.
+	 * One AI Post Triage row for a seeded post: mostly dismissed or published, a third waiting for review.
 	 *
 	 * @param int    $id        Post ID.
 	 * @param string $date      Post date.
@@ -292,7 +292,7 @@ final class Perf_Check {
 		];
 
 		$results[] = $this->save_hook( 'Save hook: post that is not wire content', self::OTHER_TYPE );
-		$results[] = $this->save_hook( 'Save hook: wire post already in Wire Desk', self::POST_TYPE );
+		$results[] = $this->save_hook( 'Save hook: wire post already in AI Post Triage', self::POST_TYPE );
 
 		format_items( 'table', $results, [ 'check', 'cold_ms', 'warm_ms', 'target_ms', 'indexes', 'result' ] );
 
@@ -484,7 +484,7 @@ final class Perf_Check {
 	/**
 	 * The six view counts on the queue screen.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post_Repository $repository Repository.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository $repository Repository.
 	 */
 	private function view_counts( Wire_Post_Repository $repository ): void {
 		foreach ( Queue_List_Table::view_states() as $state ) {
@@ -526,7 +526,7 @@ final class Perf_Check {
 	 * Lists scored posts over REST.
 	 */
 	private function rest_list(): void {
-		$request = new WP_REST_Request( 'GET', '/wire-desk/v1/posts' );
+		$request = new WP_REST_Request( 'GET', '/ai-post-triage/v1/posts' );
 		$request->set_query_params( [ 'state' => 'scored' ] );
 
 		rest_do_request( $request );
@@ -535,7 +535,7 @@ final class Perf_Check {
 	/**
 	 * Prepares and renders the queue screen's table.
 	 *
-	 * @param \JDeepD\Wire_Desk\Data\Wire_Post_Repository $repository Repository.
+	 * @param \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository $repository Repository.
 	 */
 	private function render_queue( Wire_Post_Repository $repository ): void {
 		$table = new Queue_List_Table( [], $repository );
@@ -548,7 +548,7 @@ final class Perf_Check {
 	}
 
 	/**
-	 * Times Wire Desk's save hook on a seeded post, averaged over many saves.
+	 * Times AI Post Triage's save hook on a seeded post, averaged over many saves.
 	 *
 	 * @param string $name      Name.
 	 * @param string $post_type Post type of the post to save.

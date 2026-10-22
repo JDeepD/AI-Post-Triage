@@ -2,15 +2,15 @@
 /**
  * Integration tests for Model_Catalogue.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Decisions
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Decisions
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Decisions;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Decisions;
 
-use JDeepD\Wire_Desk\Decisions\Model_Catalogue;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Decisions\Model_Catalogue;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -100,7 +100,7 @@ class Model_CatalogueTest extends TestCase {
 		$second = Model_Catalogue::get();
 
 		$this->assertWPError( $first );
-		$this->assertSame( 'wire_desk_models_unavailable', $first->get_error_code() );
+		$this->assertSame( 'ai_post_triage_models_unavailable', $first->get_error_code() );
 		$this->assertWPError( $second );
 		$this->assertCount( 1, $this->requests );
 		$this->assertSame( [], get_transient( Model_Catalogue::TRANSIENT ) );
@@ -150,7 +150,7 @@ class Model_CatalogueTest extends TestCase {
 	public function test_get_unsupported_models_are_filterable(): void {
 		$this->respond( 200, $this->fixture() );
 
-		add_filter( 'wire_desk/unsupported_models', static fn (): array => [ 'typesafe/', '~typesafe/', 'acme/' ] );
+		add_filter( 'ai_post_triage/unsupported_models', static fn (): array => [ 'typesafe/', '~typesafe/', 'acme/' ] );
 
 		$this->assertSame(
 			[

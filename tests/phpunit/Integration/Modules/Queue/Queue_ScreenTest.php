@@ -2,21 +2,21 @@
 /**
  * Integration tests for Queue_Screen.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Modules\Queue
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Modules\Queue
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Modules\Queue;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Modules\Queue;
 
-use JDeepD\Wire_Desk\Core\Assets;
-use JDeepD\Wire_Desk\Core\Capabilities;
-use JDeepD\Wire_Desk\Core\Schema;
-use JDeepD\Wire_Desk\Data\Wire_Post;
-use JDeepD\Wire_Desk\Data\Wire_Post_Repository;
-use JDeepD\Wire_Desk\Editorial\Post_Actions;
-use JDeepD\Wire_Desk\Modules\Queue\Queue_Screen;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Core\Assets;
+use JDeepD\AI_Post_Triage\Core\Capabilities;
+use JDeepD\AI_Post_Triage\Core\Schema;
+use JDeepD\AI_Post_Triage\Data\Wire_Post;
+use JDeepD\AI_Post_Triage\Data\Wire_Post_Repository;
+use JDeepD\AI_Post_Triage\Editorial\Post_Actions;
+use JDeepD\AI_Post_Triage\Modules\Queue\Queue_Screen;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -27,7 +27,7 @@ class Queue_ScreenTest extends TestCase {
 	/**
 	 * Wire post table.
 	 *
-	 * @var \JDeepD\Wire_Desk\Data\Wire_Post_Repository
+	 * @var \JDeepD\AI_Post_Triage\Data\Wire_Post_Repository
 	 */
 	private Wire_Post_Repository $repository;
 
@@ -50,7 +50,7 @@ class Queue_ScreenTest extends TestCase {
 			$GLOBALS[ $global ] = []; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Reset between tests.
 		}
 
-		unset( $_GET['view'], $_GET['wire_desk_action'], $_GET['wire_desk_done'], $_REQUEST['_wpnonce'], $_REQUEST['_wp_http_referer'] );
+		unset( $_GET['view'], $_GET['ai_post_triage_action'], $_GET['ai_post_triage_done'], $_REQUEST['_wpnonce'], $_REQUEST['_wp_http_referer'] );
 		set_current_screen( 'front' );
 
 		parent::tearDown();
@@ -69,7 +69,7 @@ class Queue_ScreenTest extends TestCase {
 	}
 
 	/**
-	 * Test that editors get the Wire Desk menu with the queue as its first page.
+	 * Test that editors get the AI Post Triage menu with the queue as its first page.
 	 */
 	public function test_register_screen_adds_menu_for_reviewers(): void {
 		global $submenu;
@@ -81,7 +81,7 @@ class Queue_ScreenTest extends TestCase {
 
 		$item = $this->menu_item();
 
-		$this->assertSame( 'Wire Desk', $item[0] ?? null );
+		$this->assertSame( 'AI Post Triage', $item[0] ?? null );
 		$this->assertSame( Capabilities::REVIEW, $item[1] ?? null );
 		$this->assertSame( 'dashicons-rss', $item[6] ?? null );
 		$this->assertSame( 'Review queue', $submenu[ Queue_Screen::SCREEN_ID ][0][0] ?? null );
@@ -117,7 +117,7 @@ class Queue_ScreenTest extends TestCase {
 
 		$this->assertStringContainsString( '<span class="awaiting-mod count-3"><span class="pending-count" aria-hidden="true">3</span>', $title );
 		$this->assertStringContainsString( '3 high-priority posts need review', $title );
-		$this->assertSame( 'wire-desk', $admin_page_hooks[ Queue_Screen::SCREEN_ID ] ?? null );
+		$this->assertSame( 'ai-post-triage', $admin_page_hooks[ Queue_Screen::SCREEN_ID ] ?? null );
 	}
 
 	/**
@@ -159,7 +159,7 @@ class Queue_ScreenTest extends TestCase {
 
 		$screen->register_screen();
 
-		$this->assertSame( 'Wire Desk', $this->menu_item()[0] ?? null );
+		$this->assertSame( 'AI Post Triage', $this->menu_item()[0] ?? null );
 
 		$this->repository->set_state( 42, Wire_Post::STATE_SCORED );
 
@@ -196,9 +196,9 @@ class Queue_ScreenTest extends TestCase {
 
 		$this->assertStringContainsString( '<h1 class="wp-heading-inline">Review queue</h1>', $output );
 		$this->assertStringContainsString( "class='subsubsub'", $output );
-		$this->assertStringContainsString( '<input type="hidden" name="page" value="wire-desk" />', $output );
+		$this->assertStringContainsString( '<input type="hidden" name="page" value="ai-post-triage" />', $output );
 		$this->assertStringNotContainsString( 'name="view"', $output );
-		$this->assertStringContainsString( 'id="wire-desk-band-filter"', $output );
+		$this->assertStringContainsString( 'id="ai-post-triage-band-filter"', $output );
 		$this->assertStringContainsString( 'No wire posts found.', $output );
 		$this->assertTrue( wp_style_is( Assets::ADMIN_HANDLE, 'enqueued' ) );
 	}
@@ -246,12 +246,12 @@ class Queue_ScreenTest extends TestCase {
 				'filter_action'    => 'Filter',
 				'action'           => Post_Actions::DISMISS,
 				'_wpnonce'         => 'abc',
-				'_wp_http_referer' => '/wp-admin/admin.php?page=wire-desk',
+				'_wp_http_referer' => '/wp-admin/admin.php?page=ai-post-triage',
 				'post'             => [ 1, 2 ],
 			]
 		);
 
-		$this->assertSame( admin_url( 'admin.php?page=wire-desk&view=failed&band=high' ), $url );
+		$this->assertSame( admin_url( 'admin.php?page=ai-post-triage&view=failed&band=high' ), $url );
 	}
 
 	/**
@@ -263,7 +263,7 @@ class Queue_ScreenTest extends TestCase {
 		$post_id = $this->scored_post();
 
 		$_REQUEST['_wpnonce']         = wp_create_nonce( Queue_Screen::nonce_action( Post_Actions::DISMISS, $post_id ) );
-		$_REQUEST['_wp_http_referer'] = '/wp-admin/admin.php?page=wire-desk&band=high&before=12&wire_desk_action=publish&wire_desk_done=4';
+		$_REQUEST['_wp_http_referer'] = '/wp-admin/admin.php?page=ai-post-triage&band=high&before=12&ai_post_triage_action=publish&ai_post_triage_done=4';
 
 		$url = ( new Queue_Screen( $this->repository ) )->handle_action(
 			[
@@ -273,7 +273,7 @@ class Queue_ScreenTest extends TestCase {
 		);
 
 		$this->assertSame( Wire_Post::STATE_DISMISSED, $this->repository->get( $post_id )?->state );
-		$this->assertSame( '/wp-admin/admin.php?page=wire-desk&band=high&before=12&wire_desk_action=dismiss&wire_desk_done=1', $url );
+		$this->assertSame( '/wp-admin/admin.php?page=ai-post-triage&band=high&before=12&ai_post_triage_action=dismiss&ai_post_triage_done=1', $url );
 	}
 
 	/**
@@ -323,7 +323,7 @@ class Queue_ScreenTest extends TestCase {
 		$this->assertSame( Wire_Post::STATE_DISMISSED, $this->repository->get( $first )?->state );
 		$this->assertSame( Wire_Post::STATE_DISMISSED, $this->repository->get( $second )?->state );
 		$this->assertSame( Wire_Post::STATE_PUBLISHED, $this->repository->get( $published )?->state );
-		$this->assertStringContainsString( 'wire_desk_action=dismiss&wire_desk_done=2&wire_desk_failed=1&wire_desk_error=wire_desk_published', (string) $url );
+		$this->assertStringContainsString( 'ai_post_triage_action=dismiss&ai_post_triage_done=2&ai_post_triage_failed=1&ai_post_triage_error=ai_post_triage_published', (string) $url );
 	}
 
 	/**
@@ -359,8 +359,8 @@ class Queue_ScreenTest extends TestCase {
 			],
 			Queue_Screen::notices(
 				[
-					'wire_desk_action' => 'publish',
-					'wire_desk_done'   => '1',
+					'ai_post_triage_action' => 'publish',
+					'ai_post_triage_done'   => '1',
 				]
 			)
 		);
@@ -368,8 +368,8 @@ class Queue_ScreenTest extends TestCase {
 			'3 posts dismissed.',
 			Queue_Screen::notices(
 				[
-					'wire_desk_action' => 'dismiss',
-					'wire_desk_done'   => '3',
+					'ai_post_triage_action' => 'dismiss',
+					'ai_post_triage_done'   => '3',
 				]
 			)[0]['message']
 		);
@@ -377,8 +377,8 @@ class Queue_ScreenTest extends TestCase {
 			'2 posts restored to the queue.',
 			Queue_Screen::notices(
 				[
-					'wire_desk_action' => 'restore',
-					'wire_desk_done'   => '2',
+					'ai_post_triage_action' => 'restore',
+					'ai_post_triage_done'   => '2',
 				]
 			)[0]['message']
 		);
@@ -386,8 +386,8 @@ class Queue_ScreenTest extends TestCase {
 			'1 post will be scored again shortly.',
 			Queue_Screen::notices(
 				[
-					'wire_desk_action' => 'rescore',
-					'wire_desk_done'   => '1',
+					'ai_post_triage_action' => 'rescore',
+					'ai_post_triage_done'   => '1',
 				]
 			)[0]['message']
 		);
@@ -400,9 +400,9 @@ class Queue_ScreenTest extends TestCase {
 			],
 			Queue_Screen::notices(
 				[
-					'wire_desk_action' => 'dismiss',
-					'wire_desk_failed' => '1',
-					'wire_desk_error'  => 'wire_desk_published',
+					'ai_post_triage_action' => 'dismiss',
+					'ai_post_triage_failed' => '1',
+					'ai_post_triage_error'  => 'ai_post_triage_published',
 				]
 			)
 		);
@@ -410,9 +410,9 @@ class Queue_ScreenTest extends TestCase {
 			'2 posts could not be updated.',
 			Queue_Screen::notices(
 				[
-					'wire_desk_action' => 'publish',
-					'wire_desk_failed' => '2',
-					'wire_desk_error'  => 'other',
+					'ai_post_triage_action' => 'publish',
+					'ai_post_triage_failed' => '2',
+					'ai_post_triage_error'  => 'other',
 				]
 			)[0]['message']
 		);
@@ -420,8 +420,8 @@ class Queue_ScreenTest extends TestCase {
 			[],
 			Queue_Screen::notices(
 				[
-					'wire_desk_action' => 'delete',
-					'wire_desk_done'   => '1',
+					'ai_post_triage_action' => 'delete',
+					'ai_post_triage_done'   => '1',
 				]
 			)
 		);
@@ -442,8 +442,8 @@ class Queue_ScreenTest extends TestCase {
 		wp_set_current_user( self::factory()->user->create( [ 'role' => 'editor' ] ) );
 		set_current_screen( Queue_Screen::HOOK_SUFFIX );
 
-		$_GET['wire_desk_action'] = 'dismiss';
-		$_GET['wire_desk_done']   = '2';
+		$_GET['ai_post_triage_action'] = 'dismiss';
+		$_GET['ai_post_triage_done']   = '2';
 
 		ob_start();
 		( new Queue_Screen( $this->repository ) )->render_screen();
@@ -465,7 +465,7 @@ class Queue_ScreenTest extends TestCase {
 	}
 
 	/**
-	 * The Wire Desk top-level menu item.
+	 * The AI Post Triage top-level menu item.
 	 *
 	 * @return array<int, string>|null
 	 */

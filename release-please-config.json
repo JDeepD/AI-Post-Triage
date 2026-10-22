@@ -29,7 +29,9 @@
 				{ "type": "test", "section": "Tests", "hidden": true },
 				{ "type": "ci", "section": "Continuous Integration" }
 			],
-			"extra-files": [ { "type": "generic", "path": "wire-desk.php" } ]
+			"extra-files": [
+				{ "type": "generic", "path": "ai-post-triage.php" }
+			]
 		}
 	}
 }

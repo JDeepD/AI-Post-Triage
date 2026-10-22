@@ -2,14 +2,14 @@
 /**
  * Reads and writes the wire post table.
  *
- * @package JDeepD\Wire_Desk
+ * @package JDeepD\AI_Post_Triage
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Data;
+namespace JDeepD\AI_Post_Triage\Data;
 
-use JDeepD\Wire_Desk\Core\Schema;
+use JDeepD\AI_Post_Triage\Core\Schema;
 
 /**
  * Class - Wire_Post_Repository
@@ -21,7 +21,7 @@ final class Wire_Post_Repository {
 	/**
 	 * Object cache group.
 	 */
-	public const CACHE_GROUP = 'wire-desk';
+	public const CACHE_GROUP = 'ai-post-triage';
 
 	/**
 	 * Maximum rows per page.
@@ -265,7 +265,7 @@ final class Wire_Post_Repository {
 	 * Gets several rows, in the order given. Posts without a row are left out.
 	 *
 	 * @param int[] $post_ids Post IDs.
-	 * @return array<int, \JDeepD\Wire_Desk\Data\Wire_Post> Keyed by post ID.
+	 * @return array<int, \JDeepD\AI_Post_Triage\Data\Wire_Post> Keyed by post ID.
 	 */
 	public function get_many( array $post_ids ): array {
 		$post_ids = array_values( array_unique( array_filter( array_map( 'intval', $post_ids ), static fn ( int $id ): bool => $id > 0 ) ) );
@@ -307,7 +307,7 @@ final class Wire_Post_Repository {
 	 * @param array{post_date: string, post_id: int}|null $cursor  Row to page from.
 	 * @param int                                         $limit   Rows per page, up to MAX_PAGE_SIZE.
 	 * @param bool                                        $newer   Get rows newer than the cursor instead of older.
-	 * @return \JDeepD\Wire_Desk\Data\Wire_Post[]
+	 * @return \JDeepD\AI_Post_Triage\Data\Wire_Post[]
 	 */
 	public function page( array $filters = [], ?array $cursor = null, int $limit = 20, bool $newer = false ): array {
 		global $wpdb;
@@ -460,7 +460,7 @@ final class Wire_Post_Repository {
 	 * Fetches rows from the database and caches them, including posts with no row.
 	 *
 	 * @param int[] $post_ids Post IDs.
-	 * @return array<int, \JDeepD\Wire_Desk\Data\Wire_Post|int> Keyed by post ID.
+	 * @return array<int, \JDeepD\AI_Post_Triage\Data\Wire_Post|int> Keyed by post ID.
 	 */
 	private function fetch( array $post_ids ): array {
 		global $wpdb;

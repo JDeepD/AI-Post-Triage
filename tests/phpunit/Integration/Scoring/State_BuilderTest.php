@@ -2,16 +2,16 @@
 /**
  * Integration tests for State_Builder.
  *
- * @package JDeepD\Wire_Desk\Tests\Integration\Scoring
+ * @package JDeepD\AI_Post_Triage\Tests\Integration\Scoring
  */
 
 declare( strict_types = 1 );
 
-namespace JDeepD\Wire_Desk\Tests\Integration\Scoring;
+namespace JDeepD\AI_Post_Triage\Tests\Integration\Scoring;
 
-use JDeepD\Wire_Desk\Modules\Settings\Settings;
-use JDeepD\Wire_Desk\Scoring\State_Builder;
-use JDeepD\Wire_Desk\Tests\TestCase;
+use JDeepD\AI_Post_Triage\Modules\Settings\Settings;
+use JDeepD\AI_Post_Triage\Scoring\State_Builder;
+use JDeepD\AI_Post_Triage\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -25,14 +25,14 @@ class State_BuilderTest extends TestCase {
 	protected function setUp(): void {
 		parent::setUp();
 
-		add_shortcode( 'wire_desk_test', static fn (): string => 'SHORTCODE OUTPUT' );
+		add_shortcode( 'ai_post_triage_test', static fn (): string => 'SHORTCODE OUTPUT' );
 	}
 
 	/**
 	 * Removes the test shortcode.
 	 */
 	protected function tearDown(): void {
-		remove_shortcode( 'wire_desk_test' );
+		remove_shortcode( 'ai_post_triage_test' );
 
 		parent::tearDown();
 	}
@@ -71,7 +71,7 @@ class State_BuilderTest extends TestCase {
 	public function test_excerpt_mode_falls_back_to_first_paragraph(): void {
 		$this->set_input( 'title_excerpt' );
 
-		$content = "<!-- wp:image --><figure><img src=\"x.jpg\" alt=\"\" /></figure><!-- /wp:image -->\n\n<!-- wp:paragraph --><p>[wire_desk_test]</p><!-- /wp:paragraph -->\n\n<!-- wp:paragraph --><p>BOGOTÁ (AP) &mdash; A quake struck.</p><!-- /wp:paragraph -->\n\n<!-- wp:paragraph --><p>Second paragraph.</p><!-- /wp:paragraph -->";
+		$content = "<!-- wp:image --><figure><img src=\"x.jpg\" alt=\"\" /></figure><!-- /wp:image -->\n\n<!-- wp:paragraph --><p>[ai_post_triage_test]</p><!-- /wp:paragraph -->\n\n<!-- wp:paragraph --><p>BOGOTÁ (AP) &mdash; A quake struck.</p><!-- /wp:paragraph -->\n\n<!-- wp:paragraph --><p>Second paragraph.</p><!-- /wp:paragraph -->";
 
 		$this->assertSame(
 			[
@@ -108,7 +108,7 @@ class State_BuilderTest extends TestCase {
 	public function test_content_mode_sends_plain_body(): void {
 		$this->set_input( 'title_content' );
 
-		$content = '<h2>Lead</h2><p>One &amp; two.</p><script>alert(1)</script><style>p{}</style><p>[wire_desk_test]Three<br>four.</p><ul><li>Five</li><li>Six</li></ul>';
+		$content = '<h2>Lead</h2><p>One &amp; two.</p><script>alert(1)</script><style>p{}</style><p>[ai_post_triage_test]Three<br>four.</p><ul><li>Five</li><li>Six</li></ul>';
 
 		$this->assertSame(
 			[
@@ -186,7 +186,7 @@ class State_BuilderTest extends TestCase {
 		$post = $this->post( 'Quake', '' );
 
 		add_filter(
-			'wire_desk/state',
+			'ai_post_triage/state',
 			static function ( array $state, \WP_Post $filtered ) use ( $post ): array {
 				return $state + [
 					'post_id'  => $filtered->ID === $post->ID ? $filtered->ID : 0,
@@ -216,7 +216,7 @@ class State_BuilderTest extends TestCase {
 	 * Test that a filter returning something other than an array gives no state.
 	 */
 	public function test_invalid_filter_result_gives_empty_state(): void {
-		add_filter( 'wire_desk/state', '__return_null' );
+		add_filter( 'ai_post_triage/state', '__return_null' );
 
 		$this->assertSame( [], State_Builder::for_post( $this->post( 'Quake', '' ) ) );
 	}
