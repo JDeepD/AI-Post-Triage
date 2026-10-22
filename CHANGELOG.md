@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.2.0](https://github.com/JDeepD/Wire-Desk/compare/v0.1.6...v0.2.0) (2026-10-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename the plugin to AI Post Triage.
+
+### Added
+
+* rename the plugin to AI Post Triage. ([02298de](https://github.com/JDeepD/Wire-Desk/commit/02298de36d8010ca94026c63112b0928d327ae6f))
+
 ## [0.1.6](https://github.com/JDeepD/Wire-Desk/compare/v0.1.5...v0.1.6) (2026-10-21)
 
 
