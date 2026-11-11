@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.2.2](https://github.com/JDeepD/AI-Post-Triage/compare/v0.2.1...v0.2.2) (2026-11-11)
+
+
+### Changed
+
+* **deps-dev:** bump the composer-dev-minor-patch group across 1 directory with 2 updates ([eb6e5f1](https://github.com/JDeepD/AI-Post-Triage/commit/eb6e5f16c3a874e1ef5b1c86b644d04313d09ee4))
+* **deps-dev:** bump the composer-dev-minor-patch group across 1 directory with 2 updates ([e9cdab8](https://github.com/JDeepD/AI-Post-Triage/commit/e9cdab8de8a4ce65b965e85163d54994e3207e3c))
+* **deps-dev:** bump the npm-dev-minor-patch group across 1 directory with 3 updates ([9b2cf76](https://github.com/JDeepD/AI-Post-Triage/commit/9b2cf76fbe0aed47fa7032fb77a668f983ce8570))
+* **deps-dev:** bump the npm-dev-minor-patch group across 1 directory with 3 updates ([e89e0d4](https://github.com/JDeepD/AI-Post-Triage/commit/e89e0d48d179538f697ae3e4c91757f7c13d894a))
+
 ## [0.2.1](https://github.com/JDeepD/AI-Post-Triage/compare/v0.2.0...v0.2.1) (2026-10-22)
 
 
